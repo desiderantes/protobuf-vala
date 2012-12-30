@@ -1,9 +1,9 @@
-public struct FileDescriptorSet
+public class FileDescriptorSet
 {
     FileDescriptorProto[] file;
 }
 
-public struct FileDescriptorProto
+public class FileDescriptorProto
 {
     string? name;
     string? package;
@@ -14,16 +14,20 @@ public struct FileDescriptorProto
     FieldDescriptorProto[] extension;
     FileOptions? options;
     SourceCodeInfo? source_code_info;
+
+    public void print ()
+    {
+    }
 }
 
-public struct DescriptorProto
+public class DescriptorProto
 {
     string? name;
     FieldDescriptorProto[] field;
     FieldDescriptorProto[] extension;
 }
 
-public struct FieldDescriptorProto
+public class FieldDescriptorProto
 {
     string? name;
     int32? number;
@@ -64,28 +68,28 @@ public enum Label
     LABEL_REPEATED = 3
 }
 
-public struct EnumDescriptorProto
+public class EnumDescriptorProto
 {
     string? name;
     EnumValueDescriptorProto[] value;
     //EnumOptions? options;
 }
 
-public struct EnumValueDescriptorProto
+public class EnumValueDescriptorProto
 {
     string? name;
     int32? number;
     //EnumValueOptions? options;
 }
 
-public struct ServiceDescriptorProto
+public class ServiceDescriptorProto
 {
     string? name;
     //MethodDescriptorProto[] method;
     //ServiceOptions? options;
 }
 
-public struct FileOptions
+public class FileOptions
 {
     string? java_package;
     string? java_outer_classname;
@@ -98,12 +102,12 @@ public struct FileOptions
     //UniterpretedOption[] uninterpreted_option;
 }
 
-public struct SourceCodeInfo
+public class SourceCodeInfo
 {
     Location[] location;
 }
 
-public struct Location
+public class Location
 {
     int32[] path;
     int32[] span;
