@@ -9,10 +9,7 @@ public static int main (string[] args)
     stderr.printf ("%zu\n", n_read);
     if (n_read < 0)
         return 1;
-
-    //for (var i = 0; i < n_read; i++)
-    //    stderr.printf ("%02X", buf[i]);
-    //stderr.printf ("\n");
+    buf.length = (int) n_read;
 
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
@@ -28,12 +25,10 @@ public static int main (string[] args)
     var rbuf = new uint8[65535];
     var n_written = resp.encode (rbuf, rbuf.length - 1);
     unowned uint8[] start = (uint8[]) ((uint8*) rbuf + rbuf.length - n_written);
+    start.length = (int) n_written;
 
-    for (var i = 0; i < n_written; i++)
-        stderr.printf ("%02X", start[i]);
-    stderr.printf ("\n");
-
-    stdout.write (start, n_written);
+    stdout.write (start);
+    stdout.flush ();
 
     return 0;
 }

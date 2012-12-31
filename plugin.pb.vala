@@ -92,17 +92,28 @@ public class CodeGeneratorRequest
 
     public string to_string ()
     {
-        var value = "file_to_generate=[";
-        foreach (var f in file_to_generate)
-            value += "\"%s\" ".printf (f);
-        value += "]";
+        var text = "";
+
+        if (file_to_generate != null)
+        {
+            text += "file_to_generate=[";
+            foreach (var f in file_to_generate)
+                text += "\"%s\" ".printf (f);
+            text += "] ";
+        }
+
         if (parameter != null)
-            value += " parameter=\"%s\"".printf (parameter);
-        value += " proto_file=[";
-        foreach (var f in proto_file)
-            value += "{ %s } ".printf (f.to_string ());
-        value += "]";
-        return value;
+            text += "parameter=\"%s\" ".printf (parameter);
+
+        if (proto_file != null)
+        {
+            text += "proto_file=[";
+            foreach (var f in proto_file)
+                text += "{ %s } ".printf (f.to_string ());
+            text += "] ";
+        }
+
+        return text;
     }
 }
 
