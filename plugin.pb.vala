@@ -81,7 +81,6 @@ public class CodeGeneratorRequest
                 stderr.printf ("Unknown CodeGeneratorRequest field %d\n", field_number);
                 Process.exit (1);
                 // Skip unknown data
-                break;
             }
 
             offset += value_length;
@@ -107,15 +106,72 @@ public class CodeGeneratorRequest
     }
 }
 
+private void encode_varint (int value, uint8[] buffer, ref size_t offset)
+{
+    var v = value;
+    while (true)
+    {
+        var next_v = v >> 7;
+        var o = (uint8) v & 0x7F;
+        if (next_v != 0)
+            o |= 0x80;
+        buffer[offset] = o;
+        offset--;
+        if (next_v == 0)
+            return;
+        v = next_v;
+    }
+}
+
+private void encode_string (string value, uint8[] buffer, ref size_t offset)
+{
+    offset -= value.length;
+    for (var i = 0; value[i] != '\0'; i++)
+        buffer[offset + i + 1] = value[i];
+    encode_varint (value.length, buffer, ref offset);
+}
+
 public class CodeGeneratorResponse
 {
-    string? error;
-    File[] file;
+    public List<File> file;
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        var start = offset;
+
+        // FIXME: Reverse the list
+        foreach (var v in file)
+        {
+            var n_written = v.encode (buffer, offset);
+            offset -= n_written;
+            encode_varint ((int) n_written, buffer, ref offset);
+            encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+        }
+
+        return start - offset;
+    }
 }
 
 public class File
 {
-    string? name;
-    string? insertion_point;
-    string? content;
+    public string? name;
+    public string? content;
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        var start = offset;
+
+        if (content != null)
+        {
+            encode_string (content, buffer, ref offset);
+            encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            encode_string (name, buffer, ref offset);
+            encode_varint ((1 << 3) | 0x2, buffer, ref offset);
+        }
+
+        return start - offset;
+    }
 }
