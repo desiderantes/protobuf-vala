@@ -4,7 +4,7 @@ public class ProtocVala
 
 public static int main (string[] args)
 {
-    var buf = new uint8[1024];
+    var buf = new uint8[65535];
     var n_read = stdin.read (buf); // FIXME: Read all
     if (n_read < 0)
         return 1;
@@ -26,7 +26,14 @@ public static int main (string[] args)
         else
             out_file.name = f.name + ".vala";
     
-        out_file.content = "TEST";
+        out_file.content = "";
+        foreach (var type in f.message_type)
+        {
+            out_file.content += "public class %s\n".printf (type.name);
+            out_file.content += "{\n";
+            out_file.content += "}\n";
+        }
+
         resp.file.append (out_file);
     }
 

@@ -2,6 +2,7 @@ public class FileDescriptorProto
 {
     public string? name;
     public string? package;
+    public List<string> dependency;
     public List<DescriptorProto> message_type;
     public FileOptions? options;
 
@@ -23,6 +24,9 @@ public class FileDescriptorProto
                 break;
             case 2:
                 package = decode_string (buffer, value_length, offset);
+                break;
+            case 3:
+                dependency.append (decode_string (buffer, value_length, offset));
                 break;
             case 4:
                 var v = new DescriptorProto ();
@@ -55,6 +59,14 @@ public class FileDescriptorProto
         if (package != null)
             value += "package=\"%s\" ".printf (package);
 
+        if (dependency != null)
+        {
+            value += "dependency=[";
+            foreach (var v in dependency)
+                value += "\"%s\" ".printf (v);
+            value += "] ";
+        }
+
         if (message_type != null)
         {
             value += "message_type=[";
@@ -72,11 +84,50 @@ public class FileDescriptorProto
 
 public class DescriptorProto
 {
+    public class ExtensionRange
+    {
+        int32? start;
+        int32? end;
+
+        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+            while (offset < length)
+            {
+                var key = decode_varint (buffer, length, ref offset);
+                var wire_type = key & 0x7;
+                var field_number = key >> 3;
+                int varint;
+                var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+                // FIXME: Check remaining space
+
+                switch (field_number)
+                {
+                case 1:
+                    start = varint;
+                    break;
+                case 2:
+                    end = varint;
+                    break;
+                default:
+                    stderr.printf ("Unknown DescriptorProto.ExtensionRange field %d\n", field_number);
+                    // Skip unknown data
+                    break;
+                }
+
+                offset += value_length;
+            }
+
+            if (offset != length)
+                stderr.printf ("Unused %zu octets on end of DescriptorProto.ExtensionRange\n", offset - length);
+        }
+    }
+
     public string? name;
     public List<FieldDescriptorProto> field;
     public List<FieldDescriptorProto> extension;
     public List<DescriptorProto> nested_type;
     public List<EnumDescriptorProto> enum_type;
+    public List<ExtensionRange> extension_range;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -108,6 +159,11 @@ public class DescriptorProto
                 var v = new EnumDescriptorProto ();
                 v.decode (buffer, offset + value_length, offset);
                 enum_type.append (v);
+                break;
+            case 5:
+                var v = new ExtensionRange ();
+                v.decode (buffer, offset + value_length, offset);
+                extension_range.append (v);
                 break;
             case 6:
                 var m = new FieldDescriptorProto ();
@@ -178,6 +234,7 @@ public class FieldDescriptorProto
     public Type? type;
     public string? type_name;
     public string? default_value;
+    public FieldOptions? options;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -210,6 +267,10 @@ public class FieldDescriptorProto
             case 7:
                 default_value = decode_string (buffer, value_length, offset);
                 break;
+            case 8:
+                options = new FieldOptions ();
+                options.decode (buffer, offset + value_length, offset);
+                break;
             default:
                 stderr.printf ("Unknown FieldDescriptorProto field %d\n", field_number);
                 // Skip unknown data
@@ -239,6 +300,8 @@ public class FieldDescriptorProto
             text += "type_name=\"%s\" ".printf (type_name);
         if (default_value != null)
             text += "default_value=\"%s\" ".printf (default_value);
+        if (options != null)
+            text += "options={ %s} ".printf (options.to_string ());
 
         return text;
     }
@@ -440,8 +503,31 @@ public class EnumValueDescriptorProto
 
 public class FileOptions
 {
+    public enum OptimizeMode
+    {
+        SPEED = 1,
+        CODE_SIZE = 2,
+        LITE_RUNTIME = 3
+    }
+
+    private string optimize_mode_to_string (OptimizeMode mode)
+    {
+        switch (mode)
+        {
+        case OptimizeMode.SPEED:
+            return "SPEED";
+        case OptimizeMode.CODE_SIZE:
+            return "CODE_SIZE";
+        case OptimizeMode.LITE_RUNTIME:
+            return "LITE_RUNTIME";
+        default:
+            return "%d".printf (mode);
+        }
+    }
+
     public string? java_package;
     public string? java_outer_classname;
+    public OptimizeMode? optimize_for;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -461,6 +547,9 @@ public class FileOptions
                 break;
             case 8:
                 java_outer_classname = decode_string (buffer, value_length, offset);
+                break;
+            case 9:
+                optimize_for = (OptimizeMode) varint;
                 break;
             default:
                 stderr.printf ("Unknown FileOptions field %d\n", field_number);
@@ -483,6 +572,52 @@ public class FileOptions
             text += "java_package=\"%s\" ".printf (java_package);
         if (java_outer_classname != null)
             text += "java_outer_classname=\"%s\" ".printf (java_outer_classname);
+        if (optimize_for != null)
+            text += "optimize_for=%s ".printf (optimize_mode_to_string (optimize_for));
+
+        return text;
+    }
+}
+
+public class FieldOptions
+{
+    public bool? packed;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        while (offset < length)
+        {
+            var key = decode_varint (buffer, length, ref offset);
+            var wire_type = key & 0x7;
+            var field_number = key >> 3;
+            int varint;
+            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            // FIXME: Check remaining space
+
+            switch (field_number)
+            {
+            case 2:
+                packed = varint != 0;
+                break;
+            default:
+                stderr.printf ("Unknown FieldOptions field %d\n", field_number);
+                // Skip unknown data
+                break;
+            }
+
+            offset += value_length;
+        }
+
+        if (offset != length)
+            stderr.printf ("Unused %zu octets on end of FieldOptions\n", offset - length);
+    }
+
+    public string to_string ()
+    {
+        var text = "";
+
+        if (packed != null)
+            text += "packed=%s ".printf (packed ? "true" : "false");
 
         return text;
     }
