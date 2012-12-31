@@ -144,6 +144,30 @@ private void encode_string (string value, uint8[] buffer, ref size_t offset)
 
 public class CodeGeneratorResponse
 {
+    public class File
+    {
+        public string? name;
+        public string? content;
+
+        public size_t encode (uint8[] buffer, size_t offset)
+        {
+            var start = offset;
+
+            if (content != null)
+            {
+                encode_string (content, buffer, ref offset);
+                encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+            }
+            if (name != null)
+            {
+                encode_string (name, buffer, ref offset);
+                encode_varint ((1 << 3) | 0x2, buffer, ref offset);
+            }
+
+            return start - offset;
+        }
+    }
+
     public List<File> file;
 
     public size_t encode (uint8[] buffer, size_t offset)
@@ -163,26 +187,3 @@ public class CodeGeneratorResponse
     }
 }
 
-public class File
-{
-    public string? name;
-    public string? content;
-
-    public size_t encode (uint8[] buffer, size_t offset)
-    {
-        var start = offset;
-
-        if (content != null)
-        {
-            encode_string (content, buffer, ref offset);
-            encode_varint ((15 << 3) | 0x2, buffer, ref offset);
-        }
-        if (name != null)
-        {
-            encode_string (name, buffer, ref offset);
-            encode_varint ((1 << 3) | 0x2, buffer, ref offset);
-        }
-
-        return start - offset;
-    }
-}

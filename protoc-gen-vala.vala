@@ -17,7 +17,7 @@ public static int main (string[] args)
     stderr.printf ("{ %s }\n", req.to_string ());
 
     var resp = new CodeGeneratorResponse ();
-    var f = new File ();
+    var f = new CodeGeneratorResponse.File ();
     f.name = "test.pb.vala";
     f.content = "TEST";
     resp.file.append (f);
