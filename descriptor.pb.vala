@@ -228,6 +228,95 @@ public class DescriptorProto
 
 public class FieldDescriptorProto
 {
+    public enum Type
+    {
+        TYPE_DOUBLE = 1,
+        TYPE_FLOAT = 2,
+        TYPE_INT64 = 3,
+        TYPE_UINT64 = 4,
+        TYPE_INT32 = 5,
+        TYPE_FIXED64 = 6,
+        TYPE_FIXED32 = 7,
+        TYPE_BOOL  = 8,
+        TYPE_STRING = 9,
+        TYPE_GROUP = 10,
+        TYPE_MESSAGE = 11,
+        TYPE_BYTES = 12,
+        TYPE_UINT32 = 13,
+        TYPE_ENUM  = 14,
+        TYPE_SFIXED32 = 15,
+        TYPE_SFIXED64 = 16,
+        TYPE_SINT32 = 17,
+        TYPE_SINT64 = 18
+    }
+
+    public string type_to_string (Type type)
+    {
+        switch (type)
+        {
+        case Type.TYPE_DOUBLE:
+            return "TYPE_DOUBLE";
+        case Type.TYPE_FLOAT:
+            return "TYPE_FLOAT";
+        case Type.TYPE_INT64:
+            return "TYPE_INT64";
+        case Type.TYPE_UINT64:
+            return "TYPE_UINT64";
+        case Type.TYPE_INT32:
+            return "TYPE_INT32";
+        case Type.TYPE_FIXED64:
+            return "TYPE_FIXED64";
+        case Type.TYPE_FIXED32:
+            return "TYPE_FIXED32";
+        case Type.TYPE_BOOL:
+            return "TYPE_BOOL";
+        case Type.TYPE_STRING:
+            return "TYPE_STRING";
+        case Type.TYPE_GROUP:
+            return "TYPE_GROUP";
+        case Type.TYPE_MESSAGE:
+            return "TYPE_MESSAGE";
+        case Type.TYPE_BYTES:
+            return "TYPE_BYTES";
+        case Type.TYPE_UINT32:
+            return "TYPE_UINT32";
+        case Type.TYPE_ENUM:
+            return "TYPE_ENUM";
+        case Type.TYPE_SFIXED32:
+            return "TYPE_SFIXED32";
+        case Type.TYPE_SFIXED64:
+            return "TYPE_SFIXED64";
+        case Type.TYPE_SINT32:
+            return "TYPE_SINT32";
+        case Type.TYPE_SINT64:
+            return "TYPE_SINT64";
+        default:
+            return "%d".printf (type);
+        }
+    }
+
+    public enum Label
+    {
+        LABEL_OPTIONAL = 1,
+        LABEL_REQUIRED = 2,
+        LABEL_REPEATED = 3
+    }
+
+    public string label_to_string (Label label)
+    {
+        switch (label)
+        {
+        case Label.LABEL_OPTIONAL:
+            return "LABEL_OPTIONAL";
+        case Label.LABEL_REQUIRED:
+            return "LABEL_REQUIRED";
+        case Label.LABEL_REPEATED:
+            return "LABEL_REPEATED";
+        default:
+            return "%d".printf (label);
+        }
+    }
+
     public string? name;
     public int32? number;
     public Label? label;
@@ -304,95 +393,6 @@ public class FieldDescriptorProto
             text += "options={ %s} ".printf (options.to_string ());
 
         return text;
-    }
-}
-
-public enum Type
-{
-    TYPE_DOUBLE = 1,
-    TYPE_FLOAT = 2,
-    TYPE_INT64 = 3,
-    TYPE_UINT64 = 4,
-    TYPE_INT32 = 5,
-    TYPE_FIXED64 = 6,
-    TYPE_FIXED32 = 7,
-    TYPE_BOOL  = 8,
-    TYPE_STRING = 9,
-    TYPE_GROUP = 10,
-    TYPE_MESSAGE = 11,
-    TYPE_BYTES = 12,
-    TYPE_UINT32 = 13,
-    TYPE_ENUM  = 14,
-    TYPE_SFIXED32 = 15,
-    TYPE_SFIXED64 = 16,
-    TYPE_SINT32 = 17,
-    TYPE_SINT64 = 18
-}
-
-public string type_to_string (Type type)
-{
-    switch (type)
-    {
-    case Type.TYPE_DOUBLE:
-        return "TYPE_DOUBLE";
-    case Type.TYPE_FLOAT:
-        return "TYPE_FLOAT";
-    case Type.TYPE_INT64:
-        return "TYPE_INT64";
-    case Type.TYPE_UINT64:
-        return "TYPE_UINT64";
-    case Type.TYPE_INT32:
-        return "TYPE_INT32";
-    case Type.TYPE_FIXED64:
-        return "TYPE_FIXED64";
-    case Type.TYPE_FIXED32:
-        return "TYPE_FIXED32";
-    case Type.TYPE_BOOL:
-        return "TYPE_BOOL";
-    case Type.TYPE_STRING:
-        return "TYPE_STRING";
-    case Type.TYPE_GROUP:
-        return "TYPE_GROUP";
-    case Type.TYPE_MESSAGE:
-        return "TYPE_MESSAGE";
-    case Type.TYPE_BYTES:
-        return "TYPE_BYTES";
-    case Type.TYPE_UINT32:
-        return "TYPE_UINT32";
-    case Type.TYPE_ENUM:
-        return "TYPE_ENUM";
-    case Type.TYPE_SFIXED32:
-        return "TYPE_SFIXED32";
-    case Type.TYPE_SFIXED64:
-        return "TYPE_SFIXED64";
-    case Type.TYPE_SINT32:
-        return "TYPE_SINT32";
-    case Type.TYPE_SINT64:
-        return "TYPE_SINT64";
-    default:
-        return "%d".printf (type);
-    }
-}
-
-public enum Label
-{
-    LABEL_OPTIONAL = 1,
-    LABEL_REQUIRED = 2,
-    LABEL_REPEATED = 3
-}
-
-public string label_to_string (Label label)
-{
-    switch (label)
-    {
-    case Label.LABEL_OPTIONAL:
-        return "LABEL_OPTIONAL";
-    case Label.LABEL_REQUIRED:
-        return "LABEL_REQUIRED";
-    case Label.LABEL_REPEATED:
-        return "LABEL_REPEATED";
-    default:
-        return "%d".printf (label);
     }
 }
 
