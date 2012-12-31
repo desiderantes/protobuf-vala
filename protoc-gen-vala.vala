@@ -6,7 +6,6 @@ public static int main (string[] args)
 {
     var buf = new uint8[1024];
     var n_read = stdin.read (buf); // FIXME: Read all
-    stderr.printf ("%zu\n", n_read);
     if (n_read < 0)
         return 1;
     buf.length = (int) n_read;
@@ -17,10 +16,19 @@ public static int main (string[] args)
     stderr.printf ("{ %s }\n", req.to_string ());
 
     var resp = new CodeGeneratorResponse ();
-    var f = new CodeGeneratorResponse.File ();
-    f.name = "test.pb.vala";
-    f.content = "TEST";
-    resp.file.append (f);
+    
+    foreach (var f in req.proto_file)
+    {
+        var out_file = new CodeGeneratorResponse.File ();
+
+        if (f.name.has_suffix (".proto"))
+            out_file.name = f.name.substring (0, f.name.length - 6) + ".pb.vala";
+        else
+            out_file.name = f.name + ".vala";
+    
+        out_file.content = "TEST";
+        resp.file.append (out_file);
+    }
 
     var rbuf = new uint8[65535];
     var n_written = resp.encode (rbuf, rbuf.length - 1);

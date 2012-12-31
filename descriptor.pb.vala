@@ -1,9 +1,9 @@
 public class FileDescriptorProto
 {
-    string? name;
-    string? package;
-    List<DescriptorProto> message_type;
-    FileOptions? options;
+    public string? name;
+    public string? package;
+    public List<DescriptorProto> message_type;
+    public FileOptions? options;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -72,11 +72,11 @@ public class FileDescriptorProto
 
 public class DescriptorProto
 {
-    string? name;
-    List<FieldDescriptorProto> field;
-    List<FieldDescriptorProto> extension;
-    List<DescriptorProto> nested_type;
-    List<EnumDescriptorProto> enum_type;
+    public string? name;
+    public List<FieldDescriptorProto> field;
+    public List<FieldDescriptorProto> extension;
+    public List<DescriptorProto> nested_type;
+    public List<EnumDescriptorProto> enum_type;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -172,12 +172,12 @@ public class DescriptorProto
 
 public class FieldDescriptorProto
 {
-    string? name;
-    int32? number;
-    Label? label;
-    Type? type;
-    string? type_name;
-    string? default_value;
+    public string? name;
+    public int32? number;
+    public Label? label;
+    public Type? type;
+    public string? type_name;
+    public string? default_value;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -335,8 +335,8 @@ public string label_to_string (Label label)
 
 public class EnumDescriptorProto
 {
-    string? name;
-    List<EnumValueDescriptorProto> value;
+    public string? name;
+    public List<EnumValueDescriptorProto> value;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -390,8 +390,8 @@ public class EnumDescriptorProto
 
 public class EnumValueDescriptorProto
 {
-    string? name;
-    int32? number;
+    public string? name;
+    public int32? number;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -440,9 +440,9 @@ public class EnumValueDescriptorProto
 
 public class FileOptions
 {
-    string? java_package;
-    string? java_outer_classname;
-    
+    public string? java_package;
+    public string? java_outer_classname;
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)

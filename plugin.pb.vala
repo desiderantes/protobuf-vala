@@ -49,9 +49,9 @@ private size_t get_value_length (int wire_type, out int varint, uint8[] buffer, 
 
 public class CodeGeneratorRequest
 {
-    List<string> file_to_generate;
-    string? parameter;
-    List<FileDescriptorProto> proto_file;
+    public List<string> file_to_generate;
+    public string? parameter;
+    public List<FileDescriptorProto> proto_file;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
