@@ -79,6 +79,25 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += "\n";
     text += indent + "    public size_t encode (uint8[] buffer, size_t offset)\n";
     text += indent + "    {\n";
+    for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
+    {
+        var field = i.data;
+        var indent2 = indent;
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        {
+            text += indent + "        if (%s != null)\n".printf (field.name);
+            text += indent + "        {\n";
+            indent2 += "    ";
+        }
+
+        text += indent2 + "        // ...\n";
+        var n = field.number << 3;
+        // FIXME add wire_type
+        text += indent2 + "        encode_varint (0x%02X, buffer, ref offset);\n".printf (n);
+
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+            text += indent + "        }\n";
+    }
     text += indent + "        return 0;\n";
     text += indent + "    }\n";
     text += indent + "}\n";

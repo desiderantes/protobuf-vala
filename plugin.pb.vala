@@ -90,6 +90,22 @@ public class CodeGeneratorRequest
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (proto_file != null)
+        {
+            // ...
+            encode_varint (0x78, buffer, ref offset);
+        }
+        if (parameter != null)
+        {
+            // ...
+            encode_varint (0x10, buffer, ref offset);
+        }
+        if (file_to_generate != null)
+        {
+            // ...
+            encode_varint (0x08, buffer, ref offset);
+        }
+
         return 0;
     }
 
