@@ -162,6 +162,23 @@ public class CodeGeneratorResponse
 
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
+            while (offset < length)
+            {
+                var key = decode_varint (buffer, length, ref offset);
+                var wire_type = key & 0x7;
+                var field_number = key >> 3;
+                int varint;
+                var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+                // FIXME: Check remaining space
+
+                switch (field_number)
+                {
+                default:
+                    break;
+                }
+
+                offset += value_length;
+            }
         }
 
         public size_t encode (uint8[] buffer, size_t offset)
@@ -188,6 +205,23 @@ public class CodeGeneratorResponse
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
+        while (offset < length)
+        {
+            var key = decode_varint (buffer, length, ref offset);
+            var wire_type = key & 0x7;
+            var field_number = key >> 3;
+            int varint;
+            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            // FIXME: Check remaining space
+
+            switch (field_number)
+            {
+            default:
+                break;
+            }
+
+            offset += value_length;
+        }
     }
 
     public size_t encode (uint8[] buffer, size_t offset)
