@@ -62,7 +62,7 @@ namespace Protobuf
         }
     }
 
-    private void encode_varint (int value, uint8[] buffer, ref size_t offset)
+    private void encode_varint (size_t value, uint8[] buffer, ref size_t offset)
     {
         var n_octets = 1;
         var v = value;
@@ -82,11 +82,21 @@ namespace Protobuf
         buffer[offset + n_octets] = (uint8) (v & 0x7F);
     }
 
-    private void encode_string (string value, uint8[] buffer, ref size_t offset)
+    private size_t encode_string (string value, uint8[] buffer, ref size_t offset)
     {
         offset -= value.length;
         for (var i = 0; value[i] != '\0'; i++)
             buffer[offset + i + 1] = value[i];
-        encode_varint (value.length, buffer, ref offset);
+
+        return value.length;
+    }
+
+    private size_t encode_bytes (uint8[] value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= value.length;
+        for (var i = 0; value[i] != '\0'; i++)
+            buffer[offset + i + 1] = value[i];
+
+        return value.length;
     }
 }

@@ -31,14 +31,18 @@ public class FileDescriptorSet
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in file)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -108,55 +112,66 @@ public class FileDescriptorProto
             stderr.printf ("Unused %zu octets on end of FileDescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (source_code_info != null)
         {
-            // ...
+            var n = source_code_info.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         foreach (var v in extension)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         foreach (var v in service)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
         foreach (var v in enum_type)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
         foreach (var v in message_type)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
         foreach (var v in dependency)
         {
-            Protobuf.encode_string (v, buffer, ref offset);
+            var n = Protobuf.encode_string (v, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (package != null)
         {
-            Protobuf.encode_string (package, buffer, ref offset);
+            var n = Protobuf.encode_string (package, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
 
-        return 0;
+        return start - offset;
     }
 
     public string to_string ()
@@ -231,19 +246,22 @@ public class DescriptorProto
                 stderr.printf ("Unused %zu octets on end of DescriptorProto.ExtensionRange\n", offset - length);
         }
 
-        public size_t encode (uint8[] buffer, size_t offset)
+        public size_t encode (uint8[] buffer, ref size_t offset)
         {
+            var start = offset;
+
             if (end != null)
             {
                 // ...
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
-            if (start != null)
+            if (this.start != null)
             {
                 // ...
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
-            return 0;
+
+            return start - offset;
         }
     }
 
@@ -303,44 +321,54 @@ public class DescriptorProto
             stderr.printf ("Unused %zu octets on end of DescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         foreach (var v in extension_range)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
         foreach (var v in enum_type)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
         foreach (var v in nested_type)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in extension)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
         foreach (var v in field)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -537,26 +565,32 @@ public class FieldDescriptorProto
             stderr.printf ("Unused %zu octets on end of FieldDescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (default_value != null)
         {
-            Protobuf.encode_string (default_value, buffer, ref offset);
+            var n = Protobuf.encode_string (default_value, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (extendee != null)
         {
-            Protobuf.encode_string (extendee, buffer, ref offset);
+            var n = Protobuf.encode_string (extendee, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (type_name != null)
         {
-            Protobuf.encode_string (type_name, buffer, ref offset);
+            var n = Protobuf.encode_string (type_name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
         if (type != null)
@@ -576,10 +610,12 @@ public class FieldDescriptorProto
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -647,24 +683,30 @@ public class EnumDescriptorProto
             stderr.printf ("Unused %zu octets on end of EnumDescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in value)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -725,11 +767,14 @@ public class EnumValueDescriptorProto
             stderr.printf ("Unused %zu octets on end of EnumValueDescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (number != null)
@@ -739,10 +784,12 @@ public class EnumValueDescriptorProto
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -797,24 +844,30 @@ public class ServiceDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in method)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -861,29 +914,36 @@ public class MethodDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (options != null)
         {
-            // ...
+            var n = options.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
         if (output_type != null)
         {
-            Protobuf.encode_string (output_type, buffer, ref offset);
+            var n = Protobuf.encode_string (output_type, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (input_type != null)
         {
-            Protobuf.encode_string (input_type, buffer, ref offset);
+            var n = Protobuf.encode_string (input_type, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
-            Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (name, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -975,11 +1035,14 @@ public class FileOptions
             stderr.printf ("Unused %zu octets on end of EnumValueDescriptorProto\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (py_generic_services != null)
@@ -1014,15 +1077,18 @@ public class FileOptions
         }
         if (java_outer_classname != null)
         {
-            Protobuf.encode_string (java_outer_classname, buffer, ref offset);
+            var n = Protobuf.encode_string (java_outer_classname, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (java_package != null)
         {
-            Protobuf.encode_string (java_package, buffer, ref offset);
+            var n = Protobuf.encode_string (java_package, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -1079,11 +1145,14 @@ public class MessageOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (no_standard_descriptor_accessor != null)
@@ -1096,7 +1165,8 @@ public class MessageOptions
             Protobuf.encode_varint (message_set_wire_format ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1157,16 +1227,20 @@ public class FieldOptions
             stderr.printf ("Unused %zu octets on end of FieldOptions\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (experimental_map_key != null)
         {
-            Protobuf.encode_string (experimental_map_key, buffer, ref offset);
+            var n = Protobuf.encode_string (experimental_map_key, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (deprecated != null)
@@ -1184,7 +1258,8 @@ public class FieldOptions
             // ...
             Protobuf.encode_varint (8, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 
     public string to_string ()
@@ -1229,14 +1304,18 @@ public class EnumOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1271,14 +1350,18 @@ public class EnumValueOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1313,14 +1396,18 @@ public class ServiceOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1355,14 +1442,18 @@ public class MethodOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in uninterpreted_option)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1403,13 +1494,17 @@ public class UninterpretedOption
             }
         }
 
-        public size_t encode (uint8[] buffer, size_t offset)
+        public size_t encode (uint8[] buffer, ref size_t offset)
         {
+            var start = offset;
+
             Protobuf.encode_varint (is_extension ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
-            Protobuf.encode_string (name_part, buffer, ref offset);
+            var n = Protobuf.encode_string (name_part, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
-            return 0;
+
+            return start - offset;
         }
     }
     public List<NamePart> name;
@@ -1462,16 +1557,20 @@ public class UninterpretedOption
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         if (aggregate_value != null)
         {
-            Protobuf.encode_string (aggregate_value, buffer, ref offset);
+            var n = Protobuf.encode_string (aggregate_value, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (string_value != null)
         {
-            // ...
+            var n = Protobuf.encode_bytes (string_value, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (double_value != null)
@@ -1491,15 +1590,18 @@ public class UninterpretedOption
         }
         if (identifier_value != null)
         {
-            // ...
+            var n = Protobuf.encode_string (identifier_value, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in name)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }
 
@@ -1540,8 +1642,10 @@ public class SourceCodeInfo
             }
         }
 
-        public size_t encode (uint8[] buffer, size_t offset)
+        public size_t encode (uint8[] buffer, ref size_t offset)
         {
+            var start = offset;
+
             foreach (var v in span)
             {
                 // ...
@@ -1552,7 +1656,8 @@ public class SourceCodeInfo
                 // ...
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
-            return 0;
+
+            return start - offset;
         }
     }
     public List<Location> location;
@@ -1584,13 +1689,17 @@ public class SourceCodeInfo
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in location)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
-        return 0;
+
+        return start - offset;
     }
 }

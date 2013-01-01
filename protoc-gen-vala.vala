@@ -38,8 +38,9 @@ public static int main (string[] args)
     }
 
     var resp_buf = new uint8[65535];
-    var n_written = resp.encode (resp_buf, resp_buf.length - 1);
-    unowned uint8[] start = (uint8[]) ((uint8*) resp_buf + resp_buf.length - n_written);
+    size_t offset = resp_buf.length - 1;
+    var n_written = resp.encode (resp_buf, ref offset);
+    unowned uint8[] start = (uint8[]) ((uint8*) resp_buf + resp_buf.length - (int) n_written);
     start.length = (int) n_written;
 
     stdout.write (start);
@@ -133,8 +134,10 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "        }\n";
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public size_t encode (uint8[] buffer, size_t offset)\n";
+    text += indent + "    public size_t encode (uint8[] buffer, ref size_t offset)\n";
     text += indent + "    {\n";
+    text += indent + "        var start = offset;\n";
+    text += "\n";
     for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
     {
         var field = i.data;
@@ -154,7 +157,19 @@ private static string write_class (DescriptorProto type, string indent = "")
             field_name = "v";
         }
 
+        var encode_length = false;
+        switch (field.type)
+        {
+        case FieldDescriptorProto.Type.TYPE_STRING:
+        case FieldDescriptorProto.Type.TYPE_BYTES:
+        case FieldDescriptorProto.Type.TYPE_MESSAGE:
+            encode_length = true;
+            break;
+        }
+
         text += indent2 + "        ";
+        if (encode_length)
+            text += "var n = ";
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_BOOL:
@@ -163,26 +178,30 @@ private static string write_class (DescriptorProto type, string indent = "")
         case FieldDescriptorProto.Type.TYPE_STRING:
             text += "Protobuf.encode_string (%s, buffer, ref offset);\n".printf (field_name);
             break;
+        case FieldDescriptorProto.Type.TYPE_BYTES:
+            text += "Protobuf.encode_bytes (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_MESSAGE:
+            text += "%s.encode (buffer, ref offset);\n".printf (field_name);
+            break;
         default:
             text += "ENCODE_UNKNOWN_TYPE%d(%s);\n".printf (field.type, field_name);
             break;
         }
+        if (encode_length)
+            text += indent2 + "        Protobuf.encode_varint (n, buffer, ref offset);\n";
 
+        /* Encode key */
         var n = field.number << 3;
-        switch (field.type)
-        {
-        case FieldDescriptorProto.Type.TYPE_STRING:
-        case FieldDescriptorProto.Type.TYPE_BYTES:
-        case FieldDescriptorProto.Type.TYPE_MESSAGE:
-            n |= 2;
-            break;
-        }
+        if (encode_length)
+            n |= 2;     
         text += indent2 + "        Protobuf.encode_varint (%d, buffer, ref offset);\n".printf (n);
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "        }\n";
     }
-    text += indent + "        return 0;\n";
+    text += "\n";
+    text += indent + "        return start - offset;\n";
     text += indent + "    }\n";
     text += indent + "}\n";
 

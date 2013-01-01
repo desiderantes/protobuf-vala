@@ -42,25 +42,30 @@ public class CodeGeneratorRequest
             stderr.printf ("Unused %zu octets on end of CodeGeneratorRequest\n", offset - length);
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
+        var start = offset;
+
         foreach (var v in proto_file)
         {
-            // ...
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (parameter != null)
         {
-            Protobuf.encode_string (parameter, buffer, ref offset);
+            var n = Protobuf.encode_string (parameter, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         foreach (var v in file_to_generate)
         {
-            Protobuf.encode_string (v, buffer, ref offset);
+            var n = Protobuf.encode_string (v, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
 
-        return 0;
+        return start - offset;
     }
 
     public string to_string ()
@@ -131,23 +136,26 @@ public class CodeGeneratorResponse
             }
         }
 
-        public size_t encode (uint8[] buffer, size_t offset)
+        public size_t encode (uint8[] buffer, ref size_t offset)
         {
             var start = offset;
 
             if (content != null)
             {
-                Protobuf.encode_string (content, buffer, ref offset);
+                var n = Protobuf.encode_string (content, buffer, ref offset);
+                Protobuf.encode_varint (n, buffer, ref offset);
                 Protobuf.encode_varint (122, buffer, ref offset);
             }
             if (insertion_point != null)
             {
-                Protobuf.encode_string (insertion_point, buffer, ref offset);
+                var n = Protobuf.encode_string (insertion_point, buffer, ref offset);
+                Protobuf.encode_varint (n, buffer, ref offset);
                 Protobuf.encode_varint (18, buffer, ref offset);
             }
             if (name != null)
             {
-                Protobuf.encode_string (name, buffer, ref offset);
+                var n = Protobuf.encode_string (name, buffer, ref offset);
+                Protobuf.encode_varint (n, buffer, ref offset);
                 Protobuf.encode_varint (10, buffer, ref offset);
             }
 
@@ -188,21 +196,21 @@ public class CodeGeneratorResponse
         }
     }
 
-    public size_t encode (uint8[] buffer, size_t offset)
+    public size_t encode (uint8[] buffer, ref size_t offset)
     {
         var start = offset;
 
         // FIXME: Reverse the list
         foreach (var v in file)
         {
-            var n_written = v.encode (buffer, offset);
-            offset -= n_written;
-            Protobuf.encode_varint ((int) n_written, buffer, ref offset);
+            var n = v.encode (buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (error != null)
         {
-            Protobuf.encode_string (error, buffer, ref offset);
+            var n = Protobuf.encode_string (error, buffer, ref offset);
+            Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
 
