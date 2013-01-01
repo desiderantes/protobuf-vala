@@ -77,11 +77,11 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "    {\n";
     text += indent + "        while (offset < length)\n";
     text += indent + "        {\n";
-    text += indent + "            var key = decode_varint (buffer, length, ref offset);\n";
+    text += indent + "            var key = Protobuf.decode_varint (buffer, length, ref offset);\n";
     text += indent + "            var wire_type = key & 0x7;\n";
     text += indent + "            var field_number = key >> 3;\n";
     text += indent + "            int varint;\n";
-    text += indent + "            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);\n";
+    text += indent + "            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);\n";
     text += indent + "            // FIXME: Check remaining space\n";
     text += "\n";
     text += indent + "            switch (field_number)\n";
@@ -113,7 +113,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent2 + "        // ...\n";
         var n = field.number << 3;
         // FIXME add wire_type
-        text += indent2 + "        encode_varint (%d, buffer, ref offset);\n".printf (n);
+        text += indent2 + "        Protobuf.encode_varint (%d, buffer, ref offset);\n".printf (n);
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "        }\n";
