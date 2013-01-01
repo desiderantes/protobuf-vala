@@ -169,7 +169,14 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
 
         var n = field.number << 3;
-        // FIXME add wire_type
+        switch (field.type)
+        {
+        case FieldDescriptorProto.Type.TYPE_STRING:
+        case FieldDescriptorProto.Type.TYPE_BYTES:
+        case FieldDescriptorProto.Type.TYPE_MESSAGE:
+            n |= 2;
+            break;
+        }
         text += indent2 + "        Protobuf.encode_varint (%d, buffer, ref offset);\n".printf (n);
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)

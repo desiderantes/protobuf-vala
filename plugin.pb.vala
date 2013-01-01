@@ -47,17 +47,17 @@ public class CodeGeneratorRequest
         foreach (var v in proto_file)
         {
             // ...
-            Protobuf.encode_varint (120, buffer, ref offset);
+            Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (parameter != null)
         {
             Protobuf.encode_string (parameter, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         foreach (var v in file_to_generate)
         {
             Protobuf.encode_string (v, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
 
         return 0;
@@ -138,17 +138,17 @@ public class CodeGeneratorResponse
             if (content != null)
             {
                 Protobuf.encode_string (content, buffer, ref offset);
-                Protobuf.encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+                Protobuf.encode_varint (122, buffer, ref offset);
             }
             if (insertion_point != null)
             {
                 Protobuf.encode_string (insertion_point, buffer, ref offset);
-                Protobuf.encode_varint (16, buffer, ref offset);
+                Protobuf.encode_varint (18, buffer, ref offset);
             }
             if (name != null)
             {
                 Protobuf.encode_string (name, buffer, ref offset);
-                Protobuf.encode_varint ((1 << 3) | 0x2, buffer, ref offset);
+                Protobuf.encode_varint (10, buffer, ref offset);
             }
 
             return start - offset;
@@ -198,12 +198,12 @@ public class CodeGeneratorResponse
             var n_written = v.encode (buffer, offset);
             offset -= n_written;
             Protobuf.encode_varint ((int) n_written, buffer, ref offset);
-            Protobuf.encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+            Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (error != null)
         {
             Protobuf.encode_string (error, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
 
         return start - offset;

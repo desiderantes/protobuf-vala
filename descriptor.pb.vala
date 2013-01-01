@@ -36,7 +36,7 @@ public class FileDescriptorSet
         foreach (var v in file)
         {
             // ...
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -113,47 +113,47 @@ public class FileDescriptorProto
         if (source_code_info != null)
         {
             // ...
-            Protobuf.encode_varint (72, buffer, ref offset);
+            Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (66, buffer, ref offset);
         }
         foreach (var v in extension)
         {
             // ...
-            Protobuf.encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (58, buffer, ref offset);
         }
         foreach (var v in service)
         {
             // ...
-            Protobuf.encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (50, buffer, ref offset);
         }
         foreach (var v in enum_type)
         {
             // ...
-            Protobuf.encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (42, buffer, ref offset);
         }
         foreach (var v in message_type)
         {
             // ...
-            Protobuf.encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (34, buffer, ref offset);
         }
         foreach (var v in dependency)
         {
             Protobuf.encode_string (v, buffer, ref offset);
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (package != null)
         {
             Protobuf.encode_string (package, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
 
         return 0;
@@ -308,37 +308,37 @@ public class DescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (58, buffer, ref offset);
         }
         foreach (var v in extension_range)
         {
             // ...
-            Protobuf.encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (42, buffer, ref offset);
         }
         foreach (var v in enum_type)
         {
             // ...
-            Protobuf.encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (34, buffer, ref offset);
         }
         foreach (var v in nested_type)
         {
             // ...
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in extension)
         {
             // ...
-            Protobuf.encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (50, buffer, ref offset);
         }
         foreach (var v in field)
         {
             // ...
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -542,22 +542,22 @@ public class FieldDescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (default_value != null)
         {
             Protobuf.encode_string (default_value, buffer, ref offset);
-            Protobuf.encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (extendee != null)
         {
             Protobuf.encode_string (extendee, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (type_name != null)
         {
             Protobuf.encode_string (type_name, buffer, ref offset);
-            Protobuf.encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (50, buffer, ref offset);
         }
         if (type != null)
         {
@@ -577,7 +577,7 @@ public class FieldDescriptorProto
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -652,17 +652,17 @@ public class EnumDescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in value)
         {
             // ...
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -730,7 +730,7 @@ public class EnumValueDescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (number != null)
         {
@@ -740,7 +740,7 @@ public class EnumValueDescriptorProto
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -802,17 +802,17 @@ public class ServiceDescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in method)
         {
             // ...
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -866,22 +866,22 @@ public class MethodDescriptorProto
         if (options != null)
         {
             // ...
-            Protobuf.encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (34, buffer, ref offset);
         }
         if (output_type != null)
         {
             Protobuf.encode_string (output_type, buffer, ref offset);
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (input_type != null)
         {
             Protobuf.encode_string (input_type, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (name != null)
         {
             Protobuf.encode_string (name, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -980,7 +980,7 @@ public class FileOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (py_generic_services != null)
         {
@@ -1015,12 +1015,12 @@ public class FileOptions
         if (java_outer_classname != null)
         {
             Protobuf.encode_string (java_outer_classname, buffer, ref offset);
-            Protobuf.encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (java_package != null)
         {
             Protobuf.encode_string (java_package, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
@@ -1084,7 +1084,7 @@ public class MessageOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (no_standard_descriptor_accessor != null)
         {
@@ -1162,12 +1162,12 @@ public class FieldOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         if (experimental_map_key != null)
         {
             Protobuf.encode_string (experimental_map_key, buffer, ref offset);
-            Protobuf.encode_varint (72, buffer, ref offset);
+            Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (deprecated != null)
         {
@@ -1176,7 +1176,7 @@ public class FieldOptions
         }
         if (packed != null)
         {
-            // ...
+            Protobuf.encode_varint (packed ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (ctype != null)
@@ -1234,7 +1234,7 @@ public class EnumOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         return 0;
     }
@@ -1276,7 +1276,7 @@ public class EnumValueOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         return 0;
     }
@@ -1318,7 +1318,7 @@ public class ServiceOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         return 0;
     }
@@ -1360,7 +1360,7 @@ public class MethodOptions
         foreach (var v in uninterpreted_option)
         {
             // ...
-            Protobuf.encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7994, buffer, ref offset);
         }
         return 0;
     }
@@ -1408,7 +1408,7 @@ public class UninterpretedOption
             Protobuf.encode_varint (is_extension ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
             Protobuf.encode_string (name_part, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
             return 0;
         }
     }
@@ -1467,12 +1467,12 @@ public class UninterpretedOption
         if (aggregate_value != null)
         {
             Protobuf.encode_string (aggregate_value, buffer, ref offset);
-            Protobuf.encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (string_value != null)
         {
             // ...
-            Protobuf.encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (double_value != null)
         {
@@ -1492,12 +1492,12 @@ public class UninterpretedOption
         if (identifier_value != null)
         {
             // ...
-            Protobuf.encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (26, buffer, ref offset);
         }
         foreach (var v in name)
         {
             // ...
-            Protobuf.encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (18, buffer, ref offset);
         }
         return 0;
     }
@@ -1589,7 +1589,7 @@ public class SourceCodeInfo
         foreach (var v in location)
         {
             // ...
-            Protobuf.encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (10, buffer, ref offset);
         }
         return 0;
     }
