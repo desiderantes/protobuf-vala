@@ -184,6 +184,9 @@ private static string write_class (DescriptorProto type, string indent = "")
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
             text += "%s.encode (buffer, ref offset);\n".printf (field_name);
             break;
+        case FieldDescriptorProto.Type.TYPE_ENUM:
+            text += "Protobuf.encode_varint (%s, buffer, ref offset);\n".printf (field_name);
+            break;
         default:
             text += "ENCODE_UNKNOWN_TYPE%d(%s);\n".printf (field.type, field_name);
             break;

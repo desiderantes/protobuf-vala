@@ -595,12 +595,12 @@ public class FieldDescriptorProto
         }
         if (type != null)
         {
-            // ...
+            Protobuf.encode_varint (type, buffer, ref offset);
             Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (label != null)
         {
-            // ...
+            Protobuf.encode_varint (label, buffer, ref offset);
             Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (number != null)
@@ -1062,7 +1062,7 @@ public class FileOptions
         }
         if (optimize_for != null)
         {
-            // ...
+            Protobuf.encode_varint (optimize_for, buffer, ref offset);
             Protobuf.encode_varint (72, buffer, ref offset);
         }
         if (java_generate_equals_and_hash != null)
@@ -1255,7 +1255,7 @@ public class FieldOptions
         }
         if (ctype != null)
         {
-            // ...
+            Protobuf.encode_varint (ctype, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 
