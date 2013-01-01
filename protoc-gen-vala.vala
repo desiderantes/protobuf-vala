@@ -170,6 +170,9 @@ private static string write_class (DescriptorProto type, string indent = "")
             text += "var n = ";
         switch (field.type)
         {
+        case FieldDescriptorProto.Type.TYPE_INT32:
+            text += "Protobuf.encode_varint (%s, buffer, ref offset);\n".printf (field_name);
+            break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
             text += "Protobuf.encode_varint (%s ? 1 : 0, buffer, ref offset);\n".printf (field_name);
             break;

@@ -252,12 +252,12 @@ public class DescriptorProto
 
             if (end != null)
             {
-                // ...
+                Protobuf.encode_varint (end, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
             if (this.start != null)
             {
-                // ...
+                Protobuf.encode_varint (start, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
 
@@ -605,7 +605,7 @@ public class FieldDescriptorProto
         }
         if (number != null)
         {
-            // ...
+            Protobuf.encode_varint (number, buffer, ref offset);
             Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (name != null)
@@ -779,7 +779,7 @@ public class EnumValueDescriptorProto
         }
         if (number != null)
         {
-            // ...
+            Protobuf.encode_varint (number, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
@@ -1646,14 +1646,14 @@ public class SourceCodeInfo
         {
             var start = offset;
 
-            foreach (var v in span)
+            for (unowned List<int32> i = span.last (); i != null; i = i.prev)
             {
-                // ...
+                Protobuf.encode_varint (i.data, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
-            foreach (var v in path)
+            for (unowned List<int32> i = path.last (); i != null; i = i.prev)
             {
-                // ...
+                Protobuf.encode_varint (i.data, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
 
