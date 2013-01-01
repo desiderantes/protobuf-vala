@@ -66,8 +66,11 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += "\n";
     text += indent + "            switch (field_number)\n";
     text += indent + "            {\n";
-    text += indent + "            default:\n";
-    text += indent + "                break;\n";
+    foreach (var field in type.field)
+    {
+        text += indent + "            case %d:\n".printf (field.number);
+        text += indent + "                break;\n";
+    }
     text += indent + "            }\n";
     text += "\n";
     text += indent + "            offset += value_length;\n";

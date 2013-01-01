@@ -17,7 +17,7 @@ public class FileDescriptorSet
 
             switch (field_number)
             {
-            default:
+            case 1:
                 break;
             }
 
@@ -70,13 +70,17 @@ public class FileDescriptorProto
                 v.decode (buffer, offset + value_length, offset);
                 message_type.append (v);
                 break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
             case 8:
                 options = new FileOptions ();
                 options.decode (buffer, offset + value_length, offset);
                 break;
-            default:
-                stderr.printf ("Unknown FileDescriptorProto field %d\n", field_number);
-                // Skip unknown data
+            case 9:
                 break;
             }
 
@@ -150,10 +154,6 @@ public class DescriptorProto
                 case 2:
                     end = varint;
                     break;
-                default:
-                    stderr.printf ("Unknown DescriptorProto.ExtensionRange field %d\n", field_number);
-                    // Skip unknown data
-                    break;
                 }
 
                 offset += value_length;
@@ -218,10 +218,8 @@ public class DescriptorProto
                 m.decode (buffer, offset + value_length, offset);
                 extension.append (m);
                 break;
-            default:
-                stderr.printf ("Unknown DescriptorProto field %d\n", field_number);
-                // Skip unknown data
-                break;
+            case 7:
+                 break;
             }
 
             offset += value_length;
@@ -407,16 +405,14 @@ public class FieldDescriptorProto
             case 6:
                 type_name = decode_string (buffer, value_length, offset);
                 break;
+            case 2:
+                break;
             case 7:
                 default_value = decode_string (buffer, value_length, offset);
                 break;
             case 8:
                 options = new FieldOptions ();
                 options.decode (buffer, offset + value_length, offset);
-                break;
-            default:
-                stderr.printf ("Unknown FieldDescriptorProto field %d\n", field_number);
-                // Skip unknown data
                 break;
             }
 
@@ -482,9 +478,7 @@ public class EnumDescriptorProto
                 v.decode (buffer, offset + value_length, offset);
                 value.append (v);
                 break;
-            default:
-                stderr.printf ("Unknown EnumDescriptorProto field %d\n", field_number);
-                // Skip unknown data
+            case 3:
                 break;
             }
 
@@ -541,9 +535,7 @@ public class EnumValueDescriptorProto
             case 2:
                 number = varint;
                 break;
-            default:
-                stderr.printf ("Unknown EnumValueDescriptorProto field %d\n", field_number);
-                // Skip unknown data
+            case 3:
                 break;
             }
 
@@ -591,7 +583,11 @@ public class ServiceDescriptorProto
 
             switch (field_number)
             {
-            default:
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
                 break;
             }
 
@@ -625,7 +621,13 @@ public class MethodDescriptorProto
 
             switch (field_number)
             {
-            default:
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
                 break;
             }
 
@@ -692,12 +694,20 @@ public class FileOptions
             case 8:
                 java_outer_classname = decode_string (buffer, value_length, offset);
                 break;
+            case 10:
+                break;
+            case 20:
+                break;
             case 9:
                 optimize_for = (OptimizeMode) varint;
                 break;
-            default:
-                stderr.printf ("Unknown FileOptions field %d\n", field_number);
-                // Skip unknown data
+            case 16:
+                break;
+            case 17:
+                break;
+            case 18:
+                break;
+            case 999:
                 break;
             }
 
@@ -747,7 +757,11 @@ public class MessageOptions
 
             switch (field_number)
             {
-            default:
+            case 1:
+                break;
+            case 2:
+                break;
+            case 999:
                 break;
             }
 
@@ -789,12 +803,16 @@ public class FieldOptions
 
             switch (field_number)
             {
+            case 1:
+                break;
             case 2:
                 packed = varint != 0;
                 break;
-            default:
-                stderr.printf ("Unknown FieldOptions field %d\n", field_number);
-                // Skip unknown data
+            case 3:
+                break;
+            case 9:
+                break;
+            case 999:
                 break;
             }
 
@@ -838,7 +856,7 @@ public class EnumOptions
 
             switch (field_number)
             {
-            default:
+            case 999:
                 break;
             }
 
@@ -869,7 +887,7 @@ public class EnumValueOptions
 
             switch (field_number)
             {
-            default:
+            case 999:
                 break;
             }
 
@@ -900,7 +918,7 @@ public class ServiceOptions
 
             switch (field_number)
             {
-            default:
+            case 999:
                 break;
             }
 
@@ -931,7 +949,7 @@ public class MethodOptions
 
             switch (field_number)
             {
-            default:
+            case 999:
                 break;
             }
 
@@ -965,7 +983,9 @@ public class UninterpretedOption
 
                 switch (field_number)
                 {
-                default:
+                case 1:
+                    break;
+                case 2:
                     break;
                 }
 
@@ -999,7 +1019,19 @@ public class UninterpretedOption
 
             switch (field_number)
             {
-            default:
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
                 break;
             }
 
@@ -1033,7 +1065,9 @@ public class SourceCodeInfo
 
                 switch (field_number)
                 {
-                default:
+                case 1:
+                    break;
+                case 2:
                     break;
                 }
 
@@ -1061,7 +1095,7 @@ public class SourceCodeInfo
 
             switch (field_number)
             {
-            default:
+            case 1:
                 break;
             }
 

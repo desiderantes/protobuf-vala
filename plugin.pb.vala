@@ -79,10 +79,6 @@ public class CodeGeneratorRequest
                 f.decode (buffer, offset + value_length, offset);
                 proto_file.append (f);
                 break;
-            default:
-                stderr.printf ("Unknown CodeGeneratorRequest field %d\n", field_number);
-                Process.exit (1);
-                // Skip unknown data
             }
 
             offset += value_length;
@@ -173,7 +169,11 @@ public class CodeGeneratorResponse
 
                 switch (field_number)
                 {
-                default:
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 15:
                     break;
                 }
 
@@ -216,7 +216,9 @@ public class CodeGeneratorResponse
 
             switch (field_number)
             {
-            default:
+            case 1:
+                break;
+            case 15:
                 break;
             }
 
