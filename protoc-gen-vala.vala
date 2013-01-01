@@ -68,9 +68,21 @@ private static string write_class (DescriptorProto type, string indent = "")
 
 private static string get_type_name (FieldDescriptorProto field)
 {
-    var type_name = "UNKNOWN_TYPE";
+    var type_name = "";
     switch (field.type)
     {
+    case FieldDescriptorProto.Type.TYPE_DOUBLE:
+         type_name = "double";
+         break;
+    case FieldDescriptorProto.Type.TYPE_FLOAT:
+         type_name = "float";
+         break;
+    case FieldDescriptorProto.Type.TYPE_INT64:
+         type_name = "int64";
+         break;
+    case FieldDescriptorProto.Type.TYPE_UINT64:
+         type_name = "uint64";
+         break;
     case FieldDescriptorProto.Type.TYPE_INT32:
          type_name = "int32";
          break;
@@ -80,8 +92,18 @@ private static string get_type_name (FieldDescriptorProto field)
     case FieldDescriptorProto.Type.TYPE_STRING:
          type_name = "string";
          break;
+    case FieldDescriptorProto.Type.TYPE_BYTES:
+         type_name = "uint8[]";
+         break;
+    case FieldDescriptorProto.Type.TYPE_UINT32:
+         type_name = "uint32";
+         break;
     case FieldDescriptorProto.Type.TYPE_MESSAGE:
+    case FieldDescriptorProto.Type.TYPE_ENUM:
          type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+         break;
+    default:
+         type_name = "UNKNOWN_TYPE%d".printf (field.type);
          break;
     }
     
