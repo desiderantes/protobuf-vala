@@ -119,19 +119,22 @@ public class CodeGeneratorRequest
 
 private void encode_varint (int value, uint8[] buffer, ref size_t offset)
 {
+    var n_octets = 1;
     var v = value;
-    while (true)
+    while (v != 0)
     {
-        var next_v = v >> 7;
-        var o = (uint8) v & 0x7F;
-        if (next_v != 0)
-            o |= 0x80;
-        buffer[offset] = o;
-        offset--;
-        if (next_v == 0)
-            return;
-        v = next_v;
+        v >>= 7;
+        n_octets++;
     }
+    offset -= n_octets;
+
+    v = value;
+    for (var i = 0; i < n_octets - 1; i++)
+    {
+        buffer[offset + i + 1] = 0x80 | (uint8) (v & 0x7F);
+        v >>= 7;
+    }
+    buffer[offset + n_octets] = (uint8) (v & 0x7F);
 }
 
 private void encode_string (string value, uint8[] buffer, ref size_t offset)
