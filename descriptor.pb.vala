@@ -8,11 +8,11 @@ public class FileDescriptorSet
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -30,7 +30,7 @@ public class FileDescriptorSet
         if (file != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -52,23 +52,23 @@ public class FileDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                name = decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 2:
-                package = decode_string (buffer, value_length, offset);
+                package = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 3:
-                dependency.append (decode_string (buffer, value_length, offset));
+                dependency.append (Protobuf.decode_string (buffer, value_length, offset));
                 break;
             case 4:
                 var v = new DescriptorProto ();
@@ -101,47 +101,47 @@ public class FileDescriptorProto
         if (source_code_info != null)
         {
             // ...
-            encode_varint (72, buffer, ref offset);
+            Protobuf.encode_varint (72, buffer, ref offset);
         }
         if (options != null)
         {
             // ...
-            encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (64, buffer, ref offset);
         }
         if (extension != null)
         {
             // ...
-            encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (56, buffer, ref offset);
         }
         if (service != null)
         {
             // ...
-            encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (48, buffer, ref offset);
         }
         if (enum_type != null)
         {
             // ...
-            encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (message_type != null)
         {
             // ...
-            encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (dependency != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (package != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
 
         return 0;
@@ -190,11 +190,11 @@ public class DescriptorProto
         {
             while (offset < length)
             {
-                var key = decode_varint (buffer, length, ref offset);
+                var key = Protobuf.decode_varint (buffer, length, ref offset);
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
                 int varint;
-                var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
                 // FIXME: Check remaining space
 
                 switch (field_number)
@@ -219,12 +219,12 @@ public class DescriptorProto
             if (end != null)
             {
                 // ...
-                encode_varint (16, buffer, ref offset);
+                Protobuf.encode_varint (16, buffer, ref offset);
             }
             if (start != null)
             {
                 // ...
-                encode_varint (8, buffer, ref offset);
+                Protobuf.encode_varint (8, buffer, ref offset);
             }
             return 0;
         }
@@ -242,17 +242,17 @@ public class DescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                name = decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 2:
                 var m = new FieldDescriptorProto ();
@@ -295,37 +295,37 @@ public class DescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (56, buffer, ref offset);
         }
         if (extension_range != null)
         {
             // ...
-            encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (enum_type != null)
         {
             // ...
-            encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (nested_type != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (extension != null)
         {
             // ...
-            encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (48, buffer, ref offset);
         }
         if (field != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -477,17 +477,17 @@ public class FieldDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                name = decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 3:
                 number = varint;
@@ -499,12 +499,12 @@ public class FieldDescriptorProto
                 type = (Type) varint;
                 break;
             case 6:
-                type_name = decode_string (buffer, value_length, offset);
+                type_name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 2:
                 break;
             case 7:
-                default_value = decode_string (buffer, value_length, offset);
+                default_value = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 8:
                 options = new FieldOptions ();
@@ -524,42 +524,42 @@ public class FieldDescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (64, buffer, ref offset);
         }
         if (default_value != null)
         {
             // ...
-            encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (56, buffer, ref offset);
         }
         if (extendee != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (type_name != null)
         {
             // ...
-            encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (48, buffer, ref offset);
         }
         if (type != null)
         {
             // ...
-            encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (label != null)
         {
             // ...
-            encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (number != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -597,17 +597,17 @@ public class EnumDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                name = decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 2:
                 var v = new EnumValueDescriptorProto ();
@@ -630,17 +630,17 @@ public class EnumDescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (value != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -671,17 +671,17 @@ public class EnumValueDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                name = decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 2:
                 number = varint;
@@ -702,17 +702,17 @@ public class EnumValueDescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (number != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -740,11 +740,11 @@ public class ServiceDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -766,17 +766,17 @@ public class ServiceDescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (method != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -793,11 +793,11 @@ public class MethodDescriptorProto
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -821,22 +821,22 @@ public class MethodDescriptorProto
         if (options != null)
         {
             // ...
-            encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (output_type != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (input_type != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -880,20 +880,20 @@ public class FileOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
             {
             case 1:
-                java_package = decode_string (buffer, value_length, offset);
+                java_package = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 8:
-                java_outer_classname = decode_string (buffer, value_length, offset);
+                java_outer_classname = Protobuf.decode_string (buffer, value_length, offset);
                 break;
             case 10:
                 break;
@@ -924,47 +924,47 @@ public class FileOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         if (py_generic_services != null)
         {
             // ...
-            encode_varint (144, buffer, ref offset);
+            Protobuf.encode_varint (144, buffer, ref offset);
         }
         if (java_generic_services != null)
         {
             // ...
-            encode_varint (136, buffer, ref offset);
+            Protobuf.encode_varint (136, buffer, ref offset);
         }
         if (cc_generic_services != null)
         {
             // ...
-            encode_varint (128, buffer, ref offset);
+            Protobuf.encode_varint (128, buffer, ref offset);
         }
         if (optimize_for != null)
         {
             // ...
-            encode_varint (72, buffer, ref offset);
+            Protobuf.encode_varint (72, buffer, ref offset);
         }
         if (java_generate_equals_and_hash != null)
         {
             // ...
-            encode_varint (160, buffer, ref offset);
+            Protobuf.encode_varint (160, buffer, ref offset);
         }
         if (java_multiple_files != null)
         {
             // ...
-            encode_varint (80, buffer, ref offset);
+            Protobuf.encode_varint (80, buffer, ref offset);
         }
         if (java_outer_classname != null)
         {
             // ...
-            encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (64, buffer, ref offset);
         }
         if (java_package != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -994,11 +994,11 @@ public class MessageOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1020,17 +1020,17 @@ public class MessageOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         if (no_standard_descriptor_accessor != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (message_set_wire_format != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -1055,11 +1055,11 @@ public class FieldOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1089,27 +1089,27 @@ public class FieldOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         if (experimental_map_key != null)
         {
             // ...
-            encode_varint (72, buffer, ref offset);
+            Protobuf.encode_varint (72, buffer, ref offset);
         }
         if (deprecated != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (packed != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (ctype != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
@@ -1133,11 +1133,11 @@ public class EnumOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1155,7 +1155,7 @@ public class EnumOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         return 0;
     }
@@ -1169,11 +1169,11 @@ public class EnumValueOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1191,7 +1191,7 @@ public class EnumValueOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         return 0;
     }
@@ -1205,11 +1205,11 @@ public class ServiceOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1227,7 +1227,7 @@ public class ServiceOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         return 0;
     }
@@ -1241,11 +1241,11 @@ public class MethodOptions
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1263,7 +1263,7 @@ public class MethodOptions
         if (uninterpreted_option != null)
         {
             // ...
-            encode_varint (7992, buffer, ref offset);
+            Protobuf.encode_varint (7992, buffer, ref offset);
         }
         return 0;
     }
@@ -1280,11 +1280,11 @@ public class UninterpretedOption
         {
             while (offset < length)
             {
-                var key = decode_varint (buffer, length, ref offset);
+                var key = Protobuf.decode_varint (buffer, length, ref offset);
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
                 int varint;
-                var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
                 // FIXME: Check remaining space
 
                 switch (field_number)
@@ -1302,9 +1302,9 @@ public class UninterpretedOption
         public size_t encode (uint8[] buffer, size_t offset)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
             return 0;
         }
     }
@@ -1320,11 +1320,11 @@ public class UninterpretedOption
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1354,37 +1354,37 @@ public class UninterpretedOption
         if (aggregate_value != null)
         {
             // ...
-            encode_varint (64, buffer, ref offset);
+            Protobuf.encode_varint (64, buffer, ref offset);
         }
         if (string_value != null)
         {
             // ...
-            encode_varint (56, buffer, ref offset);
+            Protobuf.encode_varint (56, buffer, ref offset);
         }
         if (double_value != null)
         {
             // ...
-            encode_varint (48, buffer, ref offset);
+            Protobuf.encode_varint (48, buffer, ref offset);
         }
         if (negative_int_value != null)
         {
             // ...
-            encode_varint (40, buffer, ref offset);
+            Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (positive_int_value != null)
         {
             // ...
-            encode_varint (32, buffer, ref offset);
+            Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (identifier_value != null)
         {
             // ...
-            encode_varint (24, buffer, ref offset);
+            Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (name != null)
         {
             // ...
-            encode_varint (16, buffer, ref offset);
+            Protobuf.encode_varint (16, buffer, ref offset);
         }
         return 0;
     }
@@ -1401,11 +1401,11 @@ public class SourceCodeInfo
         {
             while (offset < length)
             {
-                var key = decode_varint (buffer, length, ref offset);
+                var key = Protobuf.decode_varint (buffer, length, ref offset);
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
                 int varint;
-                var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
                 // FIXME: Check remaining space
 
                 switch (field_number)
@@ -1425,12 +1425,12 @@ public class SourceCodeInfo
             if (span != null)
             {
                 // ...
-                encode_varint (16, buffer, ref offset);
+                Protobuf.encode_varint (16, buffer, ref offset);
             }
             if (path != null)
             {
                 // ...
-                encode_varint (8, buffer, ref offset);
+                Protobuf.encode_varint (8, buffer, ref offset);
             }
             return 0;
         }
@@ -1441,11 +1441,11 @@ public class SourceCodeInfo
     {
         while (offset < length)
         {
-            var key = decode_varint (buffer, length, ref offset);
+            var key = Protobuf.decode_varint (buffer, length, ref offset);
             var wire_type = key & 0x7;
             var field_number = key >> 3;
             int varint;
-            var value_length = get_value_length (wire_type, out varint, buffer, length, ref offset);
+            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
             // FIXME: Check remaining space
 
             switch (field_number)
@@ -1463,7 +1463,7 @@ public class SourceCodeInfo
         if (location != null)
         {
             // ...
-            encode_varint (8, buffer, ref offset);
+            Protobuf.encode_varint (8, buffer, ref offset);
         }
         return 0;
     }
