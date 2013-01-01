@@ -18,14 +18,27 @@ namespace Protobuf
 
     private string decode_string (uint8[] buffer, size_t length, size_t offset)
     {
-        var value = new GLib.StringBuilder ();
-        for (var i = 0; i < length; i++)
+        var value = new GLib.StringBuilder.sized (length - offset);
+        while (offset < length)
         {
             value.append_c ((char) buffer[offset]);
             offset++;
         }
 
         return value.str;
+    }
+
+    private uint8[] decode_bytes (uint8[] buffer, size_t length, size_t offset)
+    {
+        var value = new uint8[length - offset];
+        var start = offset;
+        for (var i = start; i < length; i++)
+        {
+            value[i - start] = buffer[i];
+            offset++;
+        }
+
+        return value;
     }
 
     private size_t get_value_length (int wire_type, out int varint, uint8[] buffer, size_t length, ref size_t offset)

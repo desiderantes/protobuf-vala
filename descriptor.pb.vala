@@ -4,6 +4,11 @@ public class FileDescriptorSet
 {
     public List<FileDescriptorProto> file;
 
+    public FileDescriptorSet.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -18,6 +23,7 @@ public class FileDescriptorSet
             switch (field_number)
             {
             case 1:
+                file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -48,6 +54,11 @@ public class FileDescriptorProto
     public FileOptions? options;
     public SourceCodeInfo? source_code_info;
 
+    public FileDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -62,30 +73,31 @@ public class FileDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                package = Protobuf.decode_string (buffer, value_length, offset);
+                package = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
-                dependency.append (Protobuf.decode_string (buffer, value_length, offset));
+                dependency.append (Protobuf.decode_string (buffer, offset + value_length, offset));
                 break;
             case 4:
-                var v = new DescriptorProto ();
-                v.decode (buffer, offset + value_length, offset);
-                message_type.append (v);
+                message_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 5:
+                enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 6:
+                service.append (new ServiceDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 7:
+                extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 8:
-                options = new FileOptions ();
-                options.decode (buffer, offset + value_length, offset);
+                options = new FileOptions.from_data (buffer, offset + value_length, offset);
                 break;
             case 9:
+                source_code_info = new SourceCodeInfo.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -186,6 +198,11 @@ public class DescriptorProto
         public int32? start;
         public int32? end;
 
+        public ExtensionRange.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+            decode (buffer, length, offset);
+        }
+
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
             while (offset < length)
@@ -238,6 +255,11 @@ public class DescriptorProto
     public List<ExtensionRange> extension_range;
     public MessageOptions? options;
 
+    public DescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -252,34 +274,25 @@ public class DescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                var m = new FieldDescriptorProto ();
-                m.decode (buffer, offset + value_length, offset);
-                field.append (m);
+                field.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 6:
-                var m = new FieldDescriptorProto ();
-                m.decode (buffer, offset + value_length, offset);
-                extension.append (m);
+                extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
-                var v = new DescriptorProto ();
-                v.decode (buffer, offset + value_length, offset);
-                nested_type.append (v);
+                nested_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 4:
-                var v = new EnumDescriptorProto ();
-                v.decode (buffer, offset + value_length, offset);
-                enum_type.append (v);
+                enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 5:
-                var v = new ExtensionRange ();
-                v.decode (buffer, offset + value_length, offset);
-                extension_range.append (v);
+                extension_range.append (new ExtensionRange.from_data (buffer, offset + value_length, offset));
                 break;
             case 7:
+                options = new MessageOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -473,6 +486,11 @@ public class FieldDescriptorProto
     public string? default_value;
     public FieldOptions? options;
 
+    public FieldDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -487,7 +505,7 @@ public class FieldDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
                 number = varint;
@@ -499,16 +517,16 @@ public class FieldDescriptorProto
                 type = (Type) varint;
                 break;
             case 6:
-                type_name = Protobuf.decode_string (buffer, value_length, offset);
+                type_name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
+                extendee = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 7:
-                default_value = Protobuf.decode_string (buffer, value_length, offset);
+                default_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 8:
-                options = new FieldOptions ();
-                options.decode (buffer, offset + value_length, offset);
+                options = new FieldOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -593,6 +611,11 @@ public class EnumDescriptorProto
     public List<EnumValueDescriptorProto> value;
     public EnumOptions? options;
 
+    public EnumDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -607,14 +630,13 @@ public class EnumDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                var v = new EnumValueDescriptorProto ();
-                v.decode (buffer, offset + value_length, offset);
-                value.append (v);
+                value.append (new EnumValueDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
+                options = new EnumOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -667,6 +689,11 @@ public class EnumValueDescriptorProto
     public int32? number;
     public EnumValueOptions? options;
 
+    public EnumValueDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -681,12 +708,13 @@ public class EnumValueDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, value_length, offset);
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
                 number = varint;
                 break;
             case 3:
+                options = new EnumValueOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -736,6 +764,11 @@ public class ServiceDescriptorProto
     public List<MethodDescriptorProto> method;
     public ServiceOptions? options;
 
+    public ServiceDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -750,10 +783,13 @@ public class ServiceDescriptorProto
             switch (field_number)
             {
             case 1:
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
+                method.append (new MethodDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
+                options = new ServiceOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -789,6 +825,11 @@ public class MethodDescriptorProto
     public string? output_type;
     public MethodOptions? options;
 
+    public MethodDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -803,12 +844,16 @@ public class MethodDescriptorProto
             switch (field_number)
             {
             case 1:
+                name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
+                input_type = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
+                output_type = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 4:
+                options = new MethodOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -876,6 +921,11 @@ public class FileOptions
     public bool? py_generic_services;
     public List<UninterpretedOption> uninterpreted_option;
 
+    public FileOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -890,25 +940,31 @@ public class FileOptions
             switch (field_number)
             {
             case 1:
-                java_package = Protobuf.decode_string (buffer, value_length, offset);
+                java_package = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 8:
-                java_outer_classname = Protobuf.decode_string (buffer, value_length, offset);
+                java_outer_classname = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 10:
+                java_multiple_files = varint != 0;
                 break;
             case 20:
+                java_generate_equals_and_hash = varint != 0;
                 break;
             case 9:
                 optimize_for = (OptimizeMode) varint;
                 break;
             case 16:
+                cc_generic_services = varint != 0;
                 break;
             case 17:
+                java_generic_services = varint != 0;
                 break;
             case 18:
+                py_generic_services = varint != 0;
                 break;
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -990,6 +1046,11 @@ public class MessageOptions
     public bool? no_standard_descriptor_accessor;
     public List<UninterpretedOption> uninterpreted_option;
 
+    public MessageOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1004,10 +1065,13 @@ public class MessageOptions
             switch (field_number)
             {
             case 1:
+                message_set_wire_format = varint != 0;
                 break;
             case 2:
+                no_standard_descriptor_accessor = varint != 0;
                 break;
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1051,6 +1115,11 @@ public class FieldOptions
     public string? experimental_map_key;
     public List<UninterpretedOption> uninterpreted_option;
 
+    public FieldOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1065,15 +1134,19 @@ public class FieldOptions
             switch (field_number)
             {
             case 1:
+                ctype = (CType) varint;
                 break;
             case 2:
                 packed = varint != 0;
                 break;
             case 3:
+                deprecated = varint != 0;
                 break;
             case 9:
+                experimental_map_key = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1129,6 +1202,11 @@ public class EnumOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
+    public EnumOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1143,6 +1221,7 @@ public class EnumOptions
             switch (field_number)
             {
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1165,6 +1244,11 @@ public class EnumValueOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
+    public EnumValueOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1179,6 +1263,7 @@ public class EnumValueOptions
             switch (field_number)
             {
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1201,6 +1286,11 @@ public class ServiceOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
+    public ServiceOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1215,6 +1305,7 @@ public class ServiceOptions
             switch (field_number)
             {
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1237,6 +1328,11 @@ public class MethodOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
+    public MethodOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1251,6 +1347,7 @@ public class MethodOptions
             switch (field_number)
             {
             case 999:
+                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1276,6 +1373,11 @@ public class UninterpretedOption
         public string name_part;
         public bool is_extension;
 
+        public NamePart.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+            decode (buffer, length, offset);
+        }
+
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
             while (offset < length)
@@ -1290,8 +1392,10 @@ public class UninterpretedOption
                 switch (field_number)
                 {
                 case 1:
+                    name_part = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 case 2:
+                    is_extension = varint != 0;
                     break;
                 }
 
@@ -1316,6 +1420,11 @@ public class UninterpretedOption
     public uint8[]? string_value;
     public string? aggregate_value;
 
+    public UninterpretedOption.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1330,8 +1439,10 @@ public class UninterpretedOption
             switch (field_number)
             {
             case 2:
+                name.append (new NamePart.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
+                identifier_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 4:
                 break;
@@ -1340,8 +1451,10 @@ public class UninterpretedOption
             case 6:
                 break;
             case 7:
+                string_value = Protobuf.decode_bytes (buffer, offset + value_length, offset);
                 break;
             case 8:
+                aggregate_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -1397,6 +1510,11 @@ public class SourceCodeInfo
         public List<int32> path;
         public List<int32> span;
 
+        public Location.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+            decode (buffer, length, offset);
+        }
+
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
             while (offset < length)
@@ -1411,8 +1529,10 @@ public class SourceCodeInfo
                 switch (field_number)
                 {
                 case 1:
+                    path.append (varint);
                     break;
                 case 2:
+                    span.append (varint);
                     break;
                 }
 
@@ -1437,6 +1557,11 @@ public class SourceCodeInfo
     }
     public List<Location> location;
 
+    public SourceCodeInfo.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -1451,6 +1576,7 @@ public class SourceCodeInfo
             switch (field_number)
             {
             case 1:
+                location.append (new Location.from_data (buffer, offset + value_length, offset));
                 break;
             }
 

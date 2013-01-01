@@ -73,6 +73,11 @@ private static string write_class (DescriptorProto type, string indent = "")
     foreach (var field in type.field)
         text += indent + "    public %s %s;\n".printf (get_type_name (field), field.name);
     text += "\n";
+    text += indent + "    public %s.from_data (uint8[] buffer, size_t length, size_t offset = 0)\n".printf (type.name);
+    text += indent + "    {\n";
+    text += indent + "        decode (buffer, length, offset);\n";
+    text += indent + "    }\n";
+    text += "\n";
     text += indent + "    public void decode (uint8[] buffer, size_t length, size_t offset = 0)\n";
     text += indent + "    {\n";
     text += indent + "        while (offset < length)\n";
@@ -89,6 +94,37 @@ private static string write_class (DescriptorProto type, string indent = "")
     foreach (var field in type.field)
     {
         text += indent + "            case %d:\n".printf (field.number);
+        var decode_method = "";
+        switch (field.type)
+        {
+        case FieldDescriptorProto.Type.TYPE_INT32:
+            decode_method = "varint";
+            break;
+        case FieldDescriptorProto.Type.TYPE_BOOL:
+            decode_method = "varint != 0";
+            break;
+        case FieldDescriptorProto.Type.TYPE_STRING:
+            decode_method = "Protobuf.decode_string (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_BYTES:
+            decode_method = "Protobuf.decode_bytes (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_MESSAGE:
+            var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+            decode_method = "new %s.from_data (buffer, offset + value_length, offset)".printf (type_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_ENUM:
+            var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+            decode_method = "(%s) varint".printf (type_name);
+            break;
+        default:
+            decode_method = "DECODE_UNKNOWN_TYPE%d()".printf (field.type);
+            break;
+        }
+        if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+            text += indent + "                %s.append (%s);\n".printf (field.name, decode_method);
+        else
+            text += indent + "                %s = %s;\n".printf (field.name, decode_method);
         text += indent + "                break;\n";
     }
     text += indent + "            }\n";

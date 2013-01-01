@@ -6,6 +6,11 @@ public class CodeGeneratorRequest
     public string? parameter;
     public List<FileDescriptorProto> proto_file;
 
+    public CodeGeneratorRequest.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -20,15 +25,13 @@ public class CodeGeneratorRequest
             switch (field_number)
             {
             case 1:
-                file_to_generate.append (Protobuf.decode_string (buffer, value_length, offset));
+                file_to_generate.append (Protobuf.decode_string (buffer, offset + value_length, offset));
                 break;
             case 2:
-                parameter = Protobuf.decode_string (buffer, value_length, offset);
+                parameter = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 15:
-                var f = new FileDescriptorProto ();
-                f.decode (buffer, offset + value_length, offset);
-                proto_file.append (f);
+                proto_file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -95,6 +98,11 @@ public class CodeGeneratorResponse
         public string? insertion_point;
         public string? content;
 
+        public File.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+            decode (buffer, length, offset);
+        }
+
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
             while (offset < length)
@@ -109,10 +117,13 @@ public class CodeGeneratorResponse
                 switch (field_number)
                 {
                 case 1:
+                    name = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 case 2:
+                    insertion_point = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 case 15:
+                    content = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 }
 
@@ -142,6 +153,11 @@ public class CodeGeneratorResponse
     public string? error;
     public List<File> file;
 
+    public CodeGeneratorResponse.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+        decode (buffer, length, offset);
+    }
+
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
         while (offset < length)
@@ -156,8 +172,10 @@ public class CodeGeneratorResponse
             switch (field_number)
             {
             case 1:
+                error = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 15:
+                file.append (new File.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
