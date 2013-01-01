@@ -159,11 +159,11 @@ public class CodeGeneratorResponse
         public string? name;
         public string? insertion_point;
         public string? content;
-    
+
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
         }
-    
+
         public size_t encode (uint8[] buffer, size_t offset)
         {
             var start = offset;

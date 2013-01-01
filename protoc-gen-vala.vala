@@ -52,11 +52,11 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += write_class (nested_type, indent + "    ");
     foreach (var field in type.field)
         text += indent + "    public %s %s;\n".printf (get_type_name (field), field.name);
-    text += indent + "\n";
+    text += "\n";
     text += indent + "    public void decode (uint8[] buffer, size_t length, size_t offset = 0)\n";
     text += indent + "    {\n";
     text += indent + "    }\n";
-    text += indent + "\n";
+    text += "\n";
     text += indent + "    public size_t encode (uint8[] buffer, size_t offset)\n";
     text += indent + "    {\n";
     text += indent + "        return 0;\n";

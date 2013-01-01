@@ -21,8 +21,10 @@ public class FileDescriptorProto
     public List<string> dependency;
     public List<DescriptorProto> message_type;
     public List<EnumDescriptorProto> enum_type;
+    public List<ServiceDescriptorProto> service;
     public List<FieldDescriptorProto> extension;
     public FileOptions? options;
+    public SourceCodeInfo? source_code_info;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -109,8 +111,8 @@ public class DescriptorProto
 {
     public class ExtensionRange
     {
-        int32? start;
-        int32? end;
+        public int32? start;
+        public int32? end;
 
         public void decode (uint8[] buffer, size_t length, size_t offset = 0)
         {
@@ -143,6 +145,11 @@ public class DescriptorProto
             if (offset != length)
                 stderr.printf ("Unused %zu octets on end of DescriptorProto.ExtensionRange\n", offset - length);
         }
+
+        public size_t encode (uint8[] buffer, size_t offset)
+        {
+            return 0;
+        }
     }
 
     public string? name;
@@ -151,6 +158,7 @@ public class DescriptorProto
     public List<DescriptorProto> nested_type;
     public List<EnumDescriptorProto> enum_type;
     public List<ExtensionRange> extension_range;
+    public MessageOptions? options;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -350,6 +358,7 @@ public class FieldDescriptorProto
     public Label? label;
     public Type? type;
     public string? type_name;
+    public string? extendee;
     public string? default_value;
     public FieldOptions? options;
 
@@ -401,6 +410,11 @@ public class FieldDescriptorProto
             stderr.printf ("Unused %zu octets on end of FieldDescriptorProto\n", offset - length);
     }
 
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+
     public string to_string ()
     {
         var text = "";
@@ -428,6 +442,7 @@ public class EnumDescriptorProto
 {
     public string? name;
     public List<EnumValueDescriptorProto> value;
+    public EnumOptions? options;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -463,6 +478,11 @@ public class EnumDescriptorProto
             stderr.printf ("Unused %zu octets on end of EnumDescriptorProto\n", offset - length);
     }
 
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+
     public string to_string ()
     {
         var text = "";
@@ -483,6 +503,7 @@ public class EnumValueDescriptorProto
 {
     public string? name;
     public int32? number;
+    public EnumValueOptions? options;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -516,6 +537,11 @@ public class EnumValueDescriptorProto
             stderr.printf ("Unused %zu octets on end of EnumValueDescriptorProto\n", offset - length);
     }
 
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+
     public string to_string ()
     {
         var text = "";
@@ -526,6 +552,39 @@ public class EnumValueDescriptorProto
             text += "number=%d ".printf (number);
 
         return text;
+    }
+}
+
+public class ServiceDescriptorProto
+{
+    public string? name;
+    public List<MethodDescriptorProto> method;
+    public ServiceOptions? options;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class MethodDescriptorProto
+{
+    public string? name;
+    public string? input_type;
+    public string? output_type;
+    public MethodOptions? options;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
     }
 }
 
@@ -555,7 +614,13 @@ public class FileOptions
 
     public string? java_package;
     public string? java_outer_classname;
+    public bool? java_multiple_files;
+    public bool? java_generate_equals_and_hash;
     public OptimizeMode? optimize_for;
+    public bool? cc_generic_services;
+    public bool? java_generic_services;
+    public bool? py_generic_services;
+    public List<UninterpretedOption> uninterpreted_option;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -592,6 +657,11 @@ public class FileOptions
             stderr.printf ("Unused %zu octets on end of EnumValueDescriptorProto\n", offset - length);
     }
 
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+
     public string to_string ()
     {
         var text = "";
@@ -607,9 +677,36 @@ public class FileOptions
     }
 }
 
+public class MessageOptions
+{
+    public bool? message_set_wire_format;
+    public bool? no_standard_descriptor_accessor;
+    public List<UninterpretedOption> uninterpreted_option;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
 public class FieldOptions
 {
+    public enum CType
+    {
+        STRING = 0,
+        CORD = 1,
+        STRING_PIECE = 2
+    }
+
+    public CType? ctype;
     public bool? packed;
+    public bool? deprecated;
+    public string? experimental_map_key;
+    public List<UninterpretedOption> uninterpreted_option;
 
     public void decode (uint8[] buffer, size_t length, size_t offset = 0)
     {
@@ -653,5 +750,123 @@ public class FieldOptions
             text += "packed=%s ".printf (packed ? "true" : "false");
 
         return text;
+    }
+}
+
+public class EnumOptions
+{
+    public List<UninterpretedOption> uninterpreted_option;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class EnumValueOptions
+{
+    public List<UninterpretedOption> uninterpreted_option;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class ServiceOptions
+{
+    public List<UninterpretedOption> uninterpreted_option;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class MethodOptions
+{
+    public List<UninterpretedOption> uninterpreted_option;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class UninterpretedOption
+{
+    public class NamePart
+    {
+        public string name_part;
+        public bool is_extension;
+
+        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+        }
+
+        public size_t encode (uint8[] buffer, size_t offset)
+        {
+            return 0;
+        }
+    }
+    public List<NamePart> name;
+    public string? identifier_value;
+    public uint64? positive_int_value;
+    public int64? negative_int_value;
+    public double? double_value;
+    public uint8[]? string_value;
+    public string? aggregate_value;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
+    }
+}
+
+public class SourceCodeInfo
+{
+    public class Location
+    {
+        public List<int32> path;
+        public List<int32> span;
+
+        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        {
+        }
+
+        public size_t encode (uint8[] buffer, size_t offset)
+        {
+            return 0;
+        }
+    }
+    public List<Location> location;
+
+    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    {
+    }
+
+    public size_t encode (uint8[] buffer, size_t offset)
+    {
+        return 0;
     }
 }
