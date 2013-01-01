@@ -35,9 +35,9 @@ public class FileDescriptorSet
     {
         var start = offset;
 
-        foreach (var v in file)
+        for (unowned List<FileDescriptorProto> i = file.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -128,33 +128,33 @@ public class FileDescriptorProto
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
-        foreach (var v in extension)
+        for (unowned List<FieldDescriptorProto> i = extension.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
-        foreach (var v in service)
+        for (unowned List<ServiceDescriptorProto> i = service.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
-        foreach (var v in enum_type)
+        for (unowned List<EnumDescriptorProto> i = enum_type.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
-        foreach (var v in message_type)
+        for (unowned List<DescriptorProto> i = message_type.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
-        foreach (var v in dependency)
+        for (unowned List<string> i = dependency.last (); i != null; i = i.prev)
         {
-            var n = Protobuf.encode_string (v, buffer, ref offset);
+            var n = Protobuf.encode_string (i.data, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
@@ -331,33 +331,33 @@ public class DescriptorProto
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
-        foreach (var v in extension_range)
+        for (unowned List<ExtensionRange> i = extension_range.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
-        foreach (var v in enum_type)
+        for (unowned List<EnumDescriptorProto> i = enum_type.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
-        foreach (var v in nested_type)
+        for (unowned List<DescriptorProto> i = nested_type.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        foreach (var v in extension)
+        for (unowned List<FieldDescriptorProto> i = extension.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
-        foreach (var v in field)
+        for (unowned List<FieldDescriptorProto> i = field.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
@@ -693,9 +693,9 @@ public class EnumDescriptorProto
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        foreach (var v in value)
+        for (unowned List<EnumValueDescriptorProto> i = value.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
@@ -854,9 +854,9 @@ public class ServiceDescriptorProto
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        foreach (var v in method)
+        for (unowned List<MethodDescriptorProto> i = method.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
@@ -1039,9 +1039,9 @@ public class FileOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1149,9 +1149,9 @@ public class MessageOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1231,9 +1231,9 @@ public class FieldOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1308,9 +1308,9 @@ public class EnumOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1354,9 +1354,9 @@ public class EnumValueOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1400,9 +1400,9 @@ public class ServiceOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1446,9 +1446,9 @@ public class MethodOptions
     {
         var start = offset;
 
-        foreach (var v in uninterpreted_option)
+        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (7994, buffer, ref offset);
         }
@@ -1594,9 +1594,9 @@ public class UninterpretedOption
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        foreach (var v in name)
+        for (unowned List<NamePart> i = name.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
@@ -1693,9 +1693,9 @@ public class SourceCodeInfo
     {
         var start = offset;
 
-        foreach (var v in location)
+        for (unowned List<Location> i = location.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }

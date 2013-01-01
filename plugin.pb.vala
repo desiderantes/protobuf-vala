@@ -46,9 +46,9 @@ public class CodeGeneratorRequest
     {
         var start = offset;
 
-        foreach (var v in proto_file)
+        for (unowned List<FileDescriptorProto> i = proto_file.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }
@@ -58,9 +58,9 @@ public class CodeGeneratorRequest
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
-        foreach (var v in file_to_generate)
+        for (unowned List<string> i = file_to_generate.last (); i != null; i = i.prev)
         {
-            var n = Protobuf.encode_string (v, buffer, ref offset);
+            var n = Protobuf.encode_string (i.data, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -200,10 +200,9 @@ public class CodeGeneratorResponse
     {
         var start = offset;
 
-        // FIXME: Reverse the list
-        foreach (var v in file)
+        for (unowned List<File> i = file.last (); i != null; i = i.prev)
         {
-            var n = v.encode (buffer, ref offset);
+            var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }

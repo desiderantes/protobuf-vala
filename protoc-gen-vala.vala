@@ -111,12 +111,10 @@ private static string write_class (DescriptorProto type, string indent = "")
             decode_method = "Protobuf.decode_bytes (buffer, offset + value_length, offset)";
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
-            var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
-            decode_method = "new %s.from_data (buffer, offset + value_length, offset)".printf (type_name);
+            decode_method = "new %s.from_data (buffer, offset + value_length, offset)".printf (get_type_name (field, false));
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
-            var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
-            decode_method = "(%s) varint".printf (type_name);
+            decode_method = "(%s) varint".printf (get_type_name (field, false));
             break;
         default:
             decode_method = "DECODE_UNKNOWN_TYPE%d()".printf (field.type);
@@ -151,10 +149,10 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        foreach (var v in %s)\n".printf (field.name);
+            text += indent + "        for (unowned List<%s> i = %s.last (); i != null; i = i.prev)\n".printf (get_type_name (field, false), field.name);
             text += indent + "        {\n";
             indent2 += "    ";
-            field_name = "v";
+            field_name = "i.data";
         }
 
         var encode_length = false;
@@ -211,7 +209,7 @@ private static string write_class (DescriptorProto type, string indent = "")
     return text;
 }
 
-private static string get_type_name (FieldDescriptorProto field)
+private static string get_type_name (FieldDescriptorProto field, bool full = true)
 {
     var type_name = "";
     switch (field.type)
@@ -251,6 +249,9 @@ private static string get_type_name (FieldDescriptorProto field)
          type_name = "UNKNOWN_TYPE%d".printf (field.type);
          break;
     }
+
+    if (!full)
+         return type_name;
     
     switch (field.label)
     {
