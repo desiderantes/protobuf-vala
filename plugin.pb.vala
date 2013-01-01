@@ -44,19 +44,19 @@ public class CodeGeneratorRequest
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
-        if (proto_file != null)
+        foreach (var v in proto_file)
         {
             // ...
             Protobuf.encode_varint (120, buffer, ref offset);
         }
         if (parameter != null)
         {
-            // ...
+            Protobuf.encode_string (parameter, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
-        if (file_to_generate != null)
+        foreach (var v in file_to_generate)
         {
-            // ...
+            Protobuf.encode_string (v, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 
@@ -140,6 +140,11 @@ public class CodeGeneratorResponse
                 Protobuf.encode_string (content, buffer, ref offset);
                 Protobuf.encode_varint ((15 << 3) | 0x2, buffer, ref offset);
             }
+            if (insertion_point != null)
+            {
+                Protobuf.encode_string (insertion_point, buffer, ref offset);
+                Protobuf.encode_varint (16, buffer, ref offset);
+            }
             if (name != null)
             {
                 Protobuf.encode_string (name, buffer, ref offset);
@@ -197,7 +202,7 @@ public class CodeGeneratorResponse
         }
         if (error != null)
         {
-            // ...
+            Protobuf.encode_string (error, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 

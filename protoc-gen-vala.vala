@@ -139,14 +139,35 @@ private static string write_class (DescriptorProto type, string indent = "")
     {
         var field = i.data;
         var indent2 = indent;
-        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        var field_name = field.name;
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
         {
             text += indent + "        if (%s != null)\n".printf (field.name);
             text += indent + "        {\n";
             indent2 += "    ";
         }
+        else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        {
+            text += indent + "        foreach (var v in %s)\n".printf (field.name);
+            text += indent + "        {\n";
+            indent2 += "    ";
+            field_name = "v";
+        }
 
-        text += indent2 + "        // ...\n";
+        text += indent2 + "        ";
+        switch (field.type)
+        {
+        case FieldDescriptorProto.Type.TYPE_BOOL:
+            text += "Protobuf.encode_varint (%s ? 1 : 0, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_STRING:
+            text += "Protobuf.encode_string (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        default:
+            text += "ENCODE_UNKNOWN_TYPE%d(%s);\n".printf (field.type, field_name);
+            break;
+        }
+
         var n = field.number << 3;
         // FIXME add wire_type
         text += indent2 + "        Protobuf.encode_varint (%d, buffer, ref offset);\n".printf (n);
