@@ -93,17 +93,17 @@ public class CodeGeneratorRequest
         if (proto_file != null)
         {
             // ...
-            encode_varint (0x78, buffer, ref offset);
+            encode_varint (120, buffer, ref offset);
         }
         if (parameter != null)
         {
             // ...
-            encode_varint (0x10, buffer, ref offset);
+            encode_varint (16, buffer, ref offset);
         }
         if (file_to_generate != null)
         {
             // ...
-            encode_varint (0x08, buffer, ref offset);
+            encode_varint (8, buffer, ref offset);
         }
 
         return 0;
@@ -253,6 +253,11 @@ public class CodeGeneratorResponse
             offset -= n_written;
             encode_varint ((int) n_written, buffer, ref offset);
             encode_varint ((15 << 3) | 0x2, buffer, ref offset);
+        }
+        if (error != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
         }
 
         return start - offset;

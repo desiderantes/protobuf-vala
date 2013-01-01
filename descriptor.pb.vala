@@ -27,6 +27,11 @@ public class FileDescriptorSet
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (file != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -93,6 +98,52 @@ public class FileDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (source_code_info != null)
+        {
+            // ...
+            encode_varint (72, buffer, ref offset);
+        }
+        if (options != null)
+        {
+            // ...
+            encode_varint (64, buffer, ref offset);
+        }
+        if (extension != null)
+        {
+            // ...
+            encode_varint (56, buffer, ref offset);
+        }
+        if (service != null)
+        {
+            // ...
+            encode_varint (48, buffer, ref offset);
+        }
+        if (enum_type != null)
+        {
+            // ...
+            encode_varint (40, buffer, ref offset);
+        }
+        if (message_type != null)
+        {
+            // ...
+            encode_varint (32, buffer, ref offset);
+        }
+        if (dependency != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (package != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
+
         return 0;
     }
 
@@ -165,6 +216,16 @@ public class DescriptorProto
 
         public size_t encode (uint8[] buffer, size_t offset)
         {
+            if (end != null)
+            {
+                // ...
+                encode_varint (16, buffer, ref offset);
+            }
+            if (start != null)
+            {
+                // ...
+                encode_varint (8, buffer, ref offset);
+            }
             return 0;
         }
     }
@@ -198,6 +259,11 @@ public class DescriptorProto
                 m.decode (buffer, offset + value_length, offset);
                 field.append (m);
                 break;
+            case 6:
+                var m = new FieldDescriptorProto ();
+                m.decode (buffer, offset + value_length, offset);
+                extension.append (m);
+                break;
             case 3:
                 var v = new DescriptorProto ();
                 v.decode (buffer, offset + value_length, offset);
@@ -213,13 +279,8 @@ public class DescriptorProto
                 v.decode (buffer, offset + value_length, offset);
                 extension_range.append (v);
                 break;
-            case 6:
-                var m = new FieldDescriptorProto ();
-                m.decode (buffer, offset + value_length, offset);
-                extension.append (m);
-                break;
             case 7:
-                 break;
+                break;
             }
 
             offset += value_length;
@@ -231,6 +292,41 @@ public class DescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (56, buffer, ref offset);
+        }
+        if (extension_range != null)
+        {
+            // ...
+            encode_varint (40, buffer, ref offset);
+        }
+        if (enum_type != null)
+        {
+            // ...
+            encode_varint (32, buffer, ref offset);
+        }
+        if (nested_type != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (extension != null)
+        {
+            // ...
+            encode_varint (48, buffer, ref offset);
+        }
+        if (field != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -288,17 +384,17 @@ public class FieldDescriptorProto
         TYPE_INT32 = 5,
         TYPE_FIXED64 = 6,
         TYPE_FIXED32 = 7,
-        TYPE_BOOL  = 8,
+        TYPE_BOOL = 8,
         TYPE_STRING = 9,
         TYPE_GROUP = 10,
         TYPE_MESSAGE = 11,
         TYPE_BYTES = 12,
         TYPE_UINT32 = 13,
-        TYPE_ENUM  = 14,
+        TYPE_ENUM = 14,
         TYPE_SFIXED32 = 15,
         TYPE_SFIXED64 = 16,
         TYPE_SINT32 = 17,
-        TYPE_SINT64 = 18
+        TYPE_SINT64 = 18,
     }
 
     public string type_to_string (Type type)
@@ -350,7 +446,7 @@ public class FieldDescriptorProto
     {
         LABEL_OPTIONAL = 1,
         LABEL_REQUIRED = 2,
-        LABEL_REPEATED = 3
+        LABEL_REPEATED = 3,
     }
 
     public string label_to_string (Label label)
@@ -425,6 +521,46 @@ public class FieldDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (64, buffer, ref offset);
+        }
+        if (default_value != null)
+        {
+            // ...
+            encode_varint (56, buffer, ref offset);
+        }
+        if (extendee != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (type_name != null)
+        {
+            // ...
+            encode_varint (48, buffer, ref offset);
+        }
+        if (type != null)
+        {
+            // ...
+            encode_varint (40, buffer, ref offset);
+        }
+        if (label != null)
+        {
+            // ...
+            encode_varint (32, buffer, ref offset);
+        }
+        if (number != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -491,6 +627,21 @@ public class EnumDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (value != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -548,6 +699,21 @@ public class EnumValueDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (number != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -597,6 +763,21 @@ public class ServiceDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (method != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -637,6 +818,26 @@ public class MethodDescriptorProto
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (options != null)
+        {
+            // ...
+            encode_varint (32, buffer, ref offset);
+        }
+        if (output_type != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (input_type != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -647,7 +848,7 @@ public class FileOptions
     {
         SPEED = 1,
         CODE_SIZE = 2,
-        LITE_RUNTIME = 3
+        LITE_RUNTIME = 3,
     }
 
     private string optimize_mode_to_string (OptimizeMode mode)
@@ -720,6 +921,51 @@ public class FileOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
+        if (py_generic_services != null)
+        {
+            // ...
+            encode_varint (144, buffer, ref offset);
+        }
+        if (java_generic_services != null)
+        {
+            // ...
+            encode_varint (136, buffer, ref offset);
+        }
+        if (cc_generic_services != null)
+        {
+            // ...
+            encode_varint (128, buffer, ref offset);
+        }
+        if (optimize_for != null)
+        {
+            // ...
+            encode_varint (72, buffer, ref offset);
+        }
+        if (java_generate_equals_and_hash != null)
+        {
+            // ...
+            encode_varint (160, buffer, ref offset);
+        }
+        if (java_multiple_files != null)
+        {
+            // ...
+            encode_varint (80, buffer, ref offset);
+        }
+        if (java_outer_classname != null)
+        {
+            // ...
+            encode_varint (64, buffer, ref offset);
+        }
+        if (java_package != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -771,6 +1017,21 @@ public class MessageOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
+        if (no_standard_descriptor_accessor != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (message_set_wire_format != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -781,7 +1042,7 @@ public class FieldOptions
     {
         STRING = 0,
         CORD = 1,
-        STRING_PIECE = 2
+        STRING_PIECE = 2,
     }
 
     public CType? ctype;
@@ -825,6 +1086,31 @@ public class FieldOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
+        if (experimental_map_key != null)
+        {
+            // ...
+            encode_varint (72, buffer, ref offset);
+        }
+        if (deprecated != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (packed != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
+        if (ctype != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 
@@ -866,6 +1152,11 @@ public class EnumOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -897,6 +1188,11 @@ public class EnumValueOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -928,6 +1224,11 @@ public class ServiceOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -959,6 +1260,11 @@ public class MethodOptions
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (uninterpreted_option != null)
+        {
+            // ...
+            encode_varint (7992, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -995,6 +1301,10 @@ public class UninterpretedOption
 
         public size_t encode (uint8[] buffer, size_t offset)
         {
+            // ...
+            encode_varint (16, buffer, ref offset);
+            // ...
+            encode_varint (8, buffer, ref offset);
             return 0;
         }
     }
@@ -1041,6 +1351,41 @@ public class UninterpretedOption
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (aggregate_value != null)
+        {
+            // ...
+            encode_varint (64, buffer, ref offset);
+        }
+        if (string_value != null)
+        {
+            // ...
+            encode_varint (56, buffer, ref offset);
+        }
+        if (double_value != null)
+        {
+            // ...
+            encode_varint (48, buffer, ref offset);
+        }
+        if (negative_int_value != null)
+        {
+            // ...
+            encode_varint (40, buffer, ref offset);
+        }
+        if (positive_int_value != null)
+        {
+            // ...
+            encode_varint (32, buffer, ref offset);
+        }
+        if (identifier_value != null)
+        {
+            // ...
+            encode_varint (24, buffer, ref offset);
+        }
+        if (name != null)
+        {
+            // ...
+            encode_varint (16, buffer, ref offset);
+        }
         return 0;
     }
 }
@@ -1077,6 +1422,16 @@ public class SourceCodeInfo
 
         public size_t encode (uint8[] buffer, size_t offset)
         {
+            if (span != null)
+            {
+                // ...
+                encode_varint (16, buffer, ref offset);
+            }
+            if (path != null)
+            {
+                // ...
+                encode_varint (8, buffer, ref offset);
+            }
             return 0;
         }
     }
@@ -1105,6 +1460,11 @@ public class SourceCodeInfo
 
     public size_t encode (uint8[] buffer, size_t offset)
     {
+        if (location != null)
+        {
+            // ...
+            encode_varint (8, buffer, ref offset);
+        }
         return 0;
     }
 }
