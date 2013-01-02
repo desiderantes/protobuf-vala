@@ -337,39 +337,57 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
     switch (field.type)
     {
     case FieldDescriptorProto.Type.TYPE_DOUBLE:
-         type_name = "double";
-         break;
+        type_name = "double";
+        break;
     case FieldDescriptorProto.Type.TYPE_FLOAT:
-         type_name = "float";
-         break;
+        type_name = "float";
+        break;
     case FieldDescriptorProto.Type.TYPE_INT64:
-         type_name = "int64";
-         break;
+        type_name = "int64";
+        break;
     case FieldDescriptorProto.Type.TYPE_UINT64:
-         type_name = "uint64";
-         break;
+        type_name = "uint64";
+        break;
     case FieldDescriptorProto.Type.TYPE_INT32:
-         type_name = "int32";
-         break;
+        type_name = "int32";
+        break;
+    case FieldDescriptorProto.Type.TYPE_FIXED64:
+        type_name = "uint64";
+        break;
+    case FieldDescriptorProto.Type.TYPE_FIXED32:
+        type_name = "uint32";
+        break;
     case FieldDescriptorProto.Type.TYPE_BOOL:
-         type_name = "bool";
-         break;
+        type_name = "bool";
+        break;
     case FieldDescriptorProto.Type.TYPE_STRING:
-         type_name = "string";
-         break;
+        type_name = "string";
+        break;
     case FieldDescriptorProto.Type.TYPE_BYTES:
-         type_name = "uint8[]";
-         break;
+        type_name = "uint8[]";
+        break;
     case FieldDescriptorProto.Type.TYPE_UINT32:
-         type_name = "uint32";
-         break;
+        type_name = "uint32";
+        break;
+    case FieldDescriptorProto.Type.TYPE_SFIXED32:
+        type_name = "int32";
+        break;
+    case FieldDescriptorProto.Type.TYPE_SFIXED64:
+        type_name = "int64";
+        break;
+    case FieldDescriptorProto.Type.TYPE_SINT32:
+        type_name = "int32";
+        break;
+    case FieldDescriptorProto.Type.TYPE_SINT64:
+        type_name = "int64";
+        break;
     case FieldDescriptorProto.Type.TYPE_MESSAGE:
     case FieldDescriptorProto.Type.TYPE_ENUM:
-         type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
-         break;
+        type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+        break;
     default:
-         type_name = "UNKNOWN_TYPE%d".printf (field.type);
-         break;
+        type_name = "UNKNOWN_TYPE%d".printf (field.type);
+        break;
     }
 
     if (!full)
