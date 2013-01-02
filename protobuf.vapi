@@ -15,6 +15,12 @@ namespace Protobuf
             shift += 7;
         }
     }
+    
+    private double decode_double (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 8;
+        return 0.0; // FIXME
+    }
 
     private string decode_string (uint8[] buffer, size_t length, size_t offset)
     {
@@ -80,6 +86,13 @@ namespace Protobuf
             v >>= 7;
         }
         buffer[offset + n_octets] = (uint8) (v & 0x7F);
+    }
+
+    private size_t encode_double (double value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 8;
+        // FIXME
+        return 8;
     }
 
     private size_t encode_string (string value, uint8[] buffer, ref size_t offset)
