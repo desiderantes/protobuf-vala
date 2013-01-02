@@ -90,13 +90,13 @@ namespace Protobuf
         return decode_varint (buffer, length, ref offset);
     }
 
-    private uint32 decode_sfixed32 (uint8[] buffer, size_t length, size_t offset)
+    private int32 decode_sfixed32 (uint8[] buffer, size_t length, size_t offset)
     {
         offset += 4;
         return 0; // FIXME
     }
 
-    private uint64 decode_sfixed64 (uint8[] buffer, size_t length, size_t offset)
+    private int64 decode_sfixed64 (uint8[] buffer, size_t length, size_t offset)
     {
         offset += 8;
         return 0; // FIXME
@@ -228,14 +228,14 @@ namespace Protobuf
         return encode_varint (value, buffer, ref offset);
     }
 
-    private size_t encode_sfixed32 (uint32 value, uint8[] buffer, ref size_t offset)
+    private size_t encode_sfixed32 (int32 value, uint8[] buffer, ref size_t offset)
     {
         offset -= 4;
         // FIXME
         return 4;
     }
 
-    private size_t encode_sfixed64 (uint64 value, uint8[] buffer, ref size_t offset)
+    private size_t encode_sfixed64 (int64 value, uint8[] buffer, ref size_t offset)
     {
         offset -= 8;
         // FIXME
