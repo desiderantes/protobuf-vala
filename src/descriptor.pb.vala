@@ -1790,7 +1790,7 @@ public class UninterpretedOption
     public uint64? positive_int_value;
     public int64? negative_int_value;
     public double? double_value;
-    public uint8[]? string_value;
+    public GLib.ByteArray? string_value;
     public string? aggregate_value;
 
     public UninterpretedOption.from_data (uint8[] buffer, size_t length, size_t offset = 0)
@@ -1923,8 +1923,8 @@ public class UninterpretedOption
         if (this.string_value != null)
         {
             text += "string_value = ";
-            for (var i = 0; i < this.string_value.length; i++)
-                text += "%02X".printf (this.string_value[i]);
+            for (var i = 0; i < this.string_value.len; i++)
+                text += "%02X".printf (this.string_value.data[i]);
             text += "\n";
         }
 

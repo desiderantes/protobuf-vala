@@ -310,8 +310,8 @@ private static string write_class (DescriptorProto type, string indent = "")
             text += indent2 + "        text += \"\\\"%%s\\\";\\n\".printf (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
-            text += indent2 + "        for (var i = 0; i < %s.length; i++)\n".printf (field_name);
-            text += indent2 + "            text += \"%%02X\".printf (%s[i]);\n".printf (field_name);
+            text += indent2 + "        for (var i = 0; i < %s.len; i++)\n".printf (field_name);
+            text += indent2 + "            text += \"%%02X\".printf (%s.data[i]);\n".printf (field_name);
             text += indent2 + "        text += \"\\n\";\n";
             break;
         default:
@@ -370,8 +370,7 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
         type_name = "string";
         break;
     case FieldDescriptorProto.Type.TYPE_BYTES:
-        type_name = "uint8[]";
-        needs_box = true;
+        type_name = "GLib.ByteArray";
         break;
     case FieldDescriptorProto.Type.TYPE_UINT32:
         type_name = "uint32";

@@ -72,13 +72,13 @@ namespace Protobuf
         return value.str;
     }
 
-    private uint8[] decode_bytes (uint8[] buffer, size_t length, size_t offset)
+    private GLib.ByteArray decode_bytes (uint8[] buffer, size_t length, size_t offset)
     {
-        var value = new uint8[length - offset];
+        var value = new GLib.ByteArray.sized ((uint) (length - offset));
         var start = offset;
         for (var i = start; i < length; i++)
         {
-            value[i - start] = buffer[i];
+            value.data[i - start] = buffer[i];
             offset++;
         }
 
@@ -214,13 +214,13 @@ namespace Protobuf
         return value.length;
     }
 
-    private size_t encode_bytes (uint8[] value, uint8[] buffer, ref size_t offset)
+    private size_t encode_bytes (GLib.ByteArray value, uint8[] buffer, ref size_t offset)
     {
-        offset -= value.length;
-        for (var i = 0; value[i] != '\0'; i++)
-            buffer[offset + i + 1] = value[i];
+        offset -= value.len;
+        for (var i = 0; i < value.len; i++)
+            buffer[offset + i + 1] = value.data[i];
 
-        return value.length;
+        return value.len;
     }
 
     private size_t encode_uint32 (uint32 value, uint8[] buffer, ref size_t offset)
