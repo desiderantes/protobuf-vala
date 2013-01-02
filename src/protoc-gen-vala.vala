@@ -299,7 +299,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent2 + "        foreach (var v in this.%s)\n".printf (field.name);
+            text += indent2 + "        foreach (unowned %s v in this.%s)\n".printf (get_type_name (field, false), field.name);
             indent2 += "    ";
             field_name = "v";
         }

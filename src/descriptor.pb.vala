@@ -52,7 +52,7 @@ public class FileDescriptorSet
         if (this.file != null)
         {
             text += "file = ";
-            foreach (var v in this.file)
+            foreach (unowned FileDescriptorProto v in this.file)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -205,35 +205,35 @@ public class FileDescriptorProto
         if (this.dependency != null)
         {
             text += "dependency = ";
-            foreach (var v in this.dependency)
+            foreach (unowned string v in this.dependency)
                 text += "\"%s\";\n".printf (v);
         }
 
         if (this.message_type != null)
         {
             text += "message_type = ";
-            foreach (var v in this.message_type)
+            foreach (unowned DescriptorProto v in this.message_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.enum_type != null)
         {
             text += "enum_type = ";
-            foreach (var v in this.enum_type)
+            foreach (unowned EnumDescriptorProto v in this.enum_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.service != null)
         {
             text += "service = ";
-            foreach (var v in this.service)
+            foreach (unowned ServiceDescriptorProto v in this.service)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension != null)
         {
             text += "extension = ";
-            foreach (var v in this.extension)
+            foreach (unowned FieldDescriptorProto v in this.extension)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -445,35 +445,35 @@ public class DescriptorProto
         if (this.field != null)
         {
             text += "field = ";
-            foreach (var v in this.field)
+            foreach (unowned FieldDescriptorProto v in this.field)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension != null)
         {
             text += "extension = ";
-            foreach (var v in this.extension)
+            foreach (unowned FieldDescriptorProto v in this.extension)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.nested_type != null)
         {
             text += "nested_type = ";
-            foreach (var v in this.nested_type)
+            foreach (unowned DescriptorProto v in this.nested_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.enum_type != null)
         {
             text += "enum_type = ";
-            foreach (var v in this.enum_type)
+            foreach (unowned EnumDescriptorProto v in this.enum_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension_range != null)
         {
             text += "extension_range = ";
-            foreach (var v in this.extension_range)
+            foreach (unowned ExtensionRange v in this.extension_range)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -762,7 +762,7 @@ public class EnumDescriptorProto
         if (this.value != null)
         {
             text += "value = ";
-            foreach (var v in this.value)
+            foreach (unowned EnumValueDescriptorProto v in this.value)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -946,7 +946,7 @@ public class ServiceDescriptorProto
         if (this.method != null)
         {
             text += "method = ";
-            foreach (var v in this.method)
+            foreach (unowned MethodDescriptorProto v in this.method)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1249,7 +1249,7 @@ public class FileOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1340,7 +1340,7 @@ public class MessageOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1468,7 +1468,7 @@ public class FieldOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1529,7 +1529,7 @@ public class EnumOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1590,7 +1590,7 @@ public class EnumValueOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1651,7 +1651,7 @@ public class ServiceOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1712,7 +1712,7 @@ public class MethodOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in this.uninterpreted_option)
+            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1892,7 +1892,7 @@ public class UninterpretedOption
         if (this.name != null)
         {
             text += "name = ";
-            foreach (var v in this.name)
+            foreach (unowned NamePart v in this.name)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -2001,14 +2001,14 @@ public class SourceCodeInfo
             if (this.path != null)
             {
                 text += "path = ";
-                foreach (var v in this.path)
+                foreach (unowned int32 v in this.path)
                     text += "%s;\n".printf (v.to_string ());
             }
 
             if (this.span != null)
             {
                 text += "span = ";
-                foreach (var v in this.span)
+                foreach (unowned int32 v in this.span)
                     text += "%s;\n".printf (v.to_string ());
             }
 
@@ -2066,7 +2066,7 @@ public class SourceCodeInfo
         if (this.location != null)
         {
             text += "location = ";
-            foreach (var v in this.location)
+            foreach (unowned Location v in this.location)
                 text += "%s;\n".printf (v.to_string ());
         }
 

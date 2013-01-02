@@ -72,7 +72,7 @@ public class CodeGeneratorRequest
         if (this.file_to_generate != null)
         {
             text += "file_to_generate = ";
-            foreach (var v in this.file_to_generate)
+            foreach (unowned string v in this.file_to_generate)
                 text += "\"%s\";\n".printf (v);
         }
 
@@ -85,7 +85,7 @@ public class CodeGeneratorRequest
         if (this.proto_file != null)
         {
             text += "proto_file = ";
-            foreach (var v in this.proto_file)
+            foreach (unowned FileDescriptorProto v in this.proto_file)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -253,7 +253,7 @@ public class CodeGeneratorResponse
         if (this.file != null)
         {
             text += "file = ";
-            foreach (var v in this.file)
+            foreach (unowned File v in this.file)
                 text += "%s;\n".printf (v.to_string ());
         }
 
