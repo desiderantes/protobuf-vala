@@ -37,7 +37,7 @@ public static int main (string[] args)
         resp.file.append (out_file);
     }
 
-    var resp_buf = new uint8[65535];
+    var resp_buf = new uint8[655350];
     size_t offset = resp_buf.length - 1;
     var n_written = resp.encode (resp_buf, ref offset);
     unowned uint8[] start = (uint8[]) ((uint8*) resp_buf + resp_buf.length - (int) n_written);
@@ -117,7 +117,7 @@ private static string write_class (DescriptorProto type, string indent = "")
             decode_method = "(%s) varint".printf (get_type_name (field, false));
             break;
         default:
-            decode_method = "DECODE_UNKNOWN_TYPE%d()".printf (field.type);
+            decode_method = "DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
             break;
         }
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
@@ -189,7 +189,7 @@ private static string write_class (DescriptorProto type, string indent = "")
             text += "Protobuf.encode_varint (%s, buffer, ref offset);\n".printf (field_name);
             break;
         default:
-            text += "ENCODE_UNKNOWN_TYPE%d(%s);\n".printf (field.type, field_name);
+            text += "ENCODE_UNKNOWN_TYPE%d (%s);\n".printf (field.type, field_name);
             break;
         }
         if (encode_length)
@@ -206,6 +206,49 @@ private static string write_class (DescriptorProto type, string indent = "")
     }
     text += "\n";
     text += indent + "        return start - offset;\n";
+    text += indent + "    }\n";
+    text += "\n";
+    text += indent + "    public string to_string (string indent = \"\")\n";
+    text += indent + "    {\n";
+    text += indent + "        var text = \"{\\n\";\n";
+    foreach (var field in type.field)
+    {
+        text += "\n";
+
+        var indent2 = indent;
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        {
+            text += indent + "        if (%s != null)\n".printf (field.name);
+            text += indent + "        {\n";
+            indent2 += "    ";
+        }
+
+        text += indent2 + "        text += \"%s=\";\n".printf (field.name);
+
+        var field_name = field.name;
+        if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        {
+            text += indent2 + "        foreach (var v in %s)\n".printf (field.name);
+            indent2 += "    ";
+            field_name = "v";
+        }
+
+        switch (field.type)
+        {
+        case FieldDescriptorProto.Type.TYPE_STRING:
+            text += indent2 + "        text += \"\\\"%%s\\\";\\n\".printf (%s);\n".printf (field_name);
+            break;
+        default:
+            text += indent2 + "        text += \"%%s;\\n\".printf (%s.to_string ());\n".printf (field_name);
+            break;
+        }
+
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+            text += indent + "        }\n";
+    }
+    text += "\n";
+    text += indent + "        text += \"}\";\n";
+    text += indent + "        return text;\n";
     text += indent + "    }\n";
     text += indent + "}\n";
 

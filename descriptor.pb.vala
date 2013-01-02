@@ -44,6 +44,21 @@ public class FileDescriptorSet
 
         return start - offset;
     }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (file != null)
+        {
+            text += "file=";
+            foreach (var v in file)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
+    }
 }
 
 public class FileDescriptorProto
@@ -174,35 +189,71 @@ public class FileDescriptorProto
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var value = "";
+        var text = "{\n";
 
         if (name != null)
-            value += "name=\"%s\" ".printf (name);
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
         if (package != null)
-            value += "package=\"%s\" ".printf (package);
+        {
+            text += "package=";
+            text += "\"%s\";\n".printf (package);
+        }
 
         if (dependency != null)
         {
-            value += "dependency=[";
+            text += "dependency=";
             foreach (var v in dependency)
-                value += "\"%s\" ".printf (v);
-            value += "] ";
+                text += "\"%s\";\n".printf (v);
         }
 
         if (message_type != null)
         {
-            value += "message_type=[";
+            text += "message_type=";
             foreach (var v in message_type)
-                value += "{ %s} ".printf (v.to_string ());
-            value += "] ";
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (enum_type != null)
+        {
+            text += "enum_type=";
+            foreach (var v in enum_type)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (service != null)
+        {
+            text += "service=";
+            foreach (var v in service)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (extension != null)
+        {
+            text += "extension=";
+            foreach (var v in extension)
+                text += "%s;\n".printf (v.to_string ());
         }
 
         if (options != null)
-            value += "options={ %s} ".printf (options.to_string ());
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
 
-        return value;
+        if (source_code_info != null)
+        {
+            text += "source_code_info=";
+            text += "%s;\n".printf (source_code_info.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -262,6 +313,26 @@ public class DescriptorProto
             }
 
             return start - offset;
+        }
+
+        public string to_string (string indent = "")
+        {
+            var text = "{\n";
+
+            if (start != null)
+            {
+                text += "start=";
+                text += "%s;\n".printf (start.to_string ());
+            }
+
+            if (end != null)
+            {
+                text += "end=";
+                text += "%s;\n".printf (end.to_string ());
+            }
+
+            text += "}";
+            return text;
         }
     }
 
@@ -371,46 +442,59 @@ public class DescriptorProto
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var value = "";
+        var text = "{\n";
 
         if (name != null)
-            value += "name=\"%s\" ".printf (name);
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
 
         if (field != null)
         {
-            value += "field=[";
+            text += "field=";
             foreach (var v in field)
-                value += "{ %s} ".printf (v.to_string ());
-            value += "] ";
+                text += "%s;\n".printf (v.to_string ());
         }
 
         if (extension != null)
         {
-            value += "extension=[";
+            text += "extension=";
             foreach (var v in extension)
-                value += "{ %s} ".printf (v.to_string ());
-            value += "] ";
+                text += "%s;\n".printf (v.to_string ());
         }
 
         if (nested_type != null)
         {
-            value += "nested_type=[";
+            text += "nested_type=";
             foreach (var v in nested_type)
-                value += "{ %s} ".printf (v.to_string ());
-            value += "] ";
+                text += "%s;\n".printf (v.to_string ());
         }
 
         if (enum_type != null)
         {
-            value += "enum_type=[";
+            text += "enum_type=";
             foreach (var v in enum_type)
-                value += "{ %s} ".printf (v.to_string ());
-            value += "] ";
+                text += "%s;\n".printf (v.to_string ());
         }
 
-        return value;
+        if (extension_range != null)
+        {
+            text += "extension_range=";
+            foreach (var v in extension_range)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -437,74 +521,12 @@ public class FieldDescriptorProto
         TYPE_SINT32 = 17,
         TYPE_SINT64 = 18,
     }
-
-    public string type_to_string (Type type)
-    {
-        switch (type)
-        {
-        case Type.TYPE_DOUBLE:
-            return "TYPE_DOUBLE";
-        case Type.TYPE_FLOAT:
-            return "TYPE_FLOAT";
-        case Type.TYPE_INT64:
-            return "TYPE_INT64";
-        case Type.TYPE_UINT64:
-            return "TYPE_UINT64";
-        case Type.TYPE_INT32:
-            return "TYPE_INT32";
-        case Type.TYPE_FIXED64:
-            return "TYPE_FIXED64";
-        case Type.TYPE_FIXED32:
-            return "TYPE_FIXED32";
-        case Type.TYPE_BOOL:
-            return "TYPE_BOOL";
-        case Type.TYPE_STRING:
-            return "TYPE_STRING";
-        case Type.TYPE_GROUP:
-            return "TYPE_GROUP";
-        case Type.TYPE_MESSAGE:
-            return "TYPE_MESSAGE";
-        case Type.TYPE_BYTES:
-            return "TYPE_BYTES";
-        case Type.TYPE_UINT32:
-            return "TYPE_UINT32";
-        case Type.TYPE_ENUM:
-            return "TYPE_ENUM";
-        case Type.TYPE_SFIXED32:
-            return "TYPE_SFIXED32";
-        case Type.TYPE_SFIXED64:
-            return "TYPE_SFIXED64";
-        case Type.TYPE_SINT32:
-            return "TYPE_SINT32";
-        case Type.TYPE_SINT64:
-            return "TYPE_SINT64";
-        default:
-            return "%d".printf (type);
-        }
-    }
-
     public enum Label
     {
         LABEL_OPTIONAL = 1,
         LABEL_REQUIRED = 2,
         LABEL_REPEATED = 3,
     }
-
-    public string label_to_string (Label label)
-    {
-        switch (label)
-        {
-        case Label.LABEL_OPTIONAL:
-            return "LABEL_OPTIONAL";
-        case Label.LABEL_REQUIRED:
-            return "LABEL_REQUIRED";
-        case Label.LABEL_REPEATED:
-            return "LABEL_REPEATED";
-        default:
-            return "%d".printf (label);
-        }
-    }
-
     public string? name;
     public int32? number;
     public Label? label;
@@ -618,25 +640,59 @@ public class FieldDescriptorProto
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
-        
-        if (name != null)
-            text += "name=\"%s\" ".printf (name);
-        if (number != null)
-            text += "number=%d ".printf (number);
-        if (label != null)
-            text += "label=%s ".printf (label_to_string (label));
-        if (type != null)
-            text += "type=%s ".printf (type_to_string (type));
-        if (type_name != null)
-            text += "type_name=\"%s\" ".printf (type_name);
-        if (default_value != null)
-            text += "default_value=\"%s\" ".printf (default_value);
-        if (options != null)
-            text += "options={ %s} ".printf (options.to_string ());
+        var text = "{\n";
 
+        if (name != null)
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
+        if (number != null)
+        {
+            text += "number=";
+            text += "%s;\n".printf (number.to_string ());
+        }
+
+        if (label != null)
+        {
+            text += "label=";
+            text += "%s;\n".printf (label.to_string ());
+        }
+
+        if (type != null)
+        {
+            text += "type=";
+            text += "%s;\n".printf (type.to_string ());
+        }
+
+        if (type_name != null)
+        {
+            text += "type_name=";
+            text += "\"%s\";\n".printf (type_name);
+        }
+
+        if (extendee != null)
+        {
+            text += "extendee=";
+            text += "\"%s\";\n".printf (extendee);
+        }
+
+        if (default_value != null)
+        {
+            text += "default_value=";
+            text += "\"%s\";\n".printf (default_value);
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
         return text;
     }
 }
@@ -709,18 +765,30 @@ public class EnumDescriptorProto
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
-        
-        if (name != null)
-            text += "name=\"%s\" ".printf (name);
-        
-        text += "value=[";
-        foreach (var v in value)
-            text += "{ %s} ".printf (v.to_string ());
-        text += "] ";
+        var text = "{\n";
 
+        if (name != null)
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
+        if (value != null)
+        {
+            text += "value=";
+            foreach (var v in value)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
         return text;
     }
 }
@@ -792,15 +860,29 @@ public class EnumValueDescriptorProto
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
-        
-        if (name != null)
-            text += "name=\"%s\" ".printf (name);
-        if (number != null)
-            text += "number=%d ".printf (number);
+        var text = "{\n";
 
+        if (name != null)
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
+        if (number != null)
+        {
+            text += "number=";
+            text += "%s;\n".printf (number.to_string ());
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
         return text;
     }
 }
@@ -868,6 +950,33 @@ public class ServiceDescriptorProto
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (name != null)
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
+        if (method != null)
+        {
+            text += "method=";
+            foreach (var v in method)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -945,6 +1054,38 @@ public class MethodDescriptorProto
 
         return start - offset;
     }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (name != null)
+        {
+            text += "name=";
+            text += "\"%s\";\n".printf (name);
+        }
+
+        if (input_type != null)
+        {
+            text += "input_type=";
+            text += "\"%s\";\n".printf (input_type);
+        }
+
+        if (output_type != null)
+        {
+            text += "output_type=";
+            text += "\"%s\";\n".printf (output_type);
+        }
+
+        if (options != null)
+        {
+            text += "options=";
+            text += "%s;\n".printf (options.to_string ());
+        }
+
+        text += "}";
+        return text;
+    }
 }
 
 public class FileOptions
@@ -954,21 +1095,6 @@ public class FileOptions
         SPEED = 1,
         CODE_SIZE = 2,
         LITE_RUNTIME = 3,
-    }
-
-    private string optimize_mode_to_string (OptimizeMode mode)
-    {
-        switch (mode)
-        {
-        case OptimizeMode.SPEED:
-            return "SPEED";
-        case OptimizeMode.CODE_SIZE:
-            return "CODE_SIZE";
-        case OptimizeMode.LITE_RUNTIME:
-            return "LITE_RUNTIME";
-        default:
-            return "%d".printf (mode);
-        }
     }
 
     public string? java_package;
@@ -1091,17 +1217,66 @@ public class FileOptions
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
+        var text = "{\n";
 
         if (java_package != null)
-            text += "java_package=\"%s\" ".printf (java_package);
-        if (java_outer_classname != null)
-            text += "java_outer_classname=\"%s\" ".printf (java_outer_classname);
-        if (optimize_for != null)
-            text += "optimize_for=%s ".printf (optimize_mode_to_string (optimize_for));
+        {
+            text += "java_package=";
+            text += "\"%s\";\n".printf (java_package);
+        }
 
+        if (java_outer_classname != null)
+        {
+            text += "java_outer_classname=";
+            text += "\"%s\";\n".printf (java_outer_classname);
+        }
+
+        if (java_multiple_files != null)
+        {
+            text += "java_multiple_files=";
+            text += "%s;\n".printf (java_multiple_files.to_string ());
+        }
+
+        if (java_generate_equals_and_hash != null)
+        {
+            text += "java_generate_equals_and_hash=";
+            text += "%s;\n".printf (java_generate_equals_and_hash.to_string ());
+        }
+
+        if (optimize_for != null)
+        {
+            text += "optimize_for=";
+            text += "%s;\n".printf (optimize_for.to_string ());
+        }
+
+        if (cc_generic_services != null)
+        {
+            text += "cc_generic_services=";
+            text += "%s;\n".printf (cc_generic_services.to_string ());
+        }
+
+        if (java_generic_services != null)
+        {
+            text += "java_generic_services=";
+            text += "%s;\n".printf (java_generic_services.to_string ());
+        }
+
+        if (py_generic_services != null)
+        {
+            text += "py_generic_services=";
+            text += "%s;\n".printf (py_generic_services.to_string ());
+        }
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
         return text;
     }
 }
@@ -1167,6 +1342,33 @@ public class MessageOptions
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (message_set_wire_format != null)
+        {
+            text += "message_set_wire_format=";
+            text += "%s;\n".printf (message_set_wire_format.to_string ());
+        }
+
+        if (no_standard_descriptor_accessor != null)
+        {
+            text += "no_standard_descriptor_accessor=";
+            text += "%s;\n".printf (no_standard_descriptor_accessor.to_string ());
+        }
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -1262,13 +1464,42 @@ public class FieldOptions
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
+        var text = "{\n";
+
+        if (ctype != null)
+        {
+            text += "ctype=";
+            text += "%s;\n".printf (ctype.to_string ());
+        }
 
         if (packed != null)
-            text += "packed=%s ".printf (packed ? "true" : "false");
+        {
+            text += "packed=";
+            text += "%s;\n".printf (packed.to_string ());
+        }
 
+        if (deprecated != null)
+        {
+            text += "deprecated=";
+            text += "%s;\n".printf (deprecated.to_string ());
+        }
+
+        if (experimental_map_key != null)
+        {
+            text += "experimental_map_key=";
+            text += "\"%s\";\n".printf (experimental_map_key);
+        }
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
         return text;
     }
 }
@@ -1317,6 +1548,21 @@ public class EnumOptions
 
         return start - offset;
     }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
+    }
 }
 
 public class EnumValueOptions
@@ -1362,6 +1608,21 @@ public class EnumValueOptions
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -1409,6 +1670,21 @@ public class ServiceOptions
 
         return start - offset;
     }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
+    }
 }
 
 public class MethodOptions
@@ -1454,6 +1730,21 @@ public class MethodOptions
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (uninterpreted_option != null)
+        {
+            text += "uninterpreted_option=";
+            foreach (var v in uninterpreted_option)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
 
@@ -1505,6 +1796,20 @@ public class UninterpretedOption
             Protobuf.encode_varint (10, buffer, ref offset);
 
             return start - offset;
+        }
+
+        public string to_string (string indent = "")
+        {
+            var text = "{\n";
+
+            text += "name_part=";
+            text += "\"%s\";\n".printf (name_part);
+
+            text += "is_extension=";
+            text += "%s;\n".printf (is_extension.to_string ());
+
+            text += "}";
+            return text;
         }
     }
     public List<NamePart> name;
@@ -1603,6 +1908,57 @@ public class UninterpretedOption
 
         return start - offset;
     }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (name != null)
+        {
+            text += "name=";
+            foreach (var v in name)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        if (identifier_value != null)
+        {
+            text += "identifier_value=";
+            text += "\"%s\";\n".printf (identifier_value);
+        }
+
+        if (positive_int_value != null)
+        {
+            text += "positive_int_value=";
+            text += "%s;\n".printf (positive_int_value.to_string ());
+        }
+
+        if (negative_int_value != null)
+        {
+            text += "negative_int_value=";
+            text += "%s;\n".printf (negative_int_value.to_string ());
+        }
+
+        if (double_value != null)
+        {
+            text += "double_value=";
+            text += "%s;\n".printf (double_value.to_string ());
+        }
+
+        if (string_value != null)
+        {
+            text += "string_value=";
+            //text += "%s;\n".printf (string_value.to_string ());
+        }
+
+        if (aggregate_value != null)
+        {
+            text += "aggregate_value=";
+            text += "\"%s\";\n".printf (aggregate_value);
+        }
+
+        text += "}";
+        return text;
+    }
 }
 
 public class SourceCodeInfo
@@ -1659,6 +2015,28 @@ public class SourceCodeInfo
 
             return start - offset;
         }
+
+        public string to_string (string indent = "")
+        {
+            var text = "{\n";
+
+            if (path != null)
+            {
+                text += "path=";
+                foreach (var v in path)
+                    text += "%s;\n".printf (v.to_string ());
+            }
+
+            if (span != null)
+            {
+                text += "span=";
+                foreach (var v in span)
+                    text += "%s;\n".printf (v.to_string ());
+            }
+
+            text += "}";
+            return text;
+        }
     }
     public List<Location> location;
 
@@ -1701,5 +2079,20 @@ public class SourceCodeInfo
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (location != null)
+        {
+            text += "location=";
+            foreach (var v in location)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }

@@ -37,9 +37,6 @@ public class CodeGeneratorRequest
 
             offset += value_length;
         }
-
-        if (offset != length)
-            stderr.printf ("Unused %zu octets on end of CodeGeneratorRequest\n", offset - length);
     }
 
     public size_t encode (uint8[] buffer, ref size_t offset)
@@ -68,29 +65,31 @@ public class CodeGeneratorRequest
         return start - offset;
     }
 
-    public string to_string ()
+    public string to_string (string indent = "")
     {
-        var text = "";
+        var text = "{\n";
 
         if (file_to_generate != null)
         {
-            text += "file_to_generate=[";
-            foreach (var f in file_to_generate)
-                text += "\"%s\" ".printf (f);
-            text += "] ";
+            text += "file_to_generate=";
+            foreach (var v in file_to_generate)
+                text += "\"%s\";\n".printf (v);
         }
 
         if (parameter != null)
-            text += "parameter=\"%s\" ".printf (parameter);
+        {
+            text += "parameter=";
+            text += "\"%s\";\n".printf (parameter);
+        }
 
         if (proto_file != null)
         {
-            text += "proto_file=[";
-            foreach (var f in proto_file)
-                text += "{ %s } ".printf (f.to_string ());
-            text += "] ";
+            text += "proto_file=";
+            foreach (var v in proto_file)
+                text += "%s;\n".printf (v.to_string ());
         }
 
+        text += "}";
         return text;
     }
 }
@@ -161,8 +160,33 @@ public class CodeGeneratorResponse
 
             return start - offset;
         }
-    }
 
+        public string to_string (string indent = "")
+        {
+            var text = "{\n";
+
+            if (name != null)
+            {
+                text += "name=";
+                text += "\"%s\";\n".printf (name);
+            }
+
+            if (insertion_point != null)
+            {
+                text += "insertion_point=";
+                text += "\"%s\";\n".printf (insertion_point);
+            }
+
+            if (content != null)
+            {
+                text += "content=";
+                text += "\"%s\";\n".printf (content);
+            }
+
+            text += "}";
+            return text;
+        }
+    }
     public string? error;
     public List<File> file;
 
@@ -214,5 +238,26 @@ public class CodeGeneratorResponse
         }
 
         return start - offset;
+    }
+
+    public string to_string (string indent = "")
+    {
+        var text = "{\n";
+
+        if (error != null)
+        {
+            text += "error=";
+            text += "\"%s\";\n".printf (error);
+        }
+
+        if (file != null)
+        {
+            text += "file=";
+            foreach (var v in file)
+                text += "%s;\n".printf (v.to_string ());
+        }
+
+        text += "}";
+        return text;
     }
 }
