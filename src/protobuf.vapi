@@ -22,6 +22,44 @@ namespace Protobuf
         return 0.0; // FIXME
     }
 
+    private float decode_float (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 4;
+        return 0.0f; // FIXME
+    }
+
+    private int64 decode_int64 (uint8[] buffer, size_t length, size_t offset)
+    {
+        return decode_varint (buffer, length, ref offset);
+    }
+
+    private uint64 decode_uint64 (uint8[] buffer, size_t length, size_t offset)
+    {
+        return decode_varint (buffer, length, ref offset);
+    }
+
+    private int32 decode_int32 (uint8[] buffer, size_t length, size_t offset)
+    {
+        return decode_varint (buffer, length, ref offset);
+    }
+
+    private uint64 decode_fixed64 (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 8;
+        return 0; // FIXME
+    }
+
+    private uint32 decode_fixed32 (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 4;
+        return 4; // FIXME
+    }
+
+    private bool decode_bool (uint8[] buffer, size_t length, size_t offset)
+    {
+        return decode_varint (buffer, length, ref offset) != 0;
+    }
+
     private string decode_string (uint8[] buffer, size_t length, size_t offset)
     {
         var value = new GLib.StringBuilder.sized (length - offset);
@@ -47,6 +85,35 @@ namespace Protobuf
         return value;
     }
 
+    private uint32 decode_uint32 (uint8[] buffer, size_t length, size_t offset)
+    {
+        return decode_varint (buffer, length, ref offset);
+    }
+
+    private uint32 decode_sfixed32 (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 4;
+        return 0; // FIXME
+    }
+
+    private uint64 decode_sfixed64 (uint8[] buffer, size_t length, size_t offset)
+    {
+        offset += 8;
+        return 0; // FIXME
+    }
+
+    private int32 decode_sint32 (uint8[] buffer, size_t length, size_t offset)
+    {
+        var value = decode_varint (buffer, length, ref offset);
+        return (value >> 1) | ((value & 0x1) << 31);
+    }
+
+    private int64 decode_sint64 (uint8[] buffer, size_t length, size_t offset)
+    {
+        var value = decode_varint (buffer, length, ref offset);
+        return (value >> 1) | ((value & 0x1) << 63);
+    }
+
     private size_t get_value_length (int wire_type, out int varint, uint8[] buffer, size_t length, ref size_t offset)
     {
         varint = 0;
@@ -68,7 +135,7 @@ namespace Protobuf
         }
     }
 
-    private void encode_varint (size_t value, uint8[] buffer, ref size_t offset)
+    private size_t encode_varint (size_t value, uint8[] buffer, ref size_t offset)
     {
         var n_octets = 1;
         var v = value;
@@ -86,6 +153,8 @@ namespace Protobuf
             v >>= 7;
         }
         buffer[offset + n_octets] = (uint8) (v & 0x7F);
+
+        return n_octets;
     }
 
     private size_t encode_double (double value, uint8[] buffer, ref size_t offset)
@@ -93,6 +162,47 @@ namespace Protobuf
         offset -= 8;
         // FIXME
         return 8;
+    }
+
+    private size_t encode_float (float value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 4;
+        // FIXME
+        return 4;
+    }
+
+    private size_t encode_int64 (int64 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint ((size_t) value, buffer, ref offset);
+    }
+
+    private size_t encode_uint64 (uint64 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint ((size_t) value, buffer, ref offset);
+    }
+
+    private size_t encode_int32 (int32 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint (value, buffer, ref offset);
+    }
+
+    private size_t encode_fixed64 (uint64 value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 8;
+        // FIXME
+        return 8;
+    }
+
+    private size_t encode_fixed32 (uint32 value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 4;
+        // FIXME
+        return 4;
+    }
+
+    private size_t encode_bool (bool value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint (value ? 1 : 0, buffer, ref offset);
     }
 
     private size_t encode_string (string value, uint8[] buffer, ref size_t offset)
@@ -111,5 +221,34 @@ namespace Protobuf
             buffer[offset + i + 1] = value[i];
 
         return value.length;
+    }
+
+    private size_t encode_uint32 (uint32 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint (value, buffer, ref offset);
+    }
+
+    private size_t encode_sfixed32 (uint32 value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 4;
+        // FIXME
+        return 4;
+    }
+
+    private size_t encode_sfixed64 (uint64 value, uint8[] buffer, ref size_t offset)
+    {
+        offset -= 8;
+        // FIXME
+        return 8;
+    }
+
+    private size_t encode_sint32 (int32 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint ((value << 1) | (value >> 31), buffer, ref offset);
+    }
+
+    private size_t encode_sint64 (int64 value, uint8[] buffer, ref size_t offset)
+    {
+        return encode_varint ((size_t) (value << 1) | (value >> 63), buffer, ref offset);
     }
 }

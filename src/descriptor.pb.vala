@@ -280,10 +280,10 @@ public class DescriptorProto
                 switch (field_number)
                 {
                 case 1:
-                    this.start = varint;
+                    this.start = Protobuf.decode_int32 (buffer, offset + value_length, offset);
                     break;
                 case 2:
-                    this.end = varint;
+                    this.end = Protobuf.decode_int32 (buffer, offset + value_length, offset);
                     break;
                 }
 
@@ -297,12 +297,12 @@ public class DescriptorProto
 
             if (this.end != null)
             {
-                Protobuf.encode_varint (this.end, buffer, ref offset);
+                Protobuf.encode_int32 (this.end, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
             if (this.start != null)
             {
-                Protobuf.encode_varint (this.start, buffer, ref offset);
+                Protobuf.encode_int32 (this.start, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
 
@@ -548,7 +548,7 @@ public class FieldDescriptorProto
                 this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
-                this.number = varint;
+                this.number = Protobuf.decode_int32 (buffer, offset + value_length, offset);
                 break;
             case 4:
                 this.label = (Label) varint;
@@ -614,7 +614,7 @@ public class FieldDescriptorProto
         }
         if (this.number != null)
         {
-            Protobuf.encode_varint (this.number, buffer, ref offset);
+            Protobuf.encode_int32 (this.number, buffer, ref offset);
             Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (this.name != null)
@@ -805,7 +805,7 @@ public class EnumValueDescriptorProto
                 this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                this.number = varint;
+                this.number = Protobuf.decode_int32 (buffer, offset + value_length, offset);
                 break;
             case 3:
                 this.options = new EnumValueOptions.from_data (buffer, offset + value_length, offset);
@@ -828,7 +828,7 @@ public class EnumValueDescriptorProto
         }
         if (this.number != null)
         {
-            Protobuf.encode_varint (this.number, buffer, ref offset);
+            Protobuf.encode_int32 (this.number, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.name != null)
@@ -1112,22 +1112,22 @@ public class FileOptions
                 this.java_outer_classname = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 10:
-                this.java_multiple_files = varint != 0;
+                this.java_multiple_files = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 20:
-                this.java_generate_equals_and_hash = varint != 0;
+                this.java_generate_equals_and_hash = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 9:
                 this.optimize_for = (OptimizeMode) varint;
                 break;
             case 16:
-                this.cc_generic_services = varint != 0;
+                this.cc_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 17:
-                this.java_generic_services = varint != 0;
+                this.java_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 18:
-                this.py_generic_services = varint != 0;
+                this.py_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 999:
                 this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
@@ -1150,17 +1150,17 @@ public class FileOptions
         }
         if (this.py_generic_services != null)
         {
-            Protobuf.encode_varint (this.py_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.py_generic_services, buffer, ref offset);
             Protobuf.encode_varint (144, buffer, ref offset);
         }
         if (this.java_generic_services != null)
         {
-            Protobuf.encode_varint (this.java_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.java_generic_services, buffer, ref offset);
             Protobuf.encode_varint (136, buffer, ref offset);
         }
         if (this.cc_generic_services != null)
         {
-            Protobuf.encode_varint (this.cc_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.cc_generic_services, buffer, ref offset);
             Protobuf.encode_varint (128, buffer, ref offset);
         }
         if (this.optimize_for != null)
@@ -1170,12 +1170,12 @@ public class FileOptions
         }
         if (this.java_generate_equals_and_hash != null)
         {
-            Protobuf.encode_varint (this.java_generate_equals_and_hash ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.java_generate_equals_and_hash, buffer, ref offset);
             Protobuf.encode_varint (160, buffer, ref offset);
         }
         if (this.java_multiple_files != null)
         {
-            Protobuf.encode_varint (this.java_multiple_files ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.java_multiple_files, buffer, ref offset);
             Protobuf.encode_varint (80, buffer, ref offset);
         }
         if (this.java_outer_classname != null)
@@ -1283,10 +1283,10 @@ public class MessageOptions
             switch (field_number)
             {
             case 1:
-                this.message_set_wire_format = varint != 0;
+                this.message_set_wire_format = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 2:
-                this.no_standard_descriptor_accessor = varint != 0;
+                this.no_standard_descriptor_accessor = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 999:
                 this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
@@ -1309,12 +1309,12 @@ public class MessageOptions
         }
         if (this.no_standard_descriptor_accessor != null)
         {
-            Protobuf.encode_varint (this.no_standard_descriptor_accessor ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.no_standard_descriptor_accessor, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.message_set_wire_format != null)
         {
-            Protobuf.encode_varint (this.message_set_wire_format ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.message_set_wire_format, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 
@@ -1385,10 +1385,10 @@ public class FieldOptions
                 this.ctype = (CType) varint;
                 break;
             case 2:
-                this.packed = varint != 0;
+                this.packed = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 3:
-                this.deprecated = varint != 0;
+                this.deprecated = Protobuf.decode_bool (buffer, offset + value_length, offset);
                 break;
             case 9:
                 this.experimental_map_key = Protobuf.decode_string (buffer, offset + value_length, offset);
@@ -1420,12 +1420,12 @@ public class FieldOptions
         }
         if (this.deprecated != null)
         {
-            Protobuf.encode_varint (this.deprecated ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.deprecated, buffer, ref offset);
             Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (this.packed != null)
         {
-            Protobuf.encode_varint (this.packed ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.packed, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.ctype != null)
@@ -1750,7 +1750,7 @@ public class UninterpretedOption
                     this.name_part = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 case 2:
-                    this.is_extension = varint != 0;
+                    this.is_extension = Protobuf.decode_bool (buffer, offset + value_length, offset);
                     break;
                 }
 
@@ -1762,7 +1762,7 @@ public class UninterpretedOption
         {
             var start = offset;
 
-            Protobuf.encode_varint (this.is_extension ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_bool (this.is_extension, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
             var n = Protobuf.encode_string (this.name_part, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1818,10 +1818,10 @@ public class UninterpretedOption
                 this.identifier_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 4:
-                this.positive_int_value = varint;
+                this.positive_int_value = Protobuf.decode_uint64 (buffer, offset + value_length, offset);
                 break;
             case 5:
-                this.negative_int_value = varint;
+                this.negative_int_value = Protobuf.decode_int64 (buffer, offset + value_length, offset);
                 break;
             case 6:
                 this.double_value = Protobuf.decode_double (buffer, offset + value_length, offset);
@@ -1861,12 +1861,12 @@ public class UninterpretedOption
         }
         if (this.negative_int_value != null)
         {
-            Protobuf.encode_varint ((size_t) this.negative_int_value, buffer, ref offset);
+            Protobuf.encode_int64 (this.negative_int_value, buffer, ref offset);
             Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (this.positive_int_value != null)
         {
-            Protobuf.encode_varint ((size_t) this.positive_int_value, buffer, ref offset);
+            Protobuf.encode_uint64 (this.positive_int_value, buffer, ref offset);
             Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (this.identifier_value != null)
@@ -1965,10 +1965,10 @@ public class SourceCodeInfo
                 switch (field_number)
                 {
                 case 1:
-                    this.path.append (varint);
+                    this.path.append (Protobuf.decode_int32 (buffer, offset + value_length, offset));
                     break;
                 case 2:
-                    this.span.append (varint);
+                    this.span.append (Protobuf.decode_int32 (buffer, offset + value_length, offset));
                     break;
                 }
 
@@ -1982,12 +1982,12 @@ public class SourceCodeInfo
 
             for (unowned List<int32> i = this.span.last (); i != null; i = i.prev)
             {
-                Protobuf.encode_varint (i.data, buffer, ref offset);
+                Protobuf.encode_int32 (i.data, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
             for (unowned List<int32> i = this.path.last (); i != null; i = i.prev)
             {
-                Protobuf.encode_varint (i.data, buffer, ref offset);
+                Protobuf.encode_int32 (i.data, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
 

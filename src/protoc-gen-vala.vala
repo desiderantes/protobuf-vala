@@ -101,17 +101,26 @@ private static string write_class (DescriptorProto type, string indent = "")
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
             decode_method = "Protobuf.decode_double (buffer, offset + value_length, offset)";
             break;
+        case FieldDescriptorProto.Type.TYPE_FLOAT:
+            decode_method = "Protobuf.decode_float (buffer, offset + value_length, offset)";
+            break;
         case FieldDescriptorProto.Type.TYPE_INT64:
-            decode_method = "varint";
+            decode_method = "Protobuf.decode_int64 (buffer, offset + value_length, offset)";
             break;
         case FieldDescriptorProto.Type.TYPE_UINT64:
-            decode_method = "varint";
+            decode_method = "Protobuf.decode_uint64 (buffer, offset + value_length, offset)";
             break;
         case FieldDescriptorProto.Type.TYPE_INT32:
-            decode_method = "varint";
+            decode_method = "Protobuf.decode_int32 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_FIXED64:
+            decode_method = "Protobuf.decode_fixed64 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_FIXED32:
+            decode_method = "Protobuf.decode_fixed32 (buffer, offset + value_length, offset)";
             break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
-            decode_method = "varint != 0";
+            decode_method = "Protobuf.decode_bool (buffer, offset + value_length, offset)";
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
             decode_method = "Protobuf.decode_string (buffer, offset + value_length, offset)";
@@ -124,6 +133,21 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
             decode_method = "(%s) varint".printf (get_type_name (field, false));
+            break;
+        case FieldDescriptorProto.Type.TYPE_UINT32:
+            decode_method = "Protobuf.decode_uint32 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_SFIXED32:
+            decode_method = "Protobuf.decode_sfixed32 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_SFIXED64:
+            decode_method = "Protobuf.decode_sfixed64 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_SINT32:
+            decode_method = "Protobuf.decode_sint32 (buffer, offset + value_length, offset)";
+            break;
+        case FieldDescriptorProto.Type.TYPE_SINT64:
+            decode_method = "Protobuf.decode_sint64 (buffer, offset + value_length, offset)";
             break;
         default:
             decode_method = "DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
@@ -187,23 +211,47 @@ private static string write_class (DescriptorProto type, string indent = "")
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
             text += "Protobuf.encode_double (%s, buffer, ref offset);\n".printf (field_name);
             break;
+        case FieldDescriptorProto.Type.TYPE_FLOAT:
+            text += "Protobuf.encode_float (%s, buffer, ref offset);\n".printf (field_name);
+            break;
         case FieldDescriptorProto.Type.TYPE_INT64:
-            text += "Protobuf.encode_varint ((size_t) %s, buffer, ref offset);\n".printf (field_name);
+            text += "Protobuf.encode_int64 (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_UINT64:
-            text += "Protobuf.encode_varint ((size_t) %s, buffer, ref offset);\n".printf (field_name);
+            text += "Protobuf.encode_uint64 (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_INT32:
-            text += "Protobuf.encode_varint (%s, buffer, ref offset);\n".printf (field_name);
+            text += "Protobuf.encode_int32 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_FIXED64:
+            text += "Protobuf.encode_fixed64 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_FIXED32:
+            text += "Protobuf.encode_fixed32 (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
-            text += "Protobuf.encode_varint (%s ? 1 : 0, buffer, ref offset);\n".printf (field_name);
+            text += "Protobuf.encode_bool (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
             text += "Protobuf.encode_string (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
             text += "Protobuf.encode_bytes (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_UINT32:
+            text += "Protobuf.encode_uint32 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_SFIXED64:
+            text += "Protobuf.encode_sfixed64 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_SFIXED32:
+            text += "Protobuf.encode_sfixed32 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_SINT64:
+            text += "Protobuf.encode_sint64 (%s, buffer, ref offset);\n".printf (field_name);
+            break;
+        case FieldDescriptorProto.Type.TYPE_SINT32:
+            text += "Protobuf.encode_sint32 (%s, buffer, ref offset);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
             text += "%s.encode (buffer, ref offset);\n".printf (field_name);
