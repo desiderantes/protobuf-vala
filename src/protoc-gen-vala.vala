@@ -205,7 +205,7 @@ private static string write_class (DescriptorProto type, string indent = "")
 
         text += indent2 + "        ";
         if (encode_length)
-            text += "var n = ";
+            text += "var %s_length = ".printf (field.name);
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
@@ -264,7 +264,7 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         }
         if (encode_length)
-            text += indent2 + "        Protobuf.encode_varint (n, buffer, ref offset);\n";
+            text += indent2 + "        Protobuf.encode_varint (%s_length, buffer, ref offset);\n".printf (field.name);
 
         /* Encode key */
         var n = field.number << 3;
