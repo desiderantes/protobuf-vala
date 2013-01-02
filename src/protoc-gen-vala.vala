@@ -187,7 +187,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        for (unowned List<%s> i = this.%s.last (); i != null; i = i.prev)\n".printf (get_type_name (field, false), field.name);
+            text += indent + "        for (unowned %s i = this.%s.last (); i != null; i = i.prev)\n".printf (get_type_name (field), field.name);
             text += indent + "        {\n";
             indent2 += "    ";
             field_name = "i.data";
@@ -334,25 +334,31 @@ private static string write_class (DescriptorProto type, string indent = "")
 private static string get_type_name (FieldDescriptorProto field, bool full = true)
 {
     var type_name = "";
+    var needs_box = false;
     switch (field.type)
     {
     case FieldDescriptorProto.Type.TYPE_DOUBLE:
         type_name = "double";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_FLOAT:
         type_name = "float";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_INT64:
         type_name = "int64";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_UINT64:
         type_name = "uint64";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_INT32:
         type_name = "int32";
         break;
     case FieldDescriptorProto.Type.TYPE_FIXED64:
         type_name = "uint64";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_FIXED32:
         type_name = "uint32";
@@ -365,6 +371,7 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
         break;
     case FieldDescriptorProto.Type.TYPE_BYTES:
         type_name = "uint8[]";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_UINT32:
         type_name = "uint32";
@@ -374,12 +381,14 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
         break;
     case FieldDescriptorProto.Type.TYPE_SFIXED64:
         type_name = "int64";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_SINT32:
         type_name = "int32";
         break;
     case FieldDescriptorProto.Type.TYPE_SINT64:
         type_name = "int64";
+        needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_MESSAGE:
     case FieldDescriptorProto.Type.TYPE_ENUM:
@@ -391,12 +400,15 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
     }
 
     if (!full)
-         return type_name;
-    
+        return type_name;
+
     switch (field.label)
     {
     case FieldDescriptorProto.Label.LABEL_REPEATED:
-        return "List<%s>".printf (type_name);
+        if (needs_box)
+            return "List<%s?>".printf (type_name);
+        else
+            return "List<%s>".printf (type_name);
     case FieldDescriptorProto.Label.LABEL_OPTIONAL:
         return "%s?".printf (type_name);
     default:

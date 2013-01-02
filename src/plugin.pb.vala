@@ -45,20 +45,20 @@ public class CodeGeneratorRequest
 
         for (unowned List<FileDescriptorProto> i = this.proto_file.last (); i != null; i = i.prev)
         {
-            var n = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (n, buffer, ref offset);
+            var proto_file_length = i.data.encode (buffer, ref offset);
+            Protobuf.encode_varint (proto_file_length, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (this.parameter != null)
         {
-            var n = Protobuf.encode_string (this.parameter, buffer, ref offset);
-            Protobuf.encode_varint (n, buffer, ref offset);
+            var parameter_length = Protobuf.encode_string (this.parameter, buffer, ref offset);
+            Protobuf.encode_varint (parameter_length, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         for (unowned List<string> i = this.file_to_generate.last (); i != null; i = i.prev)
         {
-            var n = Protobuf.encode_string (i.data, buffer, ref offset);
-            Protobuf.encode_varint (n, buffer, ref offset);
+            var file_to_generate_length = Protobuf.encode_string (i.data, buffer, ref offset);
+            Protobuf.encode_varint (file_to_generate_length, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
 
@@ -141,20 +141,20 @@ public class CodeGeneratorResponse
 
             if (this.content != null)
             {
-                var n = Protobuf.encode_string (this.content, buffer, ref offset);
-                Protobuf.encode_varint (n, buffer, ref offset);
+                var content_length = Protobuf.encode_string (this.content, buffer, ref offset);
+                Protobuf.encode_varint (content_length, buffer, ref offset);
                 Protobuf.encode_varint (122, buffer, ref offset);
             }
             if (this.insertion_point != null)
             {
-                var n = Protobuf.encode_string (this.insertion_point, buffer, ref offset);
-                Protobuf.encode_varint (n, buffer, ref offset);
+                var insertion_point_length = Protobuf.encode_string (this.insertion_point, buffer, ref offset);
+                Protobuf.encode_varint (insertion_point_length, buffer, ref offset);
                 Protobuf.encode_varint (18, buffer, ref offset);
             }
             if (this.name != null)
             {
-                var n = Protobuf.encode_string (this.name, buffer, ref offset);
-                Protobuf.encode_varint (n, buffer, ref offset);
+                var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
+                Protobuf.encode_varint (name_length, buffer, ref offset);
                 Protobuf.encode_varint (10, buffer, ref offset);
             }
 
@@ -226,14 +226,14 @@ public class CodeGeneratorResponse
 
         for (unowned List<File> i = this.file.last (); i != null; i = i.prev)
         {
-            var n = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (n, buffer, ref offset);
+            var file_length = i.data.encode (buffer, ref offset);
+            Protobuf.encode_varint (file_length, buffer, ref offset);
             Protobuf.encode_varint (122, buffer, ref offset);
         }
         if (this.error != null)
         {
-            var n = Protobuf.encode_string (this.error, buffer, ref offset);
-            Protobuf.encode_varint (n, buffer, ref offset);
+            var error_length = Protobuf.encode_string (this.error, buffer, ref offset);
+            Protobuf.encode_varint (error_length, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
 
