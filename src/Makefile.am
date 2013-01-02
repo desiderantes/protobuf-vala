@@ -13,6 +13,9 @@ protoc_gen_vala_CFLAGS = \
 protoc_gen_vala_LDADD = \
 	$(PROTOC_GEN_VALA_LIBS)
 
+vapidir = $(datadir)/vala/vapi
+vapi_DATA = protobuf.vapi
+
 CLEANFILES = \
 	$(patsubst %.vala,%.c,$(filter %.vala, $(SOURCES))) \
 	*_vala.stamp
