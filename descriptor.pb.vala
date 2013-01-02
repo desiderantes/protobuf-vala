@@ -23,7 +23,7 @@ public class FileDescriptorSet
             switch (field_number)
             {
             case 1:
-                file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -35,7 +35,7 @@ public class FileDescriptorSet
     {
         var start = offset;
 
-        for (unowned List<FileDescriptorProto> i = file.last (); i != null; i = i.prev)
+        for (unowned List<FileDescriptorProto> i = this.file.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -52,7 +52,7 @@ public class FileDescriptorSet
         if (this.file != null)
         {
             text += "file = ";
-            foreach (var v in file)
+            foreach (var v in this.file)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -92,31 +92,31 @@ public class FileDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                package = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.package = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
-                dependency.append (Protobuf.decode_string (buffer, offset + value_length, offset));
+                this.dependency.append (Protobuf.decode_string (buffer, offset + value_length, offset));
                 break;
             case 4:
-                message_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.message_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 5:
-                enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 6:
-                service.append (new ServiceDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.service.append (new ServiceDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 7:
-                extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 8:
-                options = new FileOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new FileOptions.from_data (buffer, offset + value_length, offset);
                 break;
             case 9:
-                source_code_info = new SourceCodeInfo.from_data (buffer, offset + value_length, offset);
+                this.source_code_info = new SourceCodeInfo.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -130,41 +130,41 @@ public class FileDescriptorProto
 
         if (this.source_code_info != null)
         {
-            var n = source_code_info.encode (buffer, ref offset);
+            var n = this.source_code_info.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
-        for (unowned List<FieldDescriptorProto> i = extension.last (); i != null; i = i.prev)
+        for (unowned List<FieldDescriptorProto> i = this.extension.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
-        for (unowned List<ServiceDescriptorProto> i = service.last (); i != null; i = i.prev)
+        for (unowned List<ServiceDescriptorProto> i = this.service.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
-        for (unowned List<EnumDescriptorProto> i = enum_type.last (); i != null; i = i.prev)
+        for (unowned List<EnumDescriptorProto> i = this.enum_type.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
-        for (unowned List<DescriptorProto> i = message_type.last (); i != null; i = i.prev)
+        for (unowned List<DescriptorProto> i = this.message_type.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
-        for (unowned List<string> i = dependency.last (); i != null; i = i.prev)
+        for (unowned List<string> i = this.dependency.last (); i != null; i = i.prev)
         {
             var n = Protobuf.encode_string (i.data, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -172,13 +172,13 @@ public class FileDescriptorProto
         }
         if (this.package != null)
         {
-            var n = Protobuf.encode_string (package, buffer, ref offset);
+            var n = Protobuf.encode_string (this.package, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -193,60 +193,60 @@ public class FileDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.package != null)
         {
             text += "package = ";
-            text += "\"%s\";\n".printf (package);
+            text += "\"%s\";\n".printf (this.package);
         }
 
         if (this.dependency != null)
         {
             text += "dependency = ";
-            foreach (var v in dependency)
+            foreach (var v in this.dependency)
                 text += "\"%s\";\n".printf (v);
         }
 
         if (this.message_type != null)
         {
             text += "message_type = ";
-            foreach (var v in message_type)
+            foreach (var v in this.message_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.enum_type != null)
         {
             text += "enum_type = ";
-            foreach (var v in enum_type)
+            foreach (var v in this.enum_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.service != null)
         {
             text += "service = ";
-            foreach (var v in service)
+            foreach (var v in this.service)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension != null)
         {
             text += "extension = ";
-            foreach (var v in extension)
+            foreach (var v in this.extension)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         if (this.source_code_info != null)
         {
             text += "source_code_info = ";
-            text += "%s;\n".printf (source_code_info.to_string ());
+            text += "%s;\n".printf (this.source_code_info.to_string ());
         }
 
         text += "}";
@@ -280,10 +280,10 @@ public class DescriptorProto
                 switch (field_number)
                 {
                 case 1:
-                    start = varint;
+                    this.start = varint;
                     break;
                 case 2:
-                    end = varint;
+                    this.end = varint;
                     break;
                 }
 
@@ -297,12 +297,12 @@ public class DescriptorProto
 
             if (this.end != null)
             {
-                Protobuf.encode_varint (end, buffer, ref offset);
+                Protobuf.encode_varint (this.end, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
             if (this.start != null)
             {
-                Protobuf.encode_varint (start, buffer, ref offset);
+                Protobuf.encode_varint (this.start, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
             }
 
@@ -316,13 +316,13 @@ public class DescriptorProto
             if (this.start != null)
             {
                 text += "start = ";
-                text += "%s;\n".printf (start.to_string ());
+                text += "%s;\n".printf (this.start.to_string ());
             }
 
             if (this.end != null)
             {
                 text += "end = ";
-                text += "%s;\n".printf (end.to_string ());
+                text += "%s;\n".printf (this.end.to_string ());
             }
 
             text += "}";
@@ -356,25 +356,25 @@ public class DescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                field.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.field.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 6:
-                extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
-                nested_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.nested_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 4:
-                enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 5:
-                extension_range.append (new ExtensionRange.from_data (buffer, offset + value_length, offset));
+                this.extension_range.append (new ExtensionRange.from_data (buffer, offset + value_length, offset));
                 break;
             case 7:
-                options = new MessageOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new MessageOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -388,35 +388,35 @@ public class DescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
-        for (unowned List<ExtensionRange> i = extension_range.last (); i != null; i = i.prev)
+        for (unowned List<ExtensionRange> i = this.extension_range.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (42, buffer, ref offset);
         }
-        for (unowned List<EnumDescriptorProto> i = enum_type.last (); i != null; i = i.prev)
+        for (unowned List<EnumDescriptorProto> i = this.enum_type.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
-        for (unowned List<DescriptorProto> i = nested_type.last (); i != null; i = i.prev)
+        for (unowned List<DescriptorProto> i = this.nested_type.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        for (unowned List<FieldDescriptorProto> i = extension.last (); i != null; i = i.prev)
+        for (unowned List<FieldDescriptorProto> i = this.extension.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
-        for (unowned List<FieldDescriptorProto> i = field.last (); i != null; i = i.prev)
+        for (unowned List<FieldDescriptorProto> i = this.field.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -424,7 +424,7 @@ public class DescriptorProto
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -439,48 +439,48 @@ public class DescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.field != null)
         {
             text += "field = ";
-            foreach (var v in field)
+            foreach (var v in this.field)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension != null)
         {
             text += "extension = ";
-            foreach (var v in extension)
+            foreach (var v in this.extension)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.nested_type != null)
         {
             text += "nested_type = ";
-            foreach (var v in nested_type)
+            foreach (var v in this.nested_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.enum_type != null)
         {
             text += "enum_type = ";
-            foreach (var v in enum_type)
+            foreach (var v in this.enum_type)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.extension_range != null)
         {
             text += "extension_range = ";
-            foreach (var v in extension_range)
+            foreach (var v in this.extension_range)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -545,28 +545,28 @@ public class FieldDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
-                number = varint;
+                this.number = varint;
                 break;
             case 4:
-                label = (Label) varint;
+                this.label = (Label) varint;
                 break;
             case 5:
-                type = (Type) varint;
+                this.type = (Type) varint;
                 break;
             case 6:
-                type_name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.type_name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                extendee = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.extendee = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 7:
-                default_value = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.default_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 8:
-                options = new FieldOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new FieldOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -580,46 +580,46 @@ public class FieldDescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (this.default_value != null)
         {
-            var n = Protobuf.encode_string (default_value, buffer, ref offset);
+            var n = Protobuf.encode_string (this.default_value, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (this.extendee != null)
         {
-            var n = Protobuf.encode_string (extendee, buffer, ref offset);
+            var n = Protobuf.encode_string (this.extendee, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (this.type_name != null)
         {
-            var n = Protobuf.encode_string (type_name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.type_name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (50, buffer, ref offset);
         }
         if (this.type != null)
         {
-            Protobuf.encode_varint (type, buffer, ref offset);
+            Protobuf.encode_varint (this.type, buffer, ref offset);
             Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (this.label != null)
         {
-            Protobuf.encode_varint (label, buffer, ref offset);
+            Protobuf.encode_varint (this.label, buffer, ref offset);
             Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (this.number != null)
         {
-            Protobuf.encode_varint (number, buffer, ref offset);
+            Protobuf.encode_varint (this.number, buffer, ref offset);
             Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -634,49 +634,49 @@ public class FieldDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.number != null)
         {
             text += "number = ";
-            text += "%s;\n".printf (number.to_string ());
+            text += "%s;\n".printf (this.number.to_string ());
         }
 
         if (this.label != null)
         {
             text += "label = ";
-            text += "%s;\n".printf (label.to_string ());
+            text += "%s;\n".printf (this.label.to_string ());
         }
 
         if (this.type != null)
         {
             text += "type = ";
-            text += "%s;\n".printf (type.to_string ());
+            text += "%s;\n".printf (this.type.to_string ());
         }
 
         if (this.type_name != null)
         {
             text += "type_name = ";
-            text += "\"%s\";\n".printf (type_name);
+            text += "\"%s\";\n".printf (this.type_name);
         }
 
         if (this.extendee != null)
         {
             text += "extendee = ";
-            text += "\"%s\";\n".printf (extendee);
+            text += "\"%s\";\n".printf (this.extendee);
         }
 
         if (this.default_value != null)
         {
             text += "default_value = ";
-            text += "\"%s\";\n".printf (default_value);
+            text += "\"%s\";\n".printf (this.default_value);
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -709,13 +709,13 @@ public class EnumDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                value.append (new EnumValueDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.value.append (new EnumValueDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
-                options = new EnumOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new EnumOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -729,11 +729,11 @@ public class EnumDescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        for (unowned List<EnumValueDescriptorProto> i = value.last (); i != null; i = i.prev)
+        for (unowned List<EnumValueDescriptorProto> i = this.value.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -741,7 +741,7 @@ public class EnumDescriptorProto
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -756,20 +756,20 @@ public class EnumDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.value != null)
         {
             text += "value = ";
-            foreach (var v in value)
+            foreach (var v in this.value)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -802,13 +802,13 @@ public class EnumValueDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                number = varint;
+                this.number = varint;
                 break;
             case 3:
-                options = new EnumValueOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new EnumValueOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -822,18 +822,18 @@ public class EnumValueDescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (this.number != null)
         {
-            Protobuf.encode_varint (number, buffer, ref offset);
+            Protobuf.encode_varint (this.number, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -848,19 +848,19 @@ public class EnumValueDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.number != null)
         {
             text += "number = ";
-            text += "%s;\n".printf (number.to_string ());
+            text += "%s;\n".printf (this.number.to_string ());
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -893,13 +893,13 @@ public class ServiceDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                method.append (new MethodDescriptorProto.from_data (buffer, offset + value_length, offset));
+                this.method.append (new MethodDescriptorProto.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
-                options = new ServiceOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new ServiceOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -913,11 +913,11 @@ public class ServiceDescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        for (unowned List<MethodDescriptorProto> i = method.last (); i != null; i = i.prev)
+        for (unowned List<MethodDescriptorProto> i = this.method.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -925,7 +925,7 @@ public class ServiceDescriptorProto
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -940,20 +940,20 @@ public class ServiceDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.method != null)
         {
             text += "method = ";
-            foreach (var v in method)
+            foreach (var v in this.method)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -987,16 +987,16 @@ public class MethodDescriptorProto
             switch (field_number)
             {
             case 1:
-                name = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 2:
-                input_type = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.input_type = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 3:
-                output_type = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.output_type = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 4:
-                options = new MethodOptions.from_data (buffer, offset + value_length, offset);
+                this.options = new MethodOptions.from_data (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -1010,25 +1010,25 @@ public class MethodDescriptorProto
 
         if (this.options != null)
         {
-            var n = options.encode (buffer, ref offset);
+            var n = this.options.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (34, buffer, ref offset);
         }
         if (this.output_type != null)
         {
-            var n = Protobuf.encode_string (output_type, buffer, ref offset);
+            var n = Protobuf.encode_string (this.output_type, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
         if (this.input_type != null)
         {
-            var n = Protobuf.encode_string (input_type, buffer, ref offset);
+            var n = Protobuf.encode_string (this.input_type, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (18, buffer, ref offset);
         }
         if (this.name != null)
         {
-            var n = Protobuf.encode_string (name, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -1043,25 +1043,25 @@ public class MethodDescriptorProto
         if (this.name != null)
         {
             text += "name = ";
-            text += "\"%s\";\n".printf (name);
+            text += "\"%s\";\n".printf (this.name);
         }
 
         if (this.input_type != null)
         {
             text += "input_type = ";
-            text += "\"%s\";\n".printf (input_type);
+            text += "\"%s\";\n".printf (this.input_type);
         }
 
         if (this.output_type != null)
         {
             text += "output_type = ";
-            text += "\"%s\";\n".printf (output_type);
+            text += "\"%s\";\n".printf (this.output_type);
         }
 
         if (this.options != null)
         {
             text += "options = ";
-            text += "%s;\n".printf (options.to_string ());
+            text += "%s;\n".printf (this.options.to_string ());
         }
 
         text += "}";
@@ -1106,31 +1106,31 @@ public class FileOptions
             switch (field_number)
             {
             case 1:
-                java_package = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.java_package = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 8:
-                java_outer_classname = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.java_outer_classname = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 10:
-                java_multiple_files = varint != 0;
+                this.java_multiple_files = varint != 0;
                 break;
             case 20:
-                java_generate_equals_and_hash = varint != 0;
+                this.java_generate_equals_and_hash = varint != 0;
                 break;
             case 9:
-                optimize_for = (OptimizeMode) varint;
+                this.optimize_for = (OptimizeMode) varint;
                 break;
             case 16:
-                cc_generic_services = varint != 0;
+                this.cc_generic_services = varint != 0;
                 break;
             case 17:
-                java_generic_services = varint != 0;
+                this.java_generic_services = varint != 0;
                 break;
             case 18:
-                py_generic_services = varint != 0;
+                this.py_generic_services = varint != 0;
                 break;
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1142,7 +1142,7 @@ public class FileOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1150,43 +1150,43 @@ public class FileOptions
         }
         if (this.py_generic_services != null)
         {
-            Protobuf.encode_varint (py_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.py_generic_services ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (144, buffer, ref offset);
         }
         if (this.java_generic_services != null)
         {
-            Protobuf.encode_varint (java_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.java_generic_services ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (136, buffer, ref offset);
         }
         if (this.cc_generic_services != null)
         {
-            Protobuf.encode_varint (cc_generic_services ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.cc_generic_services ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (128, buffer, ref offset);
         }
         if (this.optimize_for != null)
         {
-            Protobuf.encode_varint (optimize_for, buffer, ref offset);
+            Protobuf.encode_varint (this.optimize_for, buffer, ref offset);
             Protobuf.encode_varint (72, buffer, ref offset);
         }
         if (this.java_generate_equals_and_hash != null)
         {
-            Protobuf.encode_varint (java_generate_equals_and_hash ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.java_generate_equals_and_hash ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (160, buffer, ref offset);
         }
         if (this.java_multiple_files != null)
         {
-            Protobuf.encode_varint (java_multiple_files ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.java_multiple_files ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (80, buffer, ref offset);
         }
         if (this.java_outer_classname != null)
         {
-            var n = Protobuf.encode_string (java_outer_classname, buffer, ref offset);
+            var n = Protobuf.encode_string (this.java_outer_classname, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (this.java_package != null)
         {
-            var n = Protobuf.encode_string (java_package, buffer, ref offset);
+            var n = Protobuf.encode_string (this.java_package, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
         }
@@ -1201,55 +1201,55 @@ public class FileOptions
         if (this.java_package != null)
         {
             text += "java_package = ";
-            text += "\"%s\";\n".printf (java_package);
+            text += "\"%s\";\n".printf (this.java_package);
         }
 
         if (this.java_outer_classname != null)
         {
             text += "java_outer_classname = ";
-            text += "\"%s\";\n".printf (java_outer_classname);
+            text += "\"%s\";\n".printf (this.java_outer_classname);
         }
 
         if (this.java_multiple_files != null)
         {
             text += "java_multiple_files = ";
-            text += "%s;\n".printf (java_multiple_files.to_string ());
+            text += "%s;\n".printf (this.java_multiple_files.to_string ());
         }
 
         if (this.java_generate_equals_and_hash != null)
         {
             text += "java_generate_equals_and_hash = ";
-            text += "%s;\n".printf (java_generate_equals_and_hash.to_string ());
+            text += "%s;\n".printf (this.java_generate_equals_and_hash.to_string ());
         }
 
         if (this.optimize_for != null)
         {
             text += "optimize_for = ";
-            text += "%s;\n".printf (optimize_for.to_string ());
+            text += "%s;\n".printf (this.optimize_for.to_string ());
         }
 
         if (this.cc_generic_services != null)
         {
             text += "cc_generic_services = ";
-            text += "%s;\n".printf (cc_generic_services.to_string ());
+            text += "%s;\n".printf (this.cc_generic_services.to_string ());
         }
 
         if (this.java_generic_services != null)
         {
             text += "java_generic_services = ";
-            text += "%s;\n".printf (java_generic_services.to_string ());
+            text += "%s;\n".printf (this.java_generic_services.to_string ());
         }
 
         if (this.py_generic_services != null)
         {
             text += "py_generic_services = ";
-            text += "%s;\n".printf (py_generic_services.to_string ());
+            text += "%s;\n".printf (this.py_generic_services.to_string ());
         }
 
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1283,13 +1283,13 @@ public class MessageOptions
             switch (field_number)
             {
             case 1:
-                message_set_wire_format = varint != 0;
+                this.message_set_wire_format = varint != 0;
                 break;
             case 2:
-                no_standard_descriptor_accessor = varint != 0;
+                this.no_standard_descriptor_accessor = varint != 0;
                 break;
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1301,7 +1301,7 @@ public class MessageOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1309,12 +1309,12 @@ public class MessageOptions
         }
         if (this.no_standard_descriptor_accessor != null)
         {
-            Protobuf.encode_varint (no_standard_descriptor_accessor ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.no_standard_descriptor_accessor ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.message_set_wire_format != null)
         {
-            Protobuf.encode_varint (message_set_wire_format ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.message_set_wire_format ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 
@@ -1328,19 +1328,19 @@ public class MessageOptions
         if (this.message_set_wire_format != null)
         {
             text += "message_set_wire_format = ";
-            text += "%s;\n".printf (message_set_wire_format.to_string ());
+            text += "%s;\n".printf (this.message_set_wire_format.to_string ());
         }
 
         if (this.no_standard_descriptor_accessor != null)
         {
             text += "no_standard_descriptor_accessor = ";
-            text += "%s;\n".printf (no_standard_descriptor_accessor.to_string ());
+            text += "%s;\n".printf (this.no_standard_descriptor_accessor.to_string ());
         }
 
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1382,19 +1382,19 @@ public class FieldOptions
             switch (field_number)
             {
             case 1:
-                ctype = (CType) varint;
+                this.ctype = (CType) varint;
                 break;
             case 2:
-                packed = varint != 0;
+                this.packed = varint != 0;
                 break;
             case 3:
-                deprecated = varint != 0;
+                this.deprecated = varint != 0;
                 break;
             case 9:
-                experimental_map_key = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.experimental_map_key = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1406,7 +1406,7 @@ public class FieldOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1414,23 +1414,23 @@ public class FieldOptions
         }
         if (this.experimental_map_key != null)
         {
-            var n = Protobuf.encode_string (experimental_map_key, buffer, ref offset);
+            var n = Protobuf.encode_string (this.experimental_map_key, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (74, buffer, ref offset);
         }
         if (this.deprecated != null)
         {
-            Protobuf.encode_varint (deprecated ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.deprecated ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (24, buffer, ref offset);
         }
         if (this.packed != null)
         {
-            Protobuf.encode_varint (packed ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.packed ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
         }
         if (this.ctype != null)
         {
-            Protobuf.encode_varint (ctype, buffer, ref offset);
+            Protobuf.encode_varint (this.ctype, buffer, ref offset);
             Protobuf.encode_varint (8, buffer, ref offset);
         }
 
@@ -1444,31 +1444,31 @@ public class FieldOptions
         if (this.ctype != null)
         {
             text += "ctype = ";
-            text += "%s;\n".printf (ctype.to_string ());
+            text += "%s;\n".printf (this.ctype.to_string ());
         }
 
         if (this.packed != null)
         {
             text += "packed = ";
-            text += "%s;\n".printf (packed.to_string ());
+            text += "%s;\n".printf (this.packed.to_string ());
         }
 
         if (this.deprecated != null)
         {
             text += "deprecated = ";
-            text += "%s;\n".printf (deprecated.to_string ());
+            text += "%s;\n".printf (this.deprecated.to_string ());
         }
 
         if (this.experimental_map_key != null)
         {
             text += "experimental_map_key = ";
-            text += "\"%s\";\n".printf (experimental_map_key);
+            text += "\"%s\";\n".printf (this.experimental_map_key);
         }
 
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1500,7 +1500,7 @@ public class EnumOptions
             switch (field_number)
             {
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1512,7 +1512,7 @@ public class EnumOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1529,7 +1529,7 @@ public class EnumOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1561,7 +1561,7 @@ public class EnumValueOptions
             switch (field_number)
             {
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1573,7 +1573,7 @@ public class EnumValueOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1590,7 +1590,7 @@ public class EnumValueOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1622,7 +1622,7 @@ public class ServiceOptions
             switch (field_number)
             {
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1634,7 +1634,7 @@ public class ServiceOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1651,7 +1651,7 @@ public class ServiceOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1683,7 +1683,7 @@ public class MethodOptions
             switch (field_number)
             {
             case 999:
-                uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -1695,7 +1695,7 @@ public class MethodOptions
     {
         var start = offset;
 
-        for (unowned List<UninterpretedOption> i = uninterpreted_option.last (); i != null; i = i.prev)
+        for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1712,7 +1712,7 @@ public class MethodOptions
         if (this.uninterpreted_option != null)
         {
             text += "uninterpreted_option = ";
-            foreach (var v in uninterpreted_option)
+            foreach (var v in this.uninterpreted_option)
                 text += "%s;\n".printf (v.to_string ());
         }
 
@@ -1747,10 +1747,10 @@ public class UninterpretedOption
                 switch (field_number)
                 {
                 case 1:
-                    name_part = Protobuf.decode_string (buffer, offset + value_length, offset);
+                    this.name_part = Protobuf.decode_string (buffer, offset + value_length, offset);
                     break;
                 case 2:
-                    is_extension = varint != 0;
+                    this.is_extension = varint != 0;
                     break;
                 }
 
@@ -1762,9 +1762,9 @@ public class UninterpretedOption
         {
             var start = offset;
 
-            Protobuf.encode_varint (is_extension ? 1 : 0, buffer, ref offset);
+            Protobuf.encode_varint (this.is_extension ? 1 : 0, buffer, ref offset);
             Protobuf.encode_varint (16, buffer, ref offset);
-            var n = Protobuf.encode_string (name_part, buffer, ref offset);
+            var n = Protobuf.encode_string (this.name_part, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (10, buffer, ref offset);
 
@@ -1776,10 +1776,10 @@ public class UninterpretedOption
             var text = "{\n";
 
             text += "name_part = ";
-            text += "\"%s\";\n".printf (name_part);
+            text += "\"%s\";\n".printf (this.name_part);
 
             text += "is_extension = ";
-            text += "%s;\n".printf (is_extension.to_string ());
+            text += "%s;\n".printf (this.is_extension.to_string ());
 
             text += "}";
             return text;
@@ -1812,25 +1812,25 @@ public class UninterpretedOption
             switch (field_number)
             {
             case 2:
-                name.append (new NamePart.from_data (buffer, offset + value_length, offset));
+                this.name.append (new NamePart.from_data (buffer, offset + value_length, offset));
                 break;
             case 3:
-                identifier_value = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.identifier_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             case 4:
-                positive_int_value = varint;
+                this.positive_int_value = varint;
                 break;
             case 5:
-                negative_int_value = varint;
+                this.negative_int_value = varint;
                 break;
             case 6:
-                double_value = Protobuf.decode_double (buffer, offset + value_length, offset);
+                this.double_value = Protobuf.decode_double (buffer, offset + value_length, offset);
                 break;
             case 7:
-                string_value = Protobuf.decode_bytes (buffer, offset + value_length, offset);
+                this.string_value = Protobuf.decode_bytes (buffer, offset + value_length, offset);
                 break;
             case 8:
-                aggregate_value = Protobuf.decode_string (buffer, offset + value_length, offset);
+                this.aggregate_value = Protobuf.decode_string (buffer, offset + value_length, offset);
                 break;
             }
 
@@ -1844,38 +1844,38 @@ public class UninterpretedOption
 
         if (this.aggregate_value != null)
         {
-            var n = Protobuf.encode_string (aggregate_value, buffer, ref offset);
+            var n = Protobuf.encode_string (this.aggregate_value, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (66, buffer, ref offset);
         }
         if (this.string_value != null)
         {
-            var n = Protobuf.encode_bytes (string_value, buffer, ref offset);
+            var n = Protobuf.encode_bytes (this.string_value, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (58, buffer, ref offset);
         }
         if (this.double_value != null)
         {
-            Protobuf.encode_double (double_value, buffer, ref offset);
+            Protobuf.encode_double (this.double_value, buffer, ref offset);
             Protobuf.encode_varint (48, buffer, ref offset);
         }
         if (this.negative_int_value != null)
         {
-            Protobuf.encode_varint ((size_t) negative_int_value, buffer, ref offset);
+            Protobuf.encode_varint ((size_t) this.negative_int_value, buffer, ref offset);
             Protobuf.encode_varint (40, buffer, ref offset);
         }
         if (this.positive_int_value != null)
         {
-            Protobuf.encode_varint ((size_t) positive_int_value, buffer, ref offset);
+            Protobuf.encode_varint ((size_t) this.positive_int_value, buffer, ref offset);
             Protobuf.encode_varint (32, buffer, ref offset);
         }
         if (this.identifier_value != null)
         {
-            var n = Protobuf.encode_string (identifier_value, buffer, ref offset);
+            var n = Protobuf.encode_string (this.identifier_value, buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
             Protobuf.encode_varint (26, buffer, ref offset);
         }
-        for (unowned List<NamePart> i = name.last (); i != null; i = i.prev)
+        for (unowned List<NamePart> i = this.name.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -1892,46 +1892,46 @@ public class UninterpretedOption
         if (this.name != null)
         {
             text += "name = ";
-            foreach (var v in name)
+            foreach (var v in this.name)
                 text += "%s;\n".printf (v.to_string ());
         }
 
         if (this.identifier_value != null)
         {
             text += "identifier_value = ";
-            text += "\"%s\";\n".printf (identifier_value);
+            text += "\"%s\";\n".printf (this.identifier_value);
         }
 
         if (this.positive_int_value != null)
         {
             text += "positive_int_value = ";
-            text += "%s;\n".printf (positive_int_value.to_string ());
+            text += "%s;\n".printf (this.positive_int_value.to_string ());
         }
 
         if (this.negative_int_value != null)
         {
             text += "negative_int_value = ";
-            text += "%s;\n".printf (negative_int_value.to_string ());
+            text += "%s;\n".printf (this.negative_int_value.to_string ());
         }
 
         if (this.double_value != null)
         {
             text += "double_value = ";
-            text += "%s;\n".printf (double_value.to_string ());
+            text += "%s;\n".printf (this.double_value.to_string ());
         }
 
         if (this.string_value != null)
         {
             text += "string_value = ";
-            for (var i = 0; i < string_value.length; i++)
-                text += "%02X".printf (string_value[i]);
+            for (var i = 0; i < this.string_value.length; i++)
+                text += "%02X".printf (this.string_value[i]);
             text += "\n";
         }
 
         if (this.aggregate_value != null)
         {
             text += "aggregate_value = ";
-            text += "\"%s\";\n".printf (aggregate_value);
+            text += "\"%s\";\n".printf (this.aggregate_value);
         }
 
         text += "}";
@@ -1965,10 +1965,10 @@ public class SourceCodeInfo
                 switch (field_number)
                 {
                 case 1:
-                    path.append (varint);
+                    this.path.append (varint);
                     break;
                 case 2:
-                    span.append (varint);
+                    this.span.append (varint);
                     break;
                 }
 
@@ -1980,12 +1980,12 @@ public class SourceCodeInfo
         {
             var start = offset;
 
-            for (unowned List<int32> i = span.last (); i != null; i = i.prev)
+            for (unowned List<int32> i = this.span.last (); i != null; i = i.prev)
             {
                 Protobuf.encode_varint (i.data, buffer, ref offset);
                 Protobuf.encode_varint (16, buffer, ref offset);
             }
-            for (unowned List<int32> i = path.last (); i != null; i = i.prev)
+            for (unowned List<int32> i = this.path.last (); i != null; i = i.prev)
             {
                 Protobuf.encode_varint (i.data, buffer, ref offset);
                 Protobuf.encode_varint (8, buffer, ref offset);
@@ -2001,14 +2001,14 @@ public class SourceCodeInfo
             if (this.path != null)
             {
                 text += "path = ";
-                foreach (var v in path)
+                foreach (var v in this.path)
                     text += "%s;\n".printf (v.to_string ());
             }
 
             if (this.span != null)
             {
                 text += "span = ";
-                foreach (var v in span)
+                foreach (var v in this.span)
                     text += "%s;\n".printf (v.to_string ());
             }
 
@@ -2037,7 +2037,7 @@ public class SourceCodeInfo
             switch (field_number)
             {
             case 1:
-                location.append (new Location.from_data (buffer, offset + value_length, offset));
+                this.location.append (new Location.from_data (buffer, offset + value_length, offset));
                 break;
             }
 
@@ -2049,7 +2049,7 @@ public class SourceCodeInfo
     {
         var start = offset;
 
-        for (unowned List<Location> i = location.last (); i != null; i = i.prev)
+        for (unowned List<Location> i = this.location.last (); i != null; i = i.prev)
         {
             var n = i.data.encode (buffer, ref offset);
             Protobuf.encode_varint (n, buffer, ref offset);
@@ -2066,7 +2066,7 @@ public class SourceCodeInfo
         if (this.location != null)
         {
             text += "location = ";
-            foreach (var v in location)
+            foreach (var v in this.location)
                 text += "%s;\n".printf (v.to_string ());
         }
 

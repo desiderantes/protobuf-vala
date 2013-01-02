@@ -130,9 +130,9 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         }
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
-            text += indent + "                %s.append (%s);\n".printf (field.name, decode_method);
+            text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
         else
-            text += indent + "                %s = %s;\n".printf (field.name, decode_method);
+            text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
         text += indent + "                break;\n";
     }
     text += indent + "            }\n";
@@ -154,7 +154,7 @@ private static string write_class (DescriptorProto type, string indent = "")
     {
         var field = i.data;
         var indent2 = indent;
-        var field_name = field.name;
+        var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
         {
             text += indent + "        if (this.%s != null)\n".printf (field.name);
@@ -163,7 +163,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        for (unowned List<%s> i = %s.last (); i != null; i = i.prev)\n".printf (get_type_name (field, false), field.name);
+            text += indent + "        for (unowned List<%s> i = this.%s.last (); i != null; i = i.prev)\n".printf (get_type_name (field, false), field.name);
             text += indent + "        {\n";
             indent2 += "    ";
             field_name = "i.data";
@@ -248,10 +248,10 @@ private static string write_class (DescriptorProto type, string indent = "")
 
         text += indent2 + "        text += \"%s = \";\n".printf (field.name);
 
-        var field_name = field.name;
+        var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent2 + "        foreach (var v in %s)\n".printf (field.name);
+            text += indent2 + "        foreach (var v in this.%s)\n".printf (field.name);
             indent2 += "    ";
             field_name = "v";
         }
