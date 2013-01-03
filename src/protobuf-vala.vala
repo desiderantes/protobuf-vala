@@ -270,12 +270,12 @@ namespace Protobuf
 
         public size_t encode_sint32 (int32 value)
         {
-            return encode_varint ((value << 1) | (value >> 31));
+            return encode_varint ((value << 1) ^ (value >> 31));
         }
 
         public size_t encode_sint64 (int64 value)
         {
-            return encode_varint ((size_t) (value << 1) | (value >> 63));
+            return encode_varint ((size_t) ((value << 1) ^ (value >> 63)));
         }
     }
 }
