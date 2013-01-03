@@ -186,14 +186,26 @@ namespace Protobuf
         public size_t encode_double (double value)
         {
             write_index -= 8;
-            // FIXME
+            var v = *((uint64*) (&value));
+            buffer[write_index + 1] = (uint8) v;
+            buffer[write_index + 2] = (uint8) (v >> 8);
+            buffer[write_index + 3] = (uint8) (v >> 16);
+            buffer[write_index + 4] = (uint8) (v >> 24);
+            buffer[write_index + 5] = (uint8) (v >> 32);
+            buffer[write_index + 6] = (uint8) (v >> 40);
+            buffer[write_index + 7] = (uint8) (v >> 48);
+            buffer[write_index + 8] = (uint8) (v >> 56);
             return 8;
         }
 
         public size_t encode_float (float value)
         {
             write_index -= 4;
-            // FIXME
+            var v = *((uint32*) (&value));
+            buffer[write_index + 1] = (uint8) v;
+            buffer[write_index + 2] = (uint8) (v >> 8);
+            buffer[write_index + 3] = (uint8) (v >> 16);
+            buffer[write_index + 4] = (uint8) (v >> 24);
             return 4;
         }
 

@@ -7,9 +7,24 @@ public static int main (string[] args)
     check_encode_varint (16383, "FF7F");
     check_encode_varint (16384, "808001");
 
-    // FIXME: double
+    check_encode_double (0f, "0000000000000000");
+    check_encode_double (-0f, "0000000000000080");
+    check_encode_double (1f, "000000000000F03F");
+    check_encode_double (-1f, "000000000000F0BF");
+    check_encode_double (double.MAX, "FFFFFFFFFFFFEF7F");
+    check_encode_double (-double.MAX, "FFFFFFFFFFFFEFFF");
+    check_encode_double (double.INFINITY, "000000000000F07F");
+    check_encode_double (-double.INFINITY, "000000000000F0FF");
 
-    // FIXME: float
+    check_encode_float (0f, "00000000");
+    check_encode_float (-0f, "00000080");
+    check_encode_float (1f, "0000803F");
+    check_encode_float (-1f, "000080BF");
+    check_encode_float (float.MAX, "FFFF7F7F");
+    check_encode_float (-float.MAX, "FFFF7FFF");
+    check_encode_float (float.INFINITY, "0000807F");
+    check_encode_float (-float.INFINITY, "000080FF");
+    check_encode_float (0.15625f, "0000203E");
 
     check_encode_int64 (0, "00");
     check_encode_int64 (1, "01");
@@ -67,6 +82,24 @@ private void check_encode_varint (size_t value, string expected)
     var result = buffer_to_string (buffer);
     if (result != expected)
         stderr.printf ("encode_varint (%zu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_double (double value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_double (value);
+    var result = buffer_to_string (buffer);
+    if (result != expected)
+        stderr.printf ("encode_double (%f) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_float (float value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_float (value);
+    var result = buffer_to_string (buffer);
+    if (result != expected)
+        stderr.printf ("encode_float (%f) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_int64 (int64 value, string expected)
