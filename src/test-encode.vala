@@ -1,3 +1,6 @@
+private int n_tests = 0;
+private int n_passed = 0;
+
 public static int main (string[] args)
 {
     check_encode_varint (0, "00");
@@ -80,8 +83,16 @@ public static int main (string[] args)
     check_encode_sint64 (-2, "03");
     check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
     check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
+    
+    if (n_passed != n_tests)
+    {
+        stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
+        return Posix.EXIT_FAILURE;
+    }
+    
+    stderr.printf ("Passed all %d tests\n", n_tests);
 
-    return 0;
+    return Posix.EXIT_SUCCESS;
 }
 
 private void check_encode_varint (size_t value, string expected)
@@ -89,7 +100,11 @@ private void check_encode_varint (size_t value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_varint (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_varint (%zu) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -98,7 +113,11 @@ private void check_encode_double (double value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_double (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_double (%f) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -107,7 +126,11 @@ private void check_encode_float (float value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_float (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_float (%f) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -116,7 +139,11 @@ private void check_encode_int64 (int64 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_int64 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_int64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -125,7 +152,11 @@ private void check_encode_uint64 (uint64 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_uint64 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_uint64 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -134,7 +165,11 @@ private void check_encode_int32 (int32 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_int32 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_int32 (%d) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -143,7 +178,11 @@ private void check_encode_bool (bool value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_bool (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_bool (%s) -> \"%s\", expected \"%s\"\n", value.to_string (), result, expected);
 }
 
@@ -152,7 +191,11 @@ private void check_encode_string (string value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_string (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_string (%s) -> \"%s\", expected \"%s\"\n", value.to_string (), result, expected);
 }
 
@@ -161,7 +204,11 @@ private void check_encode_uint32 (uint32 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_uint32 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_uint32 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -170,7 +217,11 @@ private void check_encode_sint32 (int32 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_sint32 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_sint32 (%d) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
@@ -179,7 +230,11 @@ private void check_encode_sint64 (int64 value, string expected)
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_sint64 (value);
     var result = buffer_to_string (buffer);
-    if (result != expected)
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
         stderr.printf ("encode_sint64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 

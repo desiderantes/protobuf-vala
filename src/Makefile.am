@@ -45,6 +45,7 @@ test_encode_SOURCES = \
 	test-encode.vala
 
 test_encode_VALAFLAGS = \
+	--pkg posix \
 	--vapidir . \
 	--pkg protobuf-vala
 
@@ -59,6 +60,7 @@ test_decode_SOURCES = \
 	test-decode.vala
 
 test_decode_VALAFLAGS = \
+	--pkg posix \
 	--vapidir . \
 	--pkg protobuf-vala
 
