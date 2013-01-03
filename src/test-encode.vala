@@ -2,10 +2,13 @@ public static int main (string[] args)
 {
     check_encode_varint (0, "00");
     check_encode_varint (1, "01");
+    check_encode_varint (3, "03");
     check_encode_varint (127, "7F");
     check_encode_varint (128, "8001");
+    check_encode_varint (270, "8E02");
     check_encode_varint (16383, "FF7F");
     check_encode_varint (16384, "808001");
+    check_encode_varint (86942, "9EA705");
 
     check_encode_double (0f, "0000000000000000");
     check_encode_double (-0f, "0000000000000080");
@@ -67,10 +70,16 @@ public static int main (string[] args)
     check_encode_sint32 (2, "04");
     check_encode_sint32 (-1, "01");
     check_encode_sint32 (-2, "03");
-    check_encode_sint32 (int32.MAX, "FEFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
-    check_encode_sint32 (int32.MIN, "FFFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
+    check_encode_sint32 (int32.MAX, "FEFFFFFF0F");
+    check_encode_sint32 (int32.MIN, "FFFFFFFF0F");
 
-    // FIXME: sint64
+    check_encode_sint64 (0, "00");
+    check_encode_sint64 (1, "02");
+    check_encode_sint64 (2, "04");
+    check_encode_sint64 (-1, "01");
+    check_encode_sint64 (-2, "03");
+    check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
+    check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
 
     return 0;
 }
@@ -163,6 +172,15 @@ private void check_encode_sint32 (int32 value, string expected)
     var result = buffer_to_string (buffer);
     if (result != expected)
         stderr.printf ("encode_sint32 (%d) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_sint64 (int64 value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_sint64 (value);
+    var result = buffer_to_string (buffer);
+    if (result != expected)
+        stderr.printf ("encode_sint64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)
