@@ -31,18 +31,18 @@ public class FileDescriptorSet
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<FileDescriptorProto> i = this.file.last (); i != null; i = i.prev)
         {
-            var file_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (file_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var file_length = i.data.encode (buffer);
+            buffer.encode_varint (file_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -124,66 +124,66 @@ public class FileDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.source_code_info != null)
         {
-            var source_code_info_length = this.source_code_info.encode (buffer, ref offset);
-            Protobuf.encode_varint (source_code_info_length, buffer, ref offset);
-            Protobuf.encode_varint (74, buffer, ref offset);
+            var source_code_info_length = this.source_code_info.encode (buffer);
+            buffer.encode_varint (source_code_info_length);
+            buffer.encode_varint (74);
         }
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (66, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (66);
         }
         for (unowned List<FieldDescriptorProto> i = this.extension.last (); i != null; i = i.prev)
         {
-            var extension_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (extension_length, buffer, ref offset);
-            Protobuf.encode_varint (58, buffer, ref offset);
+            var extension_length = i.data.encode (buffer);
+            buffer.encode_varint (extension_length);
+            buffer.encode_varint (58);
         }
         for (unowned List<ServiceDescriptorProto> i = this.service.last (); i != null; i = i.prev)
         {
-            var service_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (service_length, buffer, ref offset);
-            Protobuf.encode_varint (50, buffer, ref offset);
+            var service_length = i.data.encode (buffer);
+            buffer.encode_varint (service_length);
+            buffer.encode_varint (50);
         }
         for (unowned List<EnumDescriptorProto> i = this.enum_type.last (); i != null; i = i.prev)
         {
-            var enum_type_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (enum_type_length, buffer, ref offset);
-            Protobuf.encode_varint (42, buffer, ref offset);
+            var enum_type_length = i.data.encode (buffer);
+            buffer.encode_varint (enum_type_length);
+            buffer.encode_varint (42);
         }
         for (unowned List<DescriptorProto> i = this.message_type.last (); i != null; i = i.prev)
         {
-            var message_type_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (message_type_length, buffer, ref offset);
-            Protobuf.encode_varint (34, buffer, ref offset);
+            var message_type_length = i.data.encode (buffer);
+            buffer.encode_varint (message_type_length);
+            buffer.encode_varint (34);
         }
         for (unowned List<string> i = this.dependency.last (); i != null; i = i.prev)
         {
-            var dependency_length = Protobuf.encode_string (i.data, buffer, ref offset);
-            Protobuf.encode_varint (dependency_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var dependency_length = buffer.encode_string (i.data);
+            buffer.encode_varint (dependency_length);
+            buffer.encode_varint (26);
         }
         if (this.package != null)
         {
-            var package_length = Protobuf.encode_string (this.package, buffer, ref offset);
-            Protobuf.encode_varint (package_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var package_length = buffer.encode_string (this.package);
+            buffer.encode_varint (package_length);
+            buffer.encode_varint (18);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -291,22 +291,22 @@ public class DescriptorProto
             }
         }
 
-        public size_t encode (uint8[] buffer, ref size_t offset)
+        public size_t encode (Protobuf.EncodeBuffer buffer)
         {
-            var start = offset;
+            var start = buffer.write_index;
 
             if (this.end != null)
             {
-                Protobuf.encode_int32 (this.end, buffer, ref offset);
-                Protobuf.encode_varint (16, buffer, ref offset);
+                buffer.encode_int32 (this.end);
+                buffer.encode_varint (16);
             }
             if (this.start != null)
             {
-                Protobuf.encode_int32 (this.start, buffer, ref offset);
-                Protobuf.encode_varint (8, buffer, ref offset);
+                buffer.encode_int32 (this.start);
+                buffer.encode_varint (8);
             }
 
-            return start - offset;
+            return start - buffer.write_index;
         }
 
         public string to_string (string indent = "")
@@ -382,54 +382,54 @@ public class DescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (58, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (58);
         }
         for (unowned List<ExtensionRange> i = this.extension_range.last (); i != null; i = i.prev)
         {
-            var extension_range_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (extension_range_length, buffer, ref offset);
-            Protobuf.encode_varint (42, buffer, ref offset);
+            var extension_range_length = i.data.encode (buffer);
+            buffer.encode_varint (extension_range_length);
+            buffer.encode_varint (42);
         }
         for (unowned List<EnumDescriptorProto> i = this.enum_type.last (); i != null; i = i.prev)
         {
-            var enum_type_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (enum_type_length, buffer, ref offset);
-            Protobuf.encode_varint (34, buffer, ref offset);
+            var enum_type_length = i.data.encode (buffer);
+            buffer.encode_varint (enum_type_length);
+            buffer.encode_varint (34);
         }
         for (unowned List<DescriptorProto> i = this.nested_type.last (); i != null; i = i.prev)
         {
-            var nested_type_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (nested_type_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var nested_type_length = i.data.encode (buffer);
+            buffer.encode_varint (nested_type_length);
+            buffer.encode_varint (26);
         }
         for (unowned List<FieldDescriptorProto> i = this.extension.last (); i != null; i = i.prev)
         {
-            var extension_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (extension_length, buffer, ref offset);
-            Protobuf.encode_varint (50, buffer, ref offset);
+            var extension_length = i.data.encode (buffer);
+            buffer.encode_varint (extension_length);
+            buffer.encode_varint (50);
         }
         for (unowned List<FieldDescriptorProto> i = this.field.last (); i != null; i = i.prev)
         {
-            var field_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (field_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var field_length = i.data.encode (buffer);
+            buffer.encode_varint (field_length);
+            buffer.encode_varint (18);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -574,57 +574,57 @@ public class FieldDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (66, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (66);
         }
         if (this.default_value != null)
         {
-            var default_value_length = Protobuf.encode_string (this.default_value, buffer, ref offset);
-            Protobuf.encode_varint (default_value_length, buffer, ref offset);
-            Protobuf.encode_varint (58, buffer, ref offset);
+            var default_value_length = buffer.encode_string (this.default_value);
+            buffer.encode_varint (default_value_length);
+            buffer.encode_varint (58);
         }
         if (this.extendee != null)
         {
-            var extendee_length = Protobuf.encode_string (this.extendee, buffer, ref offset);
-            Protobuf.encode_varint (extendee_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var extendee_length = buffer.encode_string (this.extendee);
+            buffer.encode_varint (extendee_length);
+            buffer.encode_varint (18);
         }
         if (this.type_name != null)
         {
-            var type_name_length = Protobuf.encode_string (this.type_name, buffer, ref offset);
-            Protobuf.encode_varint (type_name_length, buffer, ref offset);
-            Protobuf.encode_varint (50, buffer, ref offset);
+            var type_name_length = buffer.encode_string (this.type_name);
+            buffer.encode_varint (type_name_length);
+            buffer.encode_varint (50);
         }
         if (this.type != null)
         {
-            Protobuf.encode_varint (this.type, buffer, ref offset);
-            Protobuf.encode_varint (40, buffer, ref offset);
+            buffer.encode_varint (this.type);
+            buffer.encode_varint (40);
         }
         if (this.label != null)
         {
-            Protobuf.encode_varint (this.label, buffer, ref offset);
-            Protobuf.encode_varint (32, buffer, ref offset);
+            buffer.encode_varint (this.label);
+            buffer.encode_varint (32);
         }
         if (this.number != null)
         {
-            Protobuf.encode_int32 (this.number, buffer, ref offset);
-            Protobuf.encode_varint (24, buffer, ref offset);
+            buffer.encode_int32 (this.number);
+            buffer.encode_varint (24);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -723,30 +723,30 @@ public class EnumDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (26);
         }
         for (unowned List<EnumValueDescriptorProto> i = this.value.last (); i != null; i = i.prev)
         {
-            var value_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (value_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var value_length = i.data.encode (buffer);
+            buffer.encode_varint (value_length);
+            buffer.encode_varint (18);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -816,29 +816,29 @@ public class EnumValueDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (26);
         }
         if (this.number != null)
         {
-            Protobuf.encode_int32 (this.number, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            buffer.encode_int32 (this.number);
+            buffer.encode_varint (16);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -907,30 +907,30 @@ public class ServiceDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (26);
         }
         for (unowned List<MethodDescriptorProto> i = this.method.last (); i != null; i = i.prev)
         {
-            var method_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (method_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var method_length = i.data.encode (buffer);
+            buffer.encode_varint (method_length);
+            buffer.encode_varint (18);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1004,36 +1004,36 @@ public class MethodDescriptorProto
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.options != null)
         {
-            var options_length = this.options.encode (buffer, ref offset);
-            Protobuf.encode_varint (options_length, buffer, ref offset);
-            Protobuf.encode_varint (34, buffer, ref offset);
+            var options_length = this.options.encode (buffer);
+            buffer.encode_varint (options_length);
+            buffer.encode_varint (34);
         }
         if (this.output_type != null)
         {
-            var output_type_length = Protobuf.encode_string (this.output_type, buffer, ref offset);
-            Protobuf.encode_varint (output_type_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var output_type_length = buffer.encode_string (this.output_type);
+            buffer.encode_varint (output_type_length);
+            buffer.encode_varint (26);
         }
         if (this.input_type != null)
         {
-            var input_type_length = Protobuf.encode_string (this.input_type, buffer, ref offset);
-            Protobuf.encode_varint (input_type_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var input_type_length = buffer.encode_string (this.input_type);
+            buffer.encode_varint (input_type_length);
+            buffer.encode_varint (18);
         }
         if (this.name != null)
         {
-            var name_length = Protobuf.encode_string (this.name, buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var name_length = buffer.encode_string (this.name);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1138,60 +1138,60 @@ public class FileOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
         if (this.py_generic_services != null)
         {
-            Protobuf.encode_bool (this.py_generic_services, buffer, ref offset);
-            Protobuf.encode_varint (144, buffer, ref offset);
+            buffer.encode_bool (this.py_generic_services);
+            buffer.encode_varint (144);
         }
         if (this.java_generic_services != null)
         {
-            Protobuf.encode_bool (this.java_generic_services, buffer, ref offset);
-            Protobuf.encode_varint (136, buffer, ref offset);
+            buffer.encode_bool (this.java_generic_services);
+            buffer.encode_varint (136);
         }
         if (this.cc_generic_services != null)
         {
-            Protobuf.encode_bool (this.cc_generic_services, buffer, ref offset);
-            Protobuf.encode_varint (128, buffer, ref offset);
+            buffer.encode_bool (this.cc_generic_services);
+            buffer.encode_varint (128);
         }
         if (this.optimize_for != null)
         {
-            Protobuf.encode_varint (this.optimize_for, buffer, ref offset);
-            Protobuf.encode_varint (72, buffer, ref offset);
+            buffer.encode_varint (this.optimize_for);
+            buffer.encode_varint (72);
         }
         if (this.java_generate_equals_and_hash != null)
         {
-            Protobuf.encode_bool (this.java_generate_equals_and_hash, buffer, ref offset);
-            Protobuf.encode_varint (160, buffer, ref offset);
+            buffer.encode_bool (this.java_generate_equals_and_hash);
+            buffer.encode_varint (160);
         }
         if (this.java_multiple_files != null)
         {
-            Protobuf.encode_bool (this.java_multiple_files, buffer, ref offset);
-            Protobuf.encode_varint (80, buffer, ref offset);
+            buffer.encode_bool (this.java_multiple_files);
+            buffer.encode_varint (80);
         }
         if (this.java_outer_classname != null)
         {
-            var java_outer_classname_length = Protobuf.encode_string (this.java_outer_classname, buffer, ref offset);
-            Protobuf.encode_varint (java_outer_classname_length, buffer, ref offset);
-            Protobuf.encode_varint (66, buffer, ref offset);
+            var java_outer_classname_length = buffer.encode_string (this.java_outer_classname);
+            buffer.encode_varint (java_outer_classname_length);
+            buffer.encode_varint (66);
         }
         if (this.java_package != null)
         {
-            var java_package_length = Protobuf.encode_string (this.java_package, buffer, ref offset);
-            Protobuf.encode_varint (java_package_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var java_package_length = buffer.encode_string (this.java_package);
+            buffer.encode_varint (java_package_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1297,28 +1297,28 @@ public class MessageOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
         if (this.no_standard_descriptor_accessor != null)
         {
-            Protobuf.encode_bool (this.no_standard_descriptor_accessor, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            buffer.encode_bool (this.no_standard_descriptor_accessor);
+            buffer.encode_varint (16);
         }
         if (this.message_set_wire_format != null)
         {
-            Protobuf.encode_bool (this.message_set_wire_format, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            buffer.encode_bool (this.message_set_wire_format);
+            buffer.encode_varint (8);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1402,39 +1402,39 @@ public class FieldOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
         if (this.experimental_map_key != null)
         {
-            var experimental_map_key_length = Protobuf.encode_string (this.experimental_map_key, buffer, ref offset);
-            Protobuf.encode_varint (experimental_map_key_length, buffer, ref offset);
-            Protobuf.encode_varint (74, buffer, ref offset);
+            var experimental_map_key_length = buffer.encode_string (this.experimental_map_key);
+            buffer.encode_varint (experimental_map_key_length);
+            buffer.encode_varint (74);
         }
         if (this.deprecated != null)
         {
-            Protobuf.encode_bool (this.deprecated, buffer, ref offset);
-            Protobuf.encode_varint (24, buffer, ref offset);
+            buffer.encode_bool (this.deprecated);
+            buffer.encode_varint (24);
         }
         if (this.packed != null)
         {
-            Protobuf.encode_bool (this.packed, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
+            buffer.encode_bool (this.packed);
+            buffer.encode_varint (16);
         }
         if (this.ctype != null)
         {
-            Protobuf.encode_varint (this.ctype, buffer, ref offset);
-            Protobuf.encode_varint (8, buffer, ref offset);
+            buffer.encode_varint (this.ctype);
+            buffer.encode_varint (8);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1508,18 +1508,18 @@ public class EnumOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1569,18 +1569,18 @@ public class EnumValueOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1630,18 +1630,18 @@ public class ServiceOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1691,18 +1691,18 @@ public class MethodOptions
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<UninterpretedOption> i = this.uninterpreted_option.last (); i != null; i = i.prev)
         {
-            var uninterpreted_option_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (uninterpreted_option_length, buffer, ref offset);
-            Protobuf.encode_varint (7994, buffer, ref offset);
+            var uninterpreted_option_length = i.data.encode (buffer);
+            buffer.encode_varint (uninterpreted_option_length);
+            buffer.encode_varint (7994);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1758,17 +1758,17 @@ public class UninterpretedOption
             }
         }
 
-        public size_t encode (uint8[] buffer, ref size_t offset)
+        public size_t encode (Protobuf.EncodeBuffer buffer)
         {
-            var start = offset;
+            var start = buffer.write_index;
 
-            Protobuf.encode_bool (this.is_extension, buffer, ref offset);
-            Protobuf.encode_varint (16, buffer, ref offset);
-            var name_part_length = Protobuf.encode_string (this.name_part, buffer, ref offset);
-            Protobuf.encode_varint (name_part_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            buffer.encode_bool (this.is_extension);
+            buffer.encode_varint (16);
+            var name_part_length = buffer.encode_string (this.name_part);
+            buffer.encode_varint (name_part_length);
+            buffer.encode_varint (10);
 
-            return start - offset;
+            return start - buffer.write_index;
         }
 
         public string to_string (string indent = "")
@@ -1838,51 +1838,51 @@ public class UninterpretedOption
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         if (this.aggregate_value != null)
         {
-            var aggregate_value_length = Protobuf.encode_string (this.aggregate_value, buffer, ref offset);
-            Protobuf.encode_varint (aggregate_value_length, buffer, ref offset);
-            Protobuf.encode_varint (66, buffer, ref offset);
+            var aggregate_value_length = buffer.encode_string (this.aggregate_value);
+            buffer.encode_varint (aggregate_value_length);
+            buffer.encode_varint (66);
         }
         if (this.string_value != null)
         {
-            var string_value_length = Protobuf.encode_bytes (this.string_value, buffer, ref offset);
-            Protobuf.encode_varint (string_value_length, buffer, ref offset);
-            Protobuf.encode_varint (58, buffer, ref offset);
+            var string_value_length = buffer.encode_bytes (this.string_value);
+            buffer.encode_varint (string_value_length);
+            buffer.encode_varint (58);
         }
         if (this.double_value != null)
         {
-            Protobuf.encode_double (this.double_value, buffer, ref offset);
-            Protobuf.encode_varint (48, buffer, ref offset);
+            buffer.encode_double (this.double_value);
+            buffer.encode_varint (48);
         }
         if (this.negative_int_value != null)
         {
-            Protobuf.encode_int64 (this.negative_int_value, buffer, ref offset);
-            Protobuf.encode_varint (40, buffer, ref offset);
+            buffer.encode_int64 (this.negative_int_value);
+            buffer.encode_varint (40);
         }
         if (this.positive_int_value != null)
         {
-            Protobuf.encode_uint64 (this.positive_int_value, buffer, ref offset);
-            Protobuf.encode_varint (32, buffer, ref offset);
+            buffer.encode_uint64 (this.positive_int_value);
+            buffer.encode_varint (32);
         }
         if (this.identifier_value != null)
         {
-            var identifier_value_length = Protobuf.encode_string (this.identifier_value, buffer, ref offset);
-            Protobuf.encode_varint (identifier_value_length, buffer, ref offset);
-            Protobuf.encode_varint (26, buffer, ref offset);
+            var identifier_value_length = buffer.encode_string (this.identifier_value);
+            buffer.encode_varint (identifier_value_length);
+            buffer.encode_varint (26);
         }
         for (unowned List<NamePart> i = this.name.last (); i != null; i = i.prev)
         {
-            var name_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (name_length, buffer, ref offset);
-            Protobuf.encode_varint (18, buffer, ref offset);
+            var name_length = i.data.encode (buffer);
+            buffer.encode_varint (name_length);
+            buffer.encode_varint (18);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")
@@ -1976,22 +1976,22 @@ public class SourceCodeInfo
             }
         }
 
-        public size_t encode (uint8[] buffer, ref size_t offset)
+        public size_t encode (Protobuf.EncodeBuffer buffer)
         {
-            var start = offset;
+            var start = buffer.write_index;
 
             for (unowned List<int32> i = this.span.last (); i != null; i = i.prev)
             {
-                Protobuf.encode_int32 (i.data, buffer, ref offset);
-                Protobuf.encode_varint (16, buffer, ref offset);
+                buffer.encode_int32 (i.data);
+                buffer.encode_varint (16);
             }
             for (unowned List<int32> i = this.path.last (); i != null; i = i.prev)
             {
-                Protobuf.encode_int32 (i.data, buffer, ref offset);
-                Protobuf.encode_varint (8, buffer, ref offset);
+                buffer.encode_int32 (i.data);
+                buffer.encode_varint (8);
             }
 
-            return start - offset;
+            return start - buffer.write_index;
         }
 
         public string to_string (string indent = "")
@@ -2045,18 +2045,18 @@ public class SourceCodeInfo
         }
     }
 
-    public size_t encode (uint8[] buffer, ref size_t offset)
+    public size_t encode (Protobuf.EncodeBuffer buffer)
     {
-        var start = offset;
+        var start = buffer.write_index;
 
         for (unowned List<Location> i = this.location.last (); i != null; i = i.prev)
         {
-            var location_length = i.data.encode (buffer, ref offset);
-            Protobuf.encode_varint (location_length, buffer, ref offset);
-            Protobuf.encode_varint (10, buffer, ref offset);
+            var location_length = i.data.encode (buffer);
+            buffer.encode_varint (location_length);
+            buffer.encode_varint (10);
         }
 
-        return start - offset;
+        return start - buffer.write_index;
     }
 
     public string to_string (string indent = "")

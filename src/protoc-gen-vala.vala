@@ -39,13 +39,10 @@ public static int main (string[] args)
         resp.file.append (out_file);
     }
 
-    var resp_buf = new uint8[655350];
-    size_t offset = resp_buf.length - 1;
-    var n_written = resp.encode (resp_buf, ref offset);
-    unowned uint8[] start = (uint8[]) ((uint8*) resp_buf + resp_buf.length - (int) n_written);
-    start.length = (int) n_written;
+    var resp_buf = new Protobuf.EncodeBuffer (655350);
+    resp.encode (resp_buf);
 
-    stdout.write (start);
+    stdout.write (resp_buf.data);
     stdout.flush ();
 
     return 0;
@@ -172,9 +169,9 @@ private static string write_class (DescriptorProto type, string indent = "")
     //
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public size_t encode (uint8[] buffer, ref size_t offset)\n";
+    text += indent + "    public size_t encode (Protobuf.EncodeBuffer buffer)\n";
     text += indent + "    {\n";
-    text += indent + "        var start = offset;\n";
+    text += indent + "        var start = buffer.write_index;\n";
     text += "\n";
     for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
     {
@@ -211,74 +208,74 @@ private static string write_class (DescriptorProto type, string indent = "")
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
-            text += "Protobuf.encode_double (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_double (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_FLOAT:
-            text += "Protobuf.encode_float (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_float (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_INT64:
-            text += "Protobuf.encode_int64 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_int64 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_UINT64:
-            text += "Protobuf.encode_uint64 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_uint64 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_INT32:
-            text += "Protobuf.encode_int32 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_int32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED64:
-            text += "Protobuf.encode_fixed64 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_fixed64 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED32:
-            text += "Protobuf.encode_fixed32 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_fixed32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
-            text += "Protobuf.encode_bool (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_bool (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
-            text += "Protobuf.encode_string (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_string (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
-            text += "Protobuf.encode_bytes (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_bytes (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_UINT32:
-            text += "Protobuf.encode_uint32 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_uint32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED64:
-            text += "Protobuf.encode_sfixed64 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_sfixed64 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED32:
-            text += "Protobuf.encode_sfixed32 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_sfixed32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_SINT64:
-            text += "Protobuf.encode_sint64 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_sint64 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_SINT32:
-            text += "Protobuf.encode_sint32 (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_sint32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
-            text += "%s.encode (buffer, ref offset);\n".printf (field_name);
+            text += "%s.encode (buffer);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
-            text += "Protobuf.encode_varint (%s, buffer, ref offset);\n".printf (field_name);
+            text += "buffer.encode_varint (%s);\n".printf (field_name);
             break;
         default:
             text += "ENCODE_UNKNOWN_TYPE%d (%s);\n".printf (field.type, field_name);
             break;
         }
         if (encode_length)
-            text += indent2 + "        Protobuf.encode_varint (%s_length, buffer, ref offset);\n".printf (field.name);
+            text += indent2 + "        buffer.encode_varint (%s_length);\n".printf (field.name);
 
         /* Encode key */
         var n = field.number << 3;
         if (encode_length)
             n |= 2;     
-        text += indent2 + "        Protobuf.encode_varint (%d, buffer, ref offset);\n".printf (n);
+        text += indent2 + "        buffer.encode_varint (%d);\n".printf (n);
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "        }\n";
     }
     text += "\n";
-    text += indent + "        return start - offset;\n";
+    text += indent + "        return start - buffer.write_index;\n";
     text += indent + "    }\n";
     text += "\n";
     text += indent + "    public string to_string (string indent = \"\")\n";
