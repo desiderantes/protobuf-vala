@@ -29,13 +29,21 @@ public static int main (string[] args)
     check_decode_float ("000080FF", -float.INFINITY);
     check_decode_float ("0000203E", 0.15625f);
 
-    // FIXME: float
+    check_decode_int64 ("00", 0);
+    check_decode_int64 ("01", 1);
+    check_decode_int64 ("FFFFFFFFFFFFFFFFFF01", -1);
+    check_decode_int64 ("FFFFFFFFFFFFFFFF7F", int64.MAX);
+    check_decode_int64 ("80808080808080808001", int64.MIN); // FIXME: Double check these
 
-    // FIXME: int64
+    check_decode_uint64 ("00", 0);
+    check_decode_uint64 ("01", 1);
+    check_decode_uint64 ("FFFFFFFFFFFFFFFFFF01", uint64.MAX);
 
-    // FIXME: uint64
-
-    // FIXME: int32
+    check_decode_int32 ("00", 0);
+    check_decode_int32 ("01", 1);
+    check_decode_int32 ("FFFFFFFFFFFFFFFFFF01", -1);
+    check_decode_int32 ("FFFFFFFF07", int32.MAX);
+    check_decode_int32 ("80808080F8FFFFFFFF01", int32.MIN); // FIXME: Double check these
 
     // FIXME: fixed64
 
@@ -50,15 +58,29 @@ public static int main (string[] args)
 
     // FIXME: bytes
 
-    // FIXME: uint32
+    check_decode_uint32 ("00", 0);
+    check_decode_uint32 ("01", 1);
+    check_decode_uint32 ("FFFFFFFF0F", uint32.MAX);
 
     // FIXME: sfixed32
 
     // FIXME: sfixed64
 
-    // FIXME: sint32
+    check_decode_sint32 ("00", 0);
+    check_decode_sint32 ("02", 1);
+    check_decode_sint32 ("04", 2);
+    check_decode_sint32 ("01", -1);
+    check_decode_sint32 ("03", -2);
+    check_decode_sint32 ("FEFFFFFF0F", int32.MAX);
+    check_decode_sint32 ("FFFFFFFF0F", int32.MIN);
 
-    // FIXME: sint64
+    check_decode_sint64 ("00", 0);
+    check_decode_sint64 ("02", 1);
+    check_decode_sint64 ("04", 2);
+    check_decode_sint64 ("01", -1);
+    check_decode_sint64 ("03", -2);
+    check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX); // FIXME: Double check these
+    check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN); // FIXME: Double check these
 
     return 0;
 }
@@ -90,6 +112,33 @@ private void check_decode_float (string data, float expected)
         stderr.printf ("decode_float (\"%s\") -> %f, expected %f\n", data, result, expected);
 }
 
+private void check_decode_int64 (string data, int64 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_int64 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_int64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
+}
+
+private void check_decode_uint64 (string data, uint64 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_uint64 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_uint64 (\"%s\") -> %llu, expected %llu\n", data, result, expected);
+}
+
+private void check_decode_int32 (string data, int32 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_int32 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_int32 (\"%s\") -> %d, expected %d\n", data, result, expected);
+}
+
 private void check_decode_bool (string data, bool expected)
 {
     var buffer = string_to_buffer (data);
@@ -106,6 +155,33 @@ private void check_decode_string (string data, string expected)
     var result = Protobuf.decode_string (buffer, buffer.length, offset);
     if (result != expected)
         stderr.printf ("decode_string (\"%s\") -> \"%s\", expected \"%s\"\n", data, result, expected);
+}
+
+private void check_decode_uint32 (string data, uint32 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_uint32 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_uint32 (\"%s\") -> %u, expected %u\n", data, result, expected);
+}
+
+private void check_decode_sint32 (string data, int32 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_sint32 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_sint32 (\"%s\") -> %d, expected %d\n", data, result, expected);
+}
+
+private void check_decode_sint64 (string data, int64 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_sint64 (buffer, buffer.length, offset);
+    if (result != expected)
+        stderr.printf ("decode_sint64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
 }
 
 private uint8[] string_to_buffer (string data)

@@ -104,14 +104,22 @@ namespace Protobuf
 
     public int32 decode_sint32 (uint8[] buffer, size_t length, size_t offset)
     {
-        var value = decode_varint (buffer, length, ref offset);
-        return (value >> 1) | ((value & 0x1) << 31);
+        var value = (uint32) decode_varint (buffer, length, ref offset);
+        var v = (int32) (value >> 1);
+        if ((value & 0x1) != 0)
+            return -(v + 1);
+        else
+            return v;
     }
 
     public int64 decode_sint64 (uint8[] buffer, size_t length, size_t offset)
     {
-        var value = decode_varint (buffer, length, ref offset);
-        return (value >> 1) | (((uint64) value & 0x1) << 63);
+        var value = (uint64) decode_varint (buffer, length, ref offset);
+        var v = (int64) (value >> 1);
+        if ((value & 0x1) != 0)
+            return -(v + 1);
+        else
+            return v;
     }
 
     public size_t get_value_length (int wire_type, out int varint, uint8[] buffer, size_t length, ref size_t offset)
