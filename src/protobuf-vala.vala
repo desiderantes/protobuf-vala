@@ -1,5 +1,10 @@
 namespace Protobuf
 {
+    // FIXME
+    public class DecodeBuffer
+    {
+    }
+
     public int decode_varint (uint8[] buffer, size_t length, ref size_t offset)
     {
         int value = 0;
@@ -288,6 +293,11 @@ namespace Protobuf
         public size_t encode_sint64 (int64 value)
         {
             return encode_varint ((size_t) ((value << 1) ^ (value >> 63)));
+        }
+
+        // FIXME: Double size when run out of space
+        private void allocate (size_t size)
+        {
         }
     }
 }
