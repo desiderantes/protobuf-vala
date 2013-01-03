@@ -18,13 +18,13 @@ namespace Protobuf
 
     public double decode_double (uint8[] buffer, size_t length, size_t offset)
     {
-        uint64 v = buffer[offset] | buffer[offset+1] << 8 | buffer[offset+2] << 16 | (uint64) buffer[offset+3] << 24 | (uint64) buffer[offset+4] << 32 | (uint64) buffer[offset+5] << 40 | (uint64) buffer[offset+6] << 48 | (uint64) buffer[offset+7] << 56;
+        var v = decode_fixed64 (buffer, length, offset);
         return *((double*) (&v));
     }
 
     public float decode_float (uint8[] buffer, size_t length, size_t offset)
     {
-        uint32 v = buffer[offset] | buffer[offset+1] << 8 | buffer[offset+2] << 16 | buffer[offset+3] << 24;
+        var v = decode_fixed32 (buffer, length, offset);
         return *((float*) (&v));
     }
 
@@ -45,14 +45,12 @@ namespace Protobuf
 
     public uint64 decode_fixed64 (uint8[] buffer, size_t length, size_t offset)
     {
-        offset += 8;
-        return 0; // FIXME
+        return (uint64) buffer[offset] | (uint64) buffer[offset+1] << 8 | (uint64) buffer[offset+2] << 16 | (uint64) buffer[offset+3] << 24 | (uint64) buffer[offset+4] << 32 | (uint64) buffer[offset+5] << 40 | (uint64) buffer[offset+6] << 48 | (uint64) buffer[offset+7] << 56;
     }
 
     public uint32 decode_fixed32 (uint8[] buffer, size_t length, size_t offset)
     {
-        offset += 4;
-        return 4; // FIXME
+        return (uint32) buffer[offset] | (uint32) buffer[offset+1] << 8 | (uint32) buffer[offset+2] << 16 | (uint32) buffer[offset+3] << 24;
     }
 
     public bool decode_bool (uint8[] buffer, size_t length, size_t offset)
@@ -193,28 +191,12 @@ namespace Protobuf
 
         public size_t encode_double (double value)
         {
-            write_index -= 8;
-            var v = *((uint64*) (&value));
-            buffer[write_index + 1] = (uint8) v;
-            buffer[write_index + 2] = (uint8) (v >> 8);
-            buffer[write_index + 3] = (uint8) (v >> 16);
-            buffer[write_index + 4] = (uint8) (v >> 24);
-            buffer[write_index + 5] = (uint8) (v >> 32);
-            buffer[write_index + 6] = (uint8) (v >> 40);
-            buffer[write_index + 7] = (uint8) (v >> 48);
-            buffer[write_index + 8] = (uint8) (v >> 56);
-            return 8;
+            return encode_fixed64 (*((uint64*) (&value)));
         }
 
         public size_t encode_float (float value)
         {
-            write_index -= 4;
-            var v = *((uint32*) (&value));
-            buffer[write_index + 1] = (uint8) v;
-            buffer[write_index + 2] = (uint8) (v >> 8);
-            buffer[write_index + 3] = (uint8) (v >> 16);
-            buffer[write_index + 4] = (uint8) (v >> 24);
-            return 4;
+            return encode_fixed32 (*((uint32*) (&value)));
         }
 
         public size_t encode_int64 (int64 value)
@@ -235,14 +217,24 @@ namespace Protobuf
         public size_t encode_fixed64 (uint64 value)
         {
             write_index -= 8;
-            // FIXME
+            buffer[write_index + 1] = (uint8) value;
+            buffer[write_index + 2] = (uint8) (value >> 8);
+            buffer[write_index + 3] = (uint8) (value >> 16);
+            buffer[write_index + 4] = (uint8) (value >> 24);
+            buffer[write_index + 5] = (uint8) (value >> 32);
+            buffer[write_index + 6] = (uint8) (value >> 40);
+            buffer[write_index + 7] = (uint8) (value >> 48);
+            buffer[write_index + 8] = (uint8) (value >> 56);
             return 8;
         }
 
         public size_t encode_fixed32 (uint32 value)
         {
             write_index -= 4;
-            // FIXME
+            buffer[write_index + 1] = (uint8) value;
+            buffer[write_index + 2] = (uint8) (value >> 8);
+            buffer[write_index + 3] = (uint8) (value >> 16);
+            buffer[write_index + 4] = (uint8) (value >> 24);
             return 4;
         }
 

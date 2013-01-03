@@ -48,9 +48,15 @@ public static int main (string[] args)
     check_encode_int32 (int32.MAX, "FFFFFFFF07");
     check_encode_int32 (int32.MIN, "80808080F8FFFFFFFF01"); // FIXME: Double check these
 
-    // FIXME: fixed64
+    check_encode_fixed64 (0, "0000000000000000");
+    check_encode_fixed64 (1, "0100000000000000");
+    check_encode_fixed64 (0x0123456789ABCDEF, "EFCDAB8967452301");
+    check_encode_fixed64 (uint64.MAX, "FFFFFFFFFFFFFFFF");
 
-    // FIXME: fixed32
+    check_encode_fixed32 (0, "00000000");
+    check_encode_fixed32 (1, "01000000");
+    check_encode_fixed32 (0x01234567, "67452301");
+    check_encode_fixed32 (uint32.MAX, "FFFFFFFF");
 
     check_encode_bool (false, "00");
     check_encode_bool (true, "01");
@@ -171,6 +177,32 @@ private void check_encode_int32 (int32 value, string expected)
         n_passed++;
     else
         stderr.printf ("encode_int32 (%d) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_fixed64 (uint64 value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_fixed64 (value);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_fixed64 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_fixed32 (uint32 value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_fixed32 (value);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_fixed32 (%u) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_bool (bool value, string expected)

@@ -48,9 +48,15 @@ public static int main (string[] args)
     check_decode_int32 ("FFFFFFFF07", int32.MAX);
     check_decode_int32 ("80808080F8FFFFFFFF01", int32.MIN); // FIXME: Double check these
 
-    // FIXME: fixed64
+    check_decode_fixed64 ("0000000000000000", 0);
+    check_decode_fixed64 ("0100000000000000", 1);
+    check_decode_fixed64 ("EFCDAB8967452301", 0x0123456789ABCDEF);
+    check_decode_fixed64 ("FFFFFFFFFFFFFFFF", uint64.MAX);
 
-    // FIXME: fixed32
+    check_decode_fixed32 ("00000000", 0);
+    check_decode_fixed32 ("01000000", 1);
+    check_decode_fixed32 ("67452301", 0x01234567);
+    check_decode_fixed32 ("FFFFFFFF", uint32.MAX);
 
     check_decode_bool ("00", false);
     check_decode_bool ("01", true);
@@ -172,6 +178,32 @@ private void check_decode_int32 (string data, int32 expected)
         n_passed++;
     else
         stderr.printf ("decode_int32 (\"%s\") -> %d, expected %d\n", data, result, expected);
+}
+
+private void check_decode_fixed64 (string data, uint64 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_fixed64 (buffer, buffer.length, offset);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_fixed64 (\"%s\") -> %llu, expected %llu\n", data, result, expected);
+}
+
+private void check_decode_fixed32 (string data, uint32 expected)
+{
+    var buffer = string_to_buffer (data);
+    size_t offset = 0;
+    var result = Protobuf.decode_fixed32 (buffer, buffer.length, offset);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_fixed32 (\"%s\") -> %u, expected %u\n", data, result, expected);
 }
 
 private void check_decode_bool (string data, bool expected)
