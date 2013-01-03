@@ -20,9 +20,9 @@ libprotobuf_vala_la_VALAFLAGS = \
 	-h protobuf-vala.h
 
 bin_PROGRAMS = protoc-gen-vala
-noinst_PROGRAMS = test-encode
+noinst_PROGRAMS = test-encode test-decode
 
-TESTS = test-encode
+TESTS = test-encode test-decode
 
 protoc_gen_vala_SOURCES = \
 	descriptor.pb.vala \
@@ -52,6 +52,20 @@ test_encode_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
 
 test_encode_LDADD = \
+	libprotobuf-vala.la
+	$(PROTOC_GEN_VALA_LIBS)
+
+test_decode_SOURCES = \
+	test-decode.vala
+
+test_decode_VALAFLAGS = \
+	--vapidir . \
+	--pkg protobuf-vala
+
+test_decode_CFLAGS = \
+	$(PROTOC_GEN_VALA_CFLAGS)
+
+test_decode_LDADD = \
 	libprotobuf-vala.la
 	$(PROTOC_GEN_VALA_LIBS)
 

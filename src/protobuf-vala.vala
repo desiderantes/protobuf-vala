@@ -18,14 +18,14 @@ namespace Protobuf
 
     public double decode_double (uint8[] buffer, size_t length, size_t offset)
     {
-        offset += 8;
-        return 0.0; // FIXME
+        uint64 v = buffer[offset] | buffer[offset+1] << 8 | buffer[offset+2] << 16 | (uint64) buffer[offset+3] << 24 | (uint64) buffer[offset+4] << 32 | (uint64) buffer[offset+5] << 40 | (uint64) buffer[offset+6] << 48 | (uint64) buffer[offset+7] << 56;
+        return *((double*) (&v));
     }
 
     public float decode_float (uint8[] buffer, size_t length, size_t offset)
     {
-        offset += 4;
-        return 0.0f; // FIXME
+        uint32 v = buffer[offset] | buffer[offset+1] << 8 | buffer[offset+2] << 16 | buffer[offset+3] << 24;
+        return *((float*) (&v));
     }
 
     public int64 decode_int64 (uint8[] buffer, size_t length, size_t offset)
@@ -111,7 +111,7 @@ namespace Protobuf
     public int64 decode_sint64 (uint8[] buffer, size_t length, size_t offset)
     {
         var value = decode_varint (buffer, length, ref offset);
-        return (value >> 1) | ((value & 0x1) << 63);
+        return (value >> 1) | (((uint64) value & 0x1) << 63);
     }
 
     public size_t get_value_length (int wire_type, out int varint, uint8[] buffer, size_t length, ref size_t offset)
