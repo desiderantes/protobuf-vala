@@ -30,8 +30,8 @@ protoc_gen_vala_SOURCES = \
 	protoc-gen-vala.vala
 
 protoc_gen_vala_VALAFLAGS = \
-	--vapidir . \
-	--pkg protobuf-vala
+	--pkg protobuf-vala \
+	--vapidir .
 
 protoc_gen_vala_CFLAGS = \
 	-DVERSION=\"$(VERSION)\" \
@@ -46,8 +46,8 @@ test_encode_SOURCES = \
 
 test_encode_VALAFLAGS = \
 	--pkg posix \
-	--vapidir . \
-	--pkg protobuf-vala
+	--pkg protobuf-vala \
+	--vapidir .
 
 test_encode_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
@@ -61,8 +61,8 @@ test_decode_SOURCES = \
 
 test_decode_VALAFLAGS = \
 	--pkg posix \
-	--vapidir . \
-	--pkg protobuf-vala
+	--pkg protobuf-vala \
+	--vapidir .
 
 test_decode_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
