@@ -10,9 +10,9 @@ namespace Protobuf
             buffer = new uint8[size];
         }
 
-        public int decode_varint ()
+        public uint64 decode_varint ()
         {
-            int value = 0;
+            uint64 value = 0;
             var shift = 0;
     
             while (true)
@@ -40,7 +40,8 @@ namespace Protobuf
     
         public int64 decode_int64 ()
         {
-            return decode_varint ();
+            var v = decode_varint ();
+            return *((int64*) (&v));
         }
     
         public uint64 decode_uint64 ()
@@ -50,7 +51,8 @@ namespace Protobuf
     
         public int32 decode_int32 ()
         {
-            return decode_varint ();
+            var v = decode_varint ();
+            return *((int32*) (&v));
         }
     
         public uint64 decode_fixed64 ()
@@ -94,7 +96,7 @@ namespace Protobuf
     
         public uint32 decode_uint32 ()
         {
-            return decode_varint ();
+            return (uint32) decode_varint ();
         }
     
         public int32 decode_sfixed32 ()
@@ -129,7 +131,7 @@ namespace Protobuf
                 return v;
         }
     
-        public void decode_unknown (size_t wire_type)
+        public void decode_unknown (uint64 wire_type)
         {
             switch (wire_type)
             {
@@ -141,13 +143,13 @@ namespace Protobuf
                 break;
             case 2: //length-delimited
                 var length = decode_varint ();
-                read_index += length;
+                read_index += (size_t) length;
                 break;
             case 5: //32-bit
                 read_index += 4;
                 break;
             default: //FIXME: throw error
-                GLib.stderr.printf ("Unknown wire type %zu\n", wire_type);
+                GLib.stderr.printf ("Unknown wire type %llu\n", wire_type);
                 break;
             }
         }
@@ -179,7 +181,7 @@ namespace Protobuf
             write_index = buffer.length - 1;
         }
 
-        public size_t encode_varint (size_t value)
+        public size_t encode_varint (uint64 value)
         {
             var n_octets = 0;
             var v = value;
@@ -213,17 +215,17 @@ namespace Protobuf
 
         public size_t encode_int64 (int64 value)
         {
-            return encode_varint ((size_t) value);
+            return encode_varint (*((uint64*) (&value)));
         }
 
         public size_t encode_uint64 (uint64 value)
         {
-            return encode_varint ((size_t) value);
+            return encode_varint (value);
         }
 
         public size_t encode_int32 (int32 value)
         {
-            return encode_varint (value);
+            return encode_int64 (value);
         }
 
         public size_t encode_fixed64 (uint64 value)

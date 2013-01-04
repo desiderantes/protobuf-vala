@@ -19,7 +19,7 @@ public class FileDescriptorSet
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.file.append (new FileDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.file.append (new FileDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -82,23 +82,23 @@ public class FileDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.package = buffer.decode_string (buffer.decode_varint ());
+                this.package = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 3 && wire_type == 2)
-                this.dependency.append (buffer.decode_string (buffer.decode_varint ()));
+                this.dependency.append (buffer.decode_string ((size_t) buffer.decode_varint ()));
             else if (field_number == 4 && wire_type == 2)
-                this.message_type.append (new DescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.message_type.append (new DescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 5 && wire_type == 2)
-                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 6 && wire_type == 2)
-                this.service.append (new ServiceDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.service.append (new ServiceDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 7 && wire_type == 2)
-                this.extension.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 8 && wire_type == 2)
-                this.options = new FileOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new FileOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else if (field_number == 9 && wire_type == 2)
-                this.source_code_info = new SourceCodeInfo.from_data (buffer, buffer.decode_varint ());
+                this.source_code_info = new SourceCodeInfo.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -325,19 +325,19 @@ public class DescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.field.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.field.append (new FieldDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 6 && wire_type == 2)
-                this.extension.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 3 && wire_type == 2)
-                this.nested_type.append (new DescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.nested_type.append (new DescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 4 && wire_type == 2)
-                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 5 && wire_type == 2)
-                this.extension_range.append (new ExtensionRange.from_data (buffer, buffer.decode_varint ()));
+                this.extension_range.append (new ExtensionRange.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 7 && wire_type == 2)
-                this.options = new MessageOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new MessageOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -502,7 +502,7 @@ public class FieldDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 3 && wire_type == 0)
                 this.number = buffer.decode_int32 ();
             else if (field_number == 4 && wire_type == 0)
@@ -510,13 +510,13 @@ public class FieldDescriptorProto
             else if (field_number == 5 && wire_type == 0)
                 this.type = (Type) buffer.decode_varint ();
             else if (field_number == 6 && wire_type == 2)
-                this.type_name = buffer.decode_string (buffer.decode_varint ());
+                this.type_name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.extendee = buffer.decode_string (buffer.decode_varint ());
+                this.extendee = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 7 && wire_type == 2)
-                this.default_value = buffer.decode_string (buffer.decode_varint ());
+                this.default_value = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 8 && wire_type == 2)
-                this.options = new FieldOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new FieldOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -653,11 +653,11 @@ public class EnumDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.value.append (new EnumValueDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.value.append (new EnumValueDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 3 && wire_type == 2)
-                this.options = new EnumOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new EnumOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -738,11 +738,11 @@ public class EnumValueDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 0)
                 this.number = buffer.decode_int32 ();
             else if (field_number == 3 && wire_type == 2)
-                this.options = new EnumValueOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new EnumValueOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -821,11 +821,11 @@ public class ServiceDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.method.append (new MethodDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.method.append (new MethodDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 3 && wire_type == 2)
-                this.options = new ServiceOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new ServiceOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -907,13 +907,13 @@ public class MethodDescriptorProto
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.name = buffer.decode_string (buffer.decode_varint ());
+                this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 2 && wire_type == 2)
-                this.input_type = buffer.decode_string (buffer.decode_varint ());
+                this.input_type = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 3 && wire_type == 2)
-                this.output_type = buffer.decode_string (buffer.decode_varint ());
+                this.output_type = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 4 && wire_type == 2)
-                this.options = new MethodOptions.from_data (buffer, buffer.decode_varint ());
+                this.options = new MethodOptions.from_data (buffer, (size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1017,9 +1017,9 @@ public class FileOptions
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.java_package = buffer.decode_string (buffer.decode_varint ());
+                this.java_package = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 8 && wire_type == 2)
-                this.java_outer_classname = buffer.decode_string (buffer.decode_varint ());
+                this.java_outer_classname = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 10 && wire_type == 0)
                 this.java_multiple_files = buffer.decode_bool ();
             else if (field_number == 20 && wire_type == 0)
@@ -1033,7 +1033,7 @@ public class FileOptions
             else if (field_number == 18 && wire_type == 0)
                 this.py_generic_services = buffer.decode_bool ();
             else if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1184,7 +1184,7 @@ public class MessageOptions
             else if (field_number == 2 && wire_type == 0)
                 this.no_standard_descriptor_accessor = buffer.decode_bool ();
             else if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1277,9 +1277,9 @@ public class FieldOptions
             else if (field_number == 3 && wire_type == 0)
                 this.deprecated = buffer.decode_bool ();
             else if (field_number == 9 && wire_type == 2)
-                this.experimental_map_key = buffer.decode_string (buffer.decode_varint ());
+                this.experimental_map_key = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1379,7 +1379,7 @@ public class EnumOptions
             var field_number = key >> 3;
 
             if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1434,7 +1434,7 @@ public class EnumValueOptions
             var field_number = key >> 3;
 
             if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1489,7 +1489,7 @@ public class ServiceOptions
             var field_number = key >> 3;
 
             if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1544,7 +1544,7 @@ public class MethodOptions
             var field_number = key >> 3;
 
             if (field_number == 999 && wire_type == 2)
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1602,7 +1602,7 @@ public class UninterpretedOption
                 var field_number = key >> 3;
 
                 if (field_number == 1 && wire_type == 2)
-                    this.name_part = buffer.decode_string (buffer.decode_varint ());
+                    this.name_part = buffer.decode_string ((size_t) buffer.decode_varint ());
                 else if (field_number == 2 && wire_type == 0)
                     this.is_extension = buffer.decode_bool ();
                 else
@@ -1660,9 +1660,9 @@ public class UninterpretedOption
             var field_number = key >> 3;
 
             if (field_number == 2 && wire_type == 2)
-                this.name.append (new NamePart.from_data (buffer, buffer.decode_varint ()));
+                this.name.append (new NamePart.from_data (buffer, (size_t) buffer.decode_varint ()));
             else if (field_number == 3 && wire_type == 2)
-                this.identifier_value = buffer.decode_string (buffer.decode_varint ());
+                this.identifier_value = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 4 && wire_type == 0)
                 this.positive_int_value = buffer.decode_uint64 ();
             else if (field_number == 5 && wire_type == 0)
@@ -1670,9 +1670,9 @@ public class UninterpretedOption
             else if (field_number == 6 && wire_type == 1)
                 this.double_value = buffer.decode_double ();
             else if (field_number == 7 && wire_type == 2)
-                this.string_value = buffer.decode_bytes (buffer.decode_varint ());
+                this.string_value = buffer.decode_bytes ((size_t) buffer.decode_varint ());
             else if (field_number == 8 && wire_type == 2)
-                this.aggregate_value = buffer.decode_string (buffer.decode_varint ());
+                this.aggregate_value = buffer.decode_string ((size_t) buffer.decode_varint ());
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -1866,7 +1866,7 @@ public class SourceCodeInfo
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.location.append (new Location.from_data (buffer, buffer.decode_varint ()));
+                this.location.append (new Location.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }

@@ -127,15 +127,15 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
             wire_type = 2;
-            decode_method = "buffer.decode_string (buffer.decode_varint ())";
+            decode_method = "buffer.decode_string ((size_t) buffer.decode_varint ())";
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
             wire_type = 2;
-            decode_method = "buffer.decode_bytes (buffer.decode_varint ())";
+            decode_method = "buffer.decode_bytes ((size_t) buffer.decode_varint ())";
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
             wire_type = 2;
-            decode_method = "new %s.from_data (buffer, buffer.decode_varint ())".printf (get_type_name (field, false));
+            decode_method = "new %s.from_data (buffer, (size_t) buffer.decode_varint ())".printf (get_type_name (field, false));
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
             wire_type = 0;

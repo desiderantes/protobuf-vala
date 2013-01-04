@@ -112,7 +112,7 @@ public static int main (string[] args)
     return Posix.EXIT_SUCCESS;
 }
 
-private void check_decode_varint (string data, size_t expected)
+private void check_decode_varint (string data, uint64 expected)
 {
     var buffer = string_to_buffer (data);
     var result = buffer.decode_varint ();
@@ -121,7 +121,7 @@ private void check_decode_varint (string data, size_t expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_varint (\"%s\") -> %zu, expected %zu\n", data, result, expected);
+        stderr.printf ("decode_varint (\"%s\") -> %llu, expected %llu\n", data, result, expected);
 }
 
 private void check_decode_double (string data, double expected)

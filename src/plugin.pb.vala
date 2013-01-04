@@ -21,11 +21,11 @@ public class CodeGeneratorRequest
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.file_to_generate.append (buffer.decode_string (buffer.decode_varint ()));
+                this.file_to_generate.append (buffer.decode_string ((size_t) buffer.decode_varint ()));
             else if (field_number == 2 && wire_type == 2)
-                this.parameter = buffer.decode_string (buffer.decode_varint ());
+                this.parameter = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 15 && wire_type == 2)
-                this.proto_file.append (new FileDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+                this.proto_file.append (new FileDescriptorProto.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
@@ -109,11 +109,11 @@ public class CodeGeneratorResponse
                 var field_number = key >> 3;
 
                 if (field_number == 1 && wire_type == 2)
-                    this.name = buffer.decode_string (buffer.decode_varint ());
+                    this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
                 else if (field_number == 2 && wire_type == 2)
-                    this.insertion_point = buffer.decode_string (buffer.decode_varint ());
+                    this.insertion_point = buffer.decode_string ((size_t) buffer.decode_varint ());
                 else if (field_number == 15 && wire_type == 2)
-                    this.content = buffer.decode_string (buffer.decode_varint ());
+                    this.content = buffer.decode_string ((size_t) buffer.decode_varint ());
                 else
                     buffer.decode_unknown (wire_type);
             }
@@ -189,9 +189,9 @@ public class CodeGeneratorResponse
             var field_number = key >> 3;
 
             if (field_number == 1 && wire_type == 2)
-                this.error = buffer.decode_string (buffer.decode_varint ());
+                this.error = buffer.decode_string ((size_t) buffer.decode_varint ());
             else if (field_number == 15 && wire_type == 2)
-                this.file.append (new File.from_data (buffer, buffer.decode_varint ()));
+                this.file.append (new File.from_data (buffer, (size_t) buffer.decode_varint ()));
             else
                 buffer.decode_unknown (wire_type);
         }
