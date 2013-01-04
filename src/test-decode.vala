@@ -12,6 +12,9 @@ public static int main (string[] args)
     check_decode_varint ("FF7F", 16383);
     check_decode_varint ("808001", 16384);
     check_decode_varint ("9EA705", 86942);
+    check_decode_varint ("FFFFFF07", 0xFFFFFF);
+    check_decode_varint ("FFFFFFFF0F", 0xFFFFFFFF);
+    check_decode_varint ("FFFFFFFFFFFFFFFFFF01", 0xFFFFFFFFFFFFFFFF);
 
     check_decode_double ("0000000000000000", 0f);
     check_decode_double ("0000000000000080", -0f);
@@ -36,7 +39,7 @@ public static int main (string[] args)
     check_decode_int64 ("01", 1);
     check_decode_int64 ("FFFFFFFFFFFFFFFFFF01", -1);
     check_decode_int64 ("FFFFFFFFFFFFFFFF7F", int64.MAX);
-    check_decode_int64 ("80808080808080808001", int64.MIN); // FIXME: Double check these
+    check_decode_int64 ("80808080808080808001", int64.MIN);
 
     check_decode_uint64 ("00", 0);
     check_decode_uint64 ("01", 1);
@@ -46,7 +49,7 @@ public static int main (string[] args)
     check_decode_int32 ("01", 1);
     check_decode_int32 ("FFFFFFFFFFFFFFFFFF01", -1);
     check_decode_int32 ("FFFFFFFF07", int32.MAX);
-    check_decode_int32 ("80808080F8FFFFFFFF01", int32.MIN); // FIXME: Double check these
+    check_decode_int32 ("80808080F8FFFFFFFF01", int32.MIN);
 
     check_decode_fixed64 ("0000000000000000", 0);
     check_decode_fixed64 ("0100000000000000", 1);
@@ -98,8 +101,8 @@ public static int main (string[] args)
     check_decode_sint64 ("04", 2);
     check_decode_sint64 ("01", -1);
     check_decode_sint64 ("03", -2);
-    check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX); // FIXME: Double check these
-    check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN); // FIXME: Double check these
+    check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
+    check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
     if (n_passed != n_tests)
     {

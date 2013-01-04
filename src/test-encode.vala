@@ -12,6 +12,8 @@ public static int main (string[] args)
     check_encode_varint (16383, "FF7F");
     check_encode_varint (16384, "808001");
     check_encode_varint (86942, "9EA705");
+    check_encode_varint (0xFFFFFFFF, "FFFFFFFF0F");
+    check_encode_varint (0xFFFFFFFFFFFFFFFF, "FFFFFFFFFFFFFFFFFF01");
 
     check_encode_double (0f, "0000000000000000");
     check_encode_double (-0f, "0000000000000080");
@@ -36,7 +38,7 @@ public static int main (string[] args)
     check_encode_int64 (1, "01");
     check_encode_int64 (-1, "FFFFFFFFFFFFFFFFFF01");
     check_encode_int64 (int64.MAX, "FFFFFFFFFFFFFFFF7F");
-    check_encode_int64 (int64.MIN, "80808080808080808001"); // FIXME: Double check these
+    check_encode_int64 (int64.MIN, "80808080808080808001");
 
     check_encode_uint64 (0, "00");
     check_encode_uint64 (1, "01");
@@ -46,7 +48,7 @@ public static int main (string[] args)
     check_encode_int32 (1, "01");
     check_encode_int32 (-1, "FFFFFFFFFFFFFFFFFF01");
     check_encode_int32 (int32.MAX, "FFFFFFFF07");
-    check_encode_int32 (int32.MIN, "80808080F8FFFFFFFF01"); // FIXME: Double check these
+    check_encode_int32 (int32.MIN, "80808080F8FFFFFFFF01");
 
     check_encode_fixed64 (0, "0000000000000000");
     check_encode_fixed64 (1, "0100000000000000");
@@ -97,8 +99,8 @@ public static int main (string[] args)
     check_encode_sint64 (2, "04");
     check_encode_sint64 (-1, "01");
     check_encode_sint64 (-2, "03");
-    check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
-    check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01"); // FIXME: Double check these
+    check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01");
+    check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01");
     
     if (n_passed != n_tests)
     {
@@ -111,7 +113,7 @@ public static int main (string[] args)
     return Posix.EXIT_SUCCESS;
 }
 
-private void check_encode_varint (size_t value, string expected)
+private void check_encode_varint (uint64 value, string expected)
 {
     var buffer = new Protobuf.EncodeBuffer (100);
     buffer.encode_varint (value);
@@ -121,7 +123,7 @@ private void check_encode_varint (size_t value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_varint (%zu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_varint (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_double (double value, string expected)

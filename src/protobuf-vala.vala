@@ -17,9 +17,9 @@ namespace Protobuf
     
             while (true)
             {
-                var b = buffer[read_index];
+                var b = (uint64) buffer[read_index];
                 read_index++;
-                value = value | (b & 0x7F) << shift;
+                value |= (b & 0x7F) << shift;
                 if ((b & 0x80) == 0)
                     return value;
                 shift += 7;
@@ -51,8 +51,7 @@ namespace Protobuf
     
         public int32 decode_int32 ()
         {
-            var v = decode_varint ();
-            return *((int32*) (&v));
+            return (int32) decode_int64 ();
         }
     
         public uint64 decode_fixed64 ()
@@ -292,7 +291,10 @@ namespace Protobuf
 
         public size_t encode_sint32 (int32 value)
         {
-            return encode_varint ((value << 1) ^ (value >> 31));
+            if (value < 0)
+                return encode_varint ((uint64) (- (int64) value) * 2 - 1);
+            else
+                return encode_varint ((uint64) value * 2);
         }
 
         public size_t encode_sint64 (int64 value)
