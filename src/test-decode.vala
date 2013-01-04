@@ -105,8 +105,7 @@ public static int main (string[] args)
 private void check_decode_varint (string data, size_t expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_varint (buffer, buffer.length, ref offset);
+    var result = buffer.decode_varint ();
 
     n_tests++;
     if (result == expected)
@@ -118,8 +117,7 @@ private void check_decode_varint (string data, size_t expected)
 private void check_decode_double (string data, double expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_double (buffer, buffer.length, offset);
+    var result = buffer.decode_double ();
 
     n_tests++;
     if (result == expected)
@@ -131,8 +129,7 @@ private void check_decode_double (string data, double expected)
 private void check_decode_float (string data, float expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_float (buffer, buffer.length, offset);
+    var result = buffer.decode_float ();
 
     n_tests++;
     if (result == expected)
@@ -144,8 +141,7 @@ private void check_decode_float (string data, float expected)
 private void check_decode_int64 (string data, int64 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_int64 (buffer, buffer.length, offset);
+    var result = buffer.decode_int64 ();
 
     n_tests++;
     if (result == expected)
@@ -157,8 +153,7 @@ private void check_decode_int64 (string data, int64 expected)
 private void check_decode_uint64 (string data, uint64 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_uint64 (buffer, buffer.length, offset);
+    var result = buffer.decode_uint64 ();
 
     n_tests++;
     if (result == expected)
@@ -170,8 +165,7 @@ private void check_decode_uint64 (string data, uint64 expected)
 private void check_decode_int32 (string data, int32 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_int32 (buffer, buffer.length, offset);
+    var result = buffer.decode_int32 ();
 
     n_tests++;
     if (result == expected)
@@ -183,8 +177,7 @@ private void check_decode_int32 (string data, int32 expected)
 private void check_decode_fixed64 (string data, uint64 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_fixed64 (buffer, buffer.length, offset);
+    var result = buffer.decode_fixed64 ();
 
     n_tests++;
     if (result == expected)
@@ -196,8 +189,7 @@ private void check_decode_fixed64 (string data, uint64 expected)
 private void check_decode_fixed32 (string data, uint32 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_fixed32 (buffer, buffer.length, offset);
+    var result = buffer.decode_fixed32 ();
 
     n_tests++;
     if (result == expected)
@@ -209,8 +201,7 @@ private void check_decode_fixed32 (string data, uint32 expected)
 private void check_decode_bool (string data, bool expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_bool (buffer, buffer.length, offset);
+    var result = buffer.decode_bool ();
 
     n_tests++;
     if (result == expected)
@@ -222,8 +213,7 @@ private void check_decode_bool (string data, bool expected)
 private void check_decode_string (string data, string expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_string (buffer, buffer.length, offset);
+    var result = buffer.decode_string (buffer.buffer.length);
 
     n_tests++;
     if (result == expected)
@@ -235,8 +225,7 @@ private void check_decode_string (string data, string expected)
 private void check_decode_uint32 (string data, uint32 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_uint32 (buffer, buffer.length, offset);
+    var result = buffer.decode_uint32 ();
 
     n_tests++;
     if (result == expected)
@@ -248,8 +237,7 @@ private void check_decode_uint32 (string data, uint32 expected)
 private void check_decode_sint32 (string data, int32 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_sint32 (buffer, buffer.length, offset);
+    var result = buffer.decode_sint32 ();
 
     n_tests++;
     if (result == expected)
@@ -261,8 +249,7 @@ private void check_decode_sint32 (string data, int32 expected)
 private void check_decode_sint64 (string data, int64 expected)
 {
     var buffer = string_to_buffer (data);
-    size_t offset = 0;
-    var result = Protobuf.decode_sint64 (buffer, buffer.length, offset);
+    var result = buffer.decode_sint64 ();
 
     n_tests++;
     if (result == expected)
@@ -271,12 +258,12 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
 }
 
-private uint8[] string_to_buffer (string data)
+private Protobuf.DecodeBuffer string_to_buffer (string data)
 {
-    var value = new uint8[data.length / 2];
+    var value = new Protobuf.DecodeBuffer (data.length / 2);
 
     for (var i = 0; i < data.length; i++)
-        value[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
+        value.buffer[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
 
     return value;
 }

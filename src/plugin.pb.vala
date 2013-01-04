@@ -6,36 +6,28 @@ public class CodeGeneratorRequest
     public string? parameter;
     public List<FileDescriptorProto> proto_file;
 
-    public CodeGeneratorRequest.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public CodeGeneratorRequest.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.file_to_generate.append (Protobuf.decode_string (buffer, offset + value_length, offset));
-                break;
-            case 2:
-                this.parameter = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 15:
-                this.proto_file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.file_to_generate.append (buffer.decode_string (buffer.decode_varint ()));
+            else if (field_number == 2 && wire_type == 2)
+                this.parameter = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 15 && wire_type == 2)
+                this.proto_file.append (new FileDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -102,36 +94,28 @@ public class CodeGeneratorResponse
         public string? insertion_point;
         public string? content;
 
-        public File.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        public File.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            decode (buffer, length, offset);
+            decode (buffer, data_length);
         }
 
-        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            while (offset < length)
+            var end = buffer.read_index + data_length;
+            while (buffer.read_index < end)
             {
-                var key = Protobuf.decode_varint (buffer, length, ref offset);
+                var key = buffer.decode_varint ();
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
-                int varint;
-                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-                // FIXME: Check remaining space
 
-                switch (field_number)
-                {
-                case 1:
-                    this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                    break;
-                case 2:
-                    this.insertion_point = Protobuf.decode_string (buffer, offset + value_length, offset);
-                    break;
-                case 15:
-                    this.content = Protobuf.decode_string (buffer, offset + value_length, offset);
-                    break;
-                }
-
-                offset += value_length;
+                if (field_number == 1 && wire_type == 2)
+                    this.name = buffer.decode_string (buffer.decode_varint ());
+                else if (field_number == 2 && wire_type == 2)
+                    this.insertion_point = buffer.decode_string (buffer.decode_varint ());
+                else if (field_number == 15 && wire_type == 2)
+                    this.content = buffer.decode_string (buffer.decode_varint ());
+                else
+                    buffer.decode_unknown (wire_type);
             }
         }
 
@@ -190,33 +174,26 @@ public class CodeGeneratorResponse
     public string? error;
     public List<File> file;
 
-    public CodeGeneratorResponse.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public CodeGeneratorResponse.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.error = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 15:
-                this.file.append (new File.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.error = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 15 && wire_type == 2)
+                this.file.append (new File.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 

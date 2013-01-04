@@ -2,12 +2,11 @@ extern const string VERSION;
 
 public static int main (string[] args)
 {
-    var buf = new uint8[65535];
-    var n_read = stdin.read (buf); // FIXME: Read all
+    var buf = new Protobuf.DecodeBuffer (65535);
+    var n_read = stdin.read (buf.buffer); // FIXME: Read all
     if (n_read < 0)
         return 1;
-    buf.length = (int) n_read;
-
+    buf.buffer.length = (int) n_read;
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
 
@@ -73,98 +72,115 @@ private static string write_class (DescriptorProto type, string indent = "")
     foreach (var field in type.field)
         text += indent + "    public %s %s;\n".printf (get_type_name (field), field.name);
     text += "\n";
-    text += indent + "    public %s.from_data (uint8[] buffer, size_t length, size_t offset = 0)\n".printf (type.name);
+    text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)\n".printf (type.name);
     text += indent + "    {\n";
-    text += indent + "        decode (buffer, length, offset);\n";
+    text += indent + "        decode (buffer, data_length);\n";
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public void decode (uint8[] buffer, size_t length, size_t offset = 0)\n";
+    text += indent + "    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)\n";
     text += indent + "    {\n";
-    text += indent + "        while (offset < length)\n";
+    text += indent + "        var end = buffer.read_index + data_length;\n";
+    text += indent + "        while (buffer.read_index < end)\n";
     text += indent + "        {\n";
-    text += indent + "            var key = Protobuf.decode_varint (buffer, length, ref offset);\n";
+    text += indent + "            var key = buffer.decode_varint ();\n";
     text += indent + "            var wire_type = key & 0x7;\n";
     text += indent + "            var field_number = key >> 3;\n";
-    text += indent + "            int varint;\n";
-    text += indent + "            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);\n";
-    text += indent + "            // FIXME: Check remaining space\n";
     text += "\n";
-    text += indent + "            switch (field_number)\n";
-    text += indent + "            {\n";
+    var first = true;
     foreach (var field in type.field)
     {
-        text += indent + "            case %d:\n".printf (field.number);
         var decode_method = "";
+        var wire_type = 0;
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
-            decode_method = "Protobuf.decode_double (buffer, offset + value_length, offset)";
+            wire_type = 1;
+            decode_method = "buffer.decode_double ()";
             break;
         case FieldDescriptorProto.Type.TYPE_FLOAT:
-            decode_method = "Protobuf.decode_float (buffer, offset + value_length, offset)";
+            wire_type = 5;
+            decode_method = "buffer.decode_float ()";
             break;
         case FieldDescriptorProto.Type.TYPE_INT64:
-            decode_method = "Protobuf.decode_int64 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_int64 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_UINT64:
-            decode_method = "Protobuf.decode_uint64 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_uint64 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_INT32:
-            decode_method = "Protobuf.decode_int32 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_int32 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED64:
-            decode_method = "Protobuf.decode_fixed64 (buffer, offset + value_length, offset)";
+            wire_type = 1;
+            decode_method = "buffer.decode_fixed64 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED32:
-            decode_method = "Protobuf.decode_fixed32 (buffer, offset + value_length, offset)";
+            wire_type = 5;
+            decode_method = "buffer.decode_fixed32 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
-            decode_method = "Protobuf.decode_bool (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_bool ()";
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
-            decode_method = "Protobuf.decode_string (buffer, offset + value_length, offset)";
+            wire_type = 2;
+            decode_method = "buffer.decode_string (buffer.decode_varint ())";
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
-            decode_method = "Protobuf.decode_bytes (buffer, offset + value_length, offset)";
+            wire_type = 2;
+            decode_method = "buffer.decode_bytes (buffer.decode_varint ())";
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
-            decode_method = "new %s.from_data (buffer, offset + value_length, offset)".printf (get_type_name (field, false));
+            wire_type = 2;
+            decode_method = "new %s.from_data (buffer, buffer.decode_varint ())".printf (get_type_name (field, false));
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
-            decode_method = "(%s) varint".printf (get_type_name (field, false));
+            wire_type = 0;
+            decode_method = "(%s) buffer.decode_varint ()".printf (get_type_name (field, false));
             break;
         case FieldDescriptorProto.Type.TYPE_UINT32:
-            decode_method = "Protobuf.decode_uint32 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_uint32 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED32:
-            decode_method = "Protobuf.decode_sfixed32 (buffer, offset + value_length, offset)";
+            wire_type = 5;
+            decode_method = "buffer.decode_sfixed32 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED64:
-            decode_method = "Protobuf.decode_sfixed64 (buffer, offset + value_length, offset)";
+            wire_type = 1;
+            decode_method = "buffer.decode_sfixed64 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_SINT32:
-            decode_method = "Protobuf.decode_sint32 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_sint32 ()";
             break;
         case FieldDescriptorProto.Type.TYPE_SINT64:
-            decode_method = "Protobuf.decode_sint64 (buffer, offset + value_length, offset)";
+            wire_type = 0;
+            decode_method = "buffer.decode_sint64 ()";
             break;
         default:
-            decode_method = "DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
+            // FIXME: Exit with error
+            decode_method = "buffer.DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
             break;
         }
+        
+        text += indent + "            %s (field_number == %d && wire_type == %d)\n".printf (first ? "if" : "else if", field.number, wire_type);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
         else
             text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
-        text += indent + "                break;\n";
+
+        first = false;
     }
-    text += indent + "            }\n";
-    text += "\n";
-    text += indent + "            offset += value_length;\n";
+    text += indent + "            else\n";
+    text += indent + "                buffer.decode_unknown (wire_type);\n";
     text += indent + "        }\n";
     // FIXME
     //
-    //if (offset != length)
+    //if (buffer.read_offset != end)
     //    stderr.printf ("Unused %zu octets on end of X\n", offset - length);
     //
     text += indent + "    }\n";

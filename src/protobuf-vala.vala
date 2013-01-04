@@ -1,148 +1,155 @@
 namespace Protobuf
 {
-    // FIXME
     public class DecodeBuffer
     {
-    }
+        public uint8[] buffer;
+        public size_t read_index;
 
-    public int decode_varint (uint8[] buffer, size_t length, ref size_t offset)
-    {
-        int value = 0;
-        var shift = 0;
-
-        while (true)
+        public DecodeBuffer (size_t size)
         {
-            var b = buffer[offset];
-            offset++;
-            value = value | (b & 0x7F) << shift;
-            if ((b & 0x80) == 0)
-                return value;
-            shift += 7;
-        }
-    }
-
-    public double decode_double (uint8[] buffer, size_t length, size_t offset)
-    {
-        var v = decode_fixed64 (buffer, length, offset);
-        return *((double*) (&v));
-    }
-
-    public float decode_float (uint8[] buffer, size_t length, size_t offset)
-    {
-        var v = decode_fixed32 (buffer, length, offset);
-        return *((float*) (&v));
-    }
-
-    public int64 decode_int64 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return decode_varint (buffer, length, ref offset);
-    }
-
-    public uint64 decode_uint64 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return decode_varint (buffer, length, ref offset);
-    }
-
-    public int32 decode_int32 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return decode_varint (buffer, length, ref offset);
-    }
-
-    public uint64 decode_fixed64 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return (uint64) buffer[offset] | (uint64) buffer[offset+1] << 8 | (uint64) buffer[offset+2] << 16 | (uint64) buffer[offset+3] << 24 | (uint64) buffer[offset+4] << 32 | (uint64) buffer[offset+5] << 40 | (uint64) buffer[offset+6] << 48 | (uint64) buffer[offset+7] << 56;
-    }
-
-    public uint32 decode_fixed32 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return (uint32) buffer[offset] | (uint32) buffer[offset+1] << 8 | (uint32) buffer[offset+2] << 16 | (uint32) buffer[offset+3] << 24;
-    }
-
-    public bool decode_bool (uint8[] buffer, size_t length, size_t offset)
-    {
-        return decode_varint (buffer, length, ref offset) != 0;
-    }
-
-    public string decode_string (uint8[] buffer, size_t length, size_t offset)
-    {
-        var value = new GLib.StringBuilder.sized (length - offset);
-        while (offset < length)
-        {
-            value.append_c ((char) buffer[offset]);
-            offset++;
+            buffer = new uint8[size];
         }
 
-        return value.str;
-    }
-
-    public GLib.ByteArray decode_bytes (uint8[] buffer, size_t length, size_t offset)
-    {
-        var value = new GLib.ByteArray.sized ((uint) (length - offset));
-        var start = offset;
-        for (var i = start; i < length; i++)
+        public int decode_varint ()
         {
-            value.data[i - start] = buffer[i];
-            offset++;
+            int value = 0;
+            var shift = 0;
+    
+            while (true)
+            {
+                var b = buffer[read_index];
+                read_index++;
+                value = value | (b & 0x7F) << shift;
+                if ((b & 0x80) == 0)
+                    return value;
+                shift += 7;
+            }
         }
-
-        return value;
-    }
-
-    public uint32 decode_uint32 (uint8[] buffer, size_t length, size_t offset)
-    {
-        return decode_varint (buffer, length, ref offset);
-    }
-
-    public int32 decode_sfixed32 (uint8[] buffer, size_t length, size_t offset)
-    {
-        offset += 4;
-        return 0; // FIXME
-    }
-
-    public int64 decode_sfixed64 (uint8[] buffer, size_t length, size_t offset)
-    {
-        offset += 8;
-        return 0; // FIXME
-    }
-
-    public int32 decode_sint32 (uint8[] buffer, size_t length, size_t offset)
-    {
-        var value = (uint32) decode_varint (buffer, length, ref offset);
-        var v = (int32) (value >> 1);
-        if ((value & 0x1) != 0)
-            return -(v + 1);
-        else
+    
+        public double decode_double ()
+        {
+            var v = decode_fixed64 ();
+            return *((double*) (&v));
+        }
+    
+        public float decode_float ()
+        {
+            var v = decode_fixed32 ();
+            return *((float*) (&v));
+        }
+    
+        public int64 decode_int64 ()
+        {
+            return decode_varint ();
+        }
+    
+        public uint64 decode_uint64 ()
+        {
+            return decode_varint ();
+        }
+    
+        public int32 decode_int32 ()
+        {
+            return decode_varint ();
+        }
+    
+        public uint64 decode_fixed64 ()
+        {
+            var v = (uint64) buffer[read_index] | (uint64) buffer[read_index+1] << 8 | (uint64) buffer[read_index+2] << 16 | (uint64) buffer[read_index+3] << 24 | (uint64) buffer[read_index+4] << 32 | (uint64) buffer[read_index+5] << 40 | (uint64) buffer[read_index+6] << 48 | (uint64) buffer[read_index+7] << 56;
+            read_index += 8;
             return v;
-    }
-
-    public int64 decode_sint64 (uint8[] buffer, size_t length, size_t offset)
-    {
-        var value = (uint64) decode_varint (buffer, length, ref offset);
-        var v = (int64) (value >> 1);
-        if ((value & 0x1) != 0)
-            return -(v + 1);
-        else
-            return v;
-    }
-
-    public size_t get_value_length (int wire_type, out int varint, uint8[] buffer, size_t length, ref size_t offset)
-    {
-        varint = 0;
-        switch (wire_type)
+        }
+    
+        public uint32 decode_fixed32 ()
         {
-        case 0: //varint
-            var o = offset;
-            varint = decode_varint (buffer, length, ref o);
-            return o - offset;
-        case 1: //64-bit
-            return 8;
-        case 2: //length-delimited
-            return decode_varint (buffer, length, ref offset);
-        case 5: //32-bit
-            return 4;
-        default: //FIXME: throw error
-            GLib.stderr.printf ("Unknown wire type %d\n", wire_type);
-            return 0;
+            var v = (uint32) buffer[read_index] | (uint32) buffer[read_index+1] << 8 | (uint32) buffer[read_index+2] << 16 | (uint32) buffer[read_index+3] << 24;
+            read_index += 4;
+            return v;
+        }
+    
+        public bool decode_bool ()
+        {
+            return decode_varint () != 0;
+        }
+    
+        public string decode_string (size_t length)
+        {
+            var value = new GLib.StringBuilder.sized (length);
+            for (var i = 0; i < length; i++)
+                value.append_c ((char) buffer[read_index + i]);
+            read_index += length;
+    
+            return value.str;
+        }
+    
+        public GLib.ByteArray decode_bytes (size_t length)
+        {
+            var value = new GLib.ByteArray.sized ((uint) length);
+            for (var i = 0; i < length; i++)
+                value.data[i] = buffer[read_index + i];
+            read_index += length;
+    
+            return value;
+        }
+    
+        public uint32 decode_uint32 ()
+        {
+            return decode_varint ();
+        }
+    
+        public int32 decode_sfixed32 ()
+        {
+            read_index += 4;
+            return 0; // FIXME
+        }
+    
+        public int64 decode_sfixed64 ()
+        {
+            read_index += 8;
+            return 0; // FIXME
+        }
+    
+        public int32 decode_sint32 ()
+        {
+            var value = (uint32) decode_varint ();
+            var v = (int32) (value >> 1);
+            if ((value & 0x1) != 0)
+                return -(v + 1);
+            else
+                return v;
+        }
+    
+        public int64 decode_sint64 ()
+        {
+            var value = (uint64) decode_varint ();
+            var v = (int64) (value >> 1);
+            if ((value & 0x1) != 0)
+                return -(v + 1);
+            else
+                return v;
+        }
+    
+        public void decode_unknown (size_t wire_type)
+        {
+            switch (wire_type)
+            {
+            case 0: //varint
+                decode_varint ();
+                break;
+            case 1: //64-bit
+                read_index += 8;
+                break;
+            case 2: //length-delimited
+                var length = decode_varint ();
+                read_index += length;
+                break;
+            case 5: //32-bit
+                read_index += 4;
+                break;
+            default: //FIXME: throw error
+                GLib.stderr.printf ("Unknown wire type %zu\n", wire_type);
+                break;
+            }
         }
     }
 

@@ -4,30 +4,24 @@ public class FileDescriptorSet
 {
     public List<FileDescriptorProto> file;
 
-    public FileDescriptorSet.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public FileDescriptorSet.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.file.append (new FileDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.file.append (new FileDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -73,54 +67,40 @@ public class FileDescriptorProto
     public FileOptions? options;
     public SourceCodeInfo? source_code_info;
 
-    public FileDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public FileDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.package = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 3:
-                this.dependency.append (Protobuf.decode_string (buffer, offset + value_length, offset));
-                break;
-            case 4:
-                this.message_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 5:
-                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 6:
-                this.service.append (new ServiceDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 7:
-                this.extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 8:
-                this.options = new FileOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            case 9:
-                this.source_code_info = new SourceCodeInfo.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.package = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 3 && wire_type == 2)
+                this.dependency.append (buffer.decode_string (buffer.decode_varint ()));
+            else if (field_number == 4 && wire_type == 2)
+                this.message_type.append (new DescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 5 && wire_type == 2)
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 6 && wire_type == 2)
+                this.service.append (new ServiceDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 7 && wire_type == 2)
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 8 && wire_type == 2)
+                this.options = new FileOptions.from_data (buffer, buffer.decode_varint ());
+            else if (field_number == 9 && wire_type == 2)
+                this.source_code_info = new SourceCodeInfo.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -261,33 +241,26 @@ public class DescriptorProto
         public int32? start;
         public int32? end;
 
-        public ExtensionRange.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        public ExtensionRange.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            decode (buffer, length, offset);
+            decode (buffer, data_length);
         }
 
-        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            while (offset < length)
+            var end = buffer.read_index + data_length;
+            while (buffer.read_index < end)
             {
-                var key = Protobuf.decode_varint (buffer, length, ref offset);
+                var key = buffer.decode_varint ();
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
-                int varint;
-                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-                // FIXME: Check remaining space
 
-                switch (field_number)
-                {
-                case 1:
-                    this.start = Protobuf.decode_int32 (buffer, offset + value_length, offset);
-                    break;
-                case 2:
-                    this.end = Protobuf.decode_int32 (buffer, offset + value_length, offset);
-                    break;
-                }
-
-                offset += value_length;
+                if (field_number == 1 && wire_type == 0)
+                    this.start = buffer.decode_int32 ();
+                else if (field_number == 2 && wire_type == 0)
+                    this.end = buffer.decode_int32 ();
+                else
+                    buffer.decode_unknown (wire_type);
             }
         }
 
@@ -337,48 +310,36 @@ public class DescriptorProto
     public List<ExtensionRange> extension_range;
     public MessageOptions? options;
 
-    public DescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public DescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.field.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 6:
-                this.extension.append (new FieldDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 3:
-                this.nested_type.append (new DescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 4:
-                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 5:
-                this.extension_range.append (new ExtensionRange.from_data (buffer, offset + value_length, offset));
-                break;
-            case 7:
-                this.options = new MessageOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.field.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 6 && wire_type == 2)
+                this.extension.append (new FieldDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 3 && wire_type == 2)
+                this.nested_type.append (new DescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 4 && wire_type == 2)
+                this.enum_type.append (new EnumDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 5 && wire_type == 2)
+                this.extension_range.append (new ExtensionRange.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 7 && wire_type == 2)
+                this.options = new MessageOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -526,51 +487,38 @@ public class FieldDescriptorProto
     public string? default_value;
     public FieldOptions? options;
 
-    public FieldDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public FieldDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 3:
-                this.number = Protobuf.decode_int32 (buffer, offset + value_length, offset);
-                break;
-            case 4:
-                this.label = (Label) varint;
-                break;
-            case 5:
-                this.type = (Type) varint;
-                break;
-            case 6:
-                this.type_name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.extendee = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 7:
-                this.default_value = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 8:
-                this.options = new FieldOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 3 && wire_type == 0)
+                this.number = buffer.decode_int32 ();
+            else if (field_number == 4 && wire_type == 0)
+                this.label = (Label) buffer.decode_varint ();
+            else if (field_number == 5 && wire_type == 0)
+                this.type = (Type) buffer.decode_varint ();
+            else if (field_number == 6 && wire_type == 2)
+                this.type_name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.extendee = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 7 && wire_type == 2)
+                this.default_value = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 8 && wire_type == 2)
+                this.options = new FieldOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -690,36 +638,28 @@ public class EnumDescriptorProto
     public List<EnumValueDescriptorProto> value;
     public EnumOptions? options;
 
-    public EnumDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public EnumDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.value.append (new EnumValueDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 3:
-                this.options = new EnumOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.value.append (new EnumValueDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 3 && wire_type == 2)
+                this.options = new EnumOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -783,36 +723,28 @@ public class EnumValueDescriptorProto
     public int32? number;
     public EnumValueOptions? options;
 
-    public EnumValueDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public EnumValueDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.number = Protobuf.decode_int32 (buffer, offset + value_length, offset);
-                break;
-            case 3:
-                this.options = new EnumValueOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 0)
+                this.number = buffer.decode_int32 ();
+            else if (field_number == 3 && wire_type == 2)
+                this.options = new EnumValueOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -874,36 +806,28 @@ public class ServiceDescriptorProto
     public List<MethodDescriptorProto> method;
     public ServiceOptions? options;
 
-    public ServiceDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public ServiceDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.method.append (new MethodDescriptorProto.from_data (buffer, offset + value_length, offset));
-                break;
-            case 3:
-                this.options = new ServiceOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.method.append (new MethodDescriptorProto.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 3 && wire_type == 2)
+                this.options = new ServiceOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -968,39 +892,30 @@ public class MethodDescriptorProto
     public string? output_type;
     public MethodOptions? options;
 
-    public MethodDescriptorProto.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public MethodDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.name = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.input_type = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 3:
-                this.output_type = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 4:
-                this.options = new MethodOptions.from_data (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.name = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 2 && wire_type == 2)
+                this.input_type = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 3 && wire_type == 2)
+                this.output_type = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 4 && wire_type == 2)
+                this.options = new MethodOptions.from_data (buffer, buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1087,54 +1002,40 @@ public class FileOptions
     public bool? py_generic_services;
     public List<UninterpretedOption> uninterpreted_option;
 
-    public FileOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public FileOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.java_package = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 8:
-                this.java_outer_classname = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 10:
-                this.java_multiple_files = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 20:
-                this.java_generate_equals_and_hash = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 9:
-                this.optimize_for = (OptimizeMode) varint;
-                break;
-            case 16:
-                this.cc_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 17:
-                this.java_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 18:
-                this.py_generic_services = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.java_package = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 8 && wire_type == 2)
+                this.java_outer_classname = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 10 && wire_type == 0)
+                this.java_multiple_files = buffer.decode_bool ();
+            else if (field_number == 20 && wire_type == 0)
+                this.java_generate_equals_and_hash = buffer.decode_bool ();
+            else if (field_number == 9 && wire_type == 0)
+                this.optimize_for = (OptimizeMode) buffer.decode_varint ();
+            else if (field_number == 16 && wire_type == 0)
+                this.cc_generic_services = buffer.decode_bool ();
+            else if (field_number == 17 && wire_type == 0)
+                this.java_generic_services = buffer.decode_bool ();
+            else if (field_number == 18 && wire_type == 0)
+                this.py_generic_services = buffer.decode_bool ();
+            else if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1264,36 +1165,28 @@ public class MessageOptions
     public bool? no_standard_descriptor_accessor;
     public List<UninterpretedOption> uninterpreted_option;
 
-    public MessageOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public MessageOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.message_set_wire_format = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 2:
-                this.no_standard_descriptor_accessor = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 0)
+                this.message_set_wire_format = buffer.decode_bool ();
+            else if (field_number == 2 && wire_type == 0)
+                this.no_standard_descriptor_accessor = buffer.decode_bool ();
+            else if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1363,42 +1256,32 @@ public class FieldOptions
     public string? experimental_map_key;
     public List<UninterpretedOption> uninterpreted_option;
 
-    public FieldOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public FieldOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.ctype = (CType) varint;
-                break;
-            case 2:
-                this.packed = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 3:
-                this.deprecated = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                break;
-            case 9:
-                this.experimental_map_key = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 0)
+                this.ctype = (CType) buffer.decode_varint ();
+            else if (field_number == 2 && wire_type == 0)
+                this.packed = buffer.decode_bool ();
+            else if (field_number == 3 && wire_type == 0)
+                this.deprecated = buffer.decode_bool ();
+            else if (field_number == 9 && wire_type == 2)
+                this.experimental_map_key = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1481,30 +1364,24 @@ public class EnumOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
-    public EnumOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public EnumOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1542,30 +1419,24 @@ public class EnumValueOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
-    public EnumValueOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public EnumValueOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1603,30 +1474,24 @@ public class ServiceOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
-    public ServiceOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public ServiceOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1664,30 +1529,24 @@ public class MethodOptions
 {
     public List<UninterpretedOption> uninterpreted_option;
 
-    public MethodOptions.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public MethodOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 999:
-                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 999 && wire_type == 2)
+                this.uninterpreted_option.append (new UninterpretedOption.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1728,33 +1587,26 @@ public class UninterpretedOption
         public string name_part;
         public bool is_extension;
 
-        public NamePart.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        public NamePart.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            decode (buffer, length, offset);
+            decode (buffer, data_length);
         }
 
-        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            while (offset < length)
+            var end = buffer.read_index + data_length;
+            while (buffer.read_index < end)
             {
-                var key = Protobuf.decode_varint (buffer, length, ref offset);
+                var key = buffer.decode_varint ();
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
-                int varint;
-                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-                // FIXME: Check remaining space
 
-                switch (field_number)
-                {
-                case 1:
-                    this.name_part = Protobuf.decode_string (buffer, offset + value_length, offset);
-                    break;
-                case 2:
-                    this.is_extension = Protobuf.decode_bool (buffer, offset + value_length, offset);
-                    break;
-                }
-
-                offset += value_length;
+                if (field_number == 1 && wire_type == 2)
+                    this.name_part = buffer.decode_string (buffer.decode_varint ());
+                else if (field_number == 2 && wire_type == 0)
+                    this.is_extension = buffer.decode_bool ();
+                else
+                    buffer.decode_unknown (wire_type);
             }
         }
 
@@ -1793,48 +1645,36 @@ public class UninterpretedOption
     public GLib.ByteArray? string_value;
     public string? aggregate_value;
 
-    public UninterpretedOption.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public UninterpretedOption.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 2:
-                this.name.append (new NamePart.from_data (buffer, offset + value_length, offset));
-                break;
-            case 3:
-                this.identifier_value = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            case 4:
-                this.positive_int_value = Protobuf.decode_uint64 (buffer, offset + value_length, offset);
-                break;
-            case 5:
-                this.negative_int_value = Protobuf.decode_int64 (buffer, offset + value_length, offset);
-                break;
-            case 6:
-                this.double_value = Protobuf.decode_double (buffer, offset + value_length, offset);
-                break;
-            case 7:
-                this.string_value = Protobuf.decode_bytes (buffer, offset + value_length, offset);
-                break;
-            case 8:
-                this.aggregate_value = Protobuf.decode_string (buffer, offset + value_length, offset);
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 2 && wire_type == 2)
+                this.name.append (new NamePart.from_data (buffer, buffer.decode_varint ()));
+            else if (field_number == 3 && wire_type == 2)
+                this.identifier_value = buffer.decode_string (buffer.decode_varint ());
+            else if (field_number == 4 && wire_type == 0)
+                this.positive_int_value = buffer.decode_uint64 ();
+            else if (field_number == 5 && wire_type == 0)
+                this.negative_int_value = buffer.decode_int64 ();
+            else if (field_number == 6 && wire_type == 1)
+                this.double_value = buffer.decode_double ();
+            else if (field_number == 7 && wire_type == 2)
+                this.string_value = buffer.decode_bytes (buffer.decode_varint ());
+            else if (field_number == 8 && wire_type == 2)
+                this.aggregate_value = buffer.decode_string (buffer.decode_varint ());
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
@@ -1946,33 +1786,26 @@ public class SourceCodeInfo
         public List<int32> path;
         public List<int32> span;
 
-        public Location.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+        public Location.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            decode (buffer, length, offset);
+            decode (buffer, data_length);
         }
 
-        public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+        public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
-            while (offset < length)
+            var end = buffer.read_index + data_length;
+            while (buffer.read_index < end)
             {
-                var key = Protobuf.decode_varint (buffer, length, ref offset);
+                var key = buffer.decode_varint ();
                 var wire_type = key & 0x7;
                 var field_number = key >> 3;
-                int varint;
-                var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-                // FIXME: Check remaining space
 
-                switch (field_number)
-                {
-                case 1:
-                    this.path.append (Protobuf.decode_int32 (buffer, offset + value_length, offset));
-                    break;
-                case 2:
-                    this.span.append (Protobuf.decode_int32 (buffer, offset + value_length, offset));
-                    break;
-                }
-
-                offset += value_length;
+                if (field_number == 1 && wire_type == 0)
+                    this.path.append (buffer.decode_int32 ());
+                else if (field_number == 2 && wire_type == 0)
+                    this.span.append (buffer.decode_int32 ());
+                else
+                    buffer.decode_unknown (wire_type);
             }
         }
 
@@ -2018,30 +1851,24 @@ public class SourceCodeInfo
     }
     public List<Location> location;
 
-    public SourceCodeInfo.from_data (uint8[] buffer, size_t length, size_t offset = 0)
+    public SourceCodeInfo.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        decode (buffer, length, offset);
+        decode (buffer, data_length);
     }
 
-    public void decode (uint8[] buffer, size_t length, size_t offset = 0)
+    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
-        while (offset < length)
+        var end = buffer.read_index + data_length;
+        while (buffer.read_index < end)
         {
-            var key = Protobuf.decode_varint (buffer, length, ref offset);
+            var key = buffer.decode_varint ();
             var wire_type = key & 0x7;
             var field_number = key >> 3;
-            int varint;
-            var value_length = Protobuf.get_value_length (wire_type, out varint, buffer, length, ref offset);
-            // FIXME: Check remaining space
 
-            switch (field_number)
-            {
-            case 1:
-                this.location.append (new Location.from_data (buffer, offset + value_length, offset));
-                break;
-            }
-
-            offset += value_length;
+            if (field_number == 1 && wire_type == 2)
+                this.location.append (new Location.from_data (buffer, buffer.decode_varint ()));
+            else
+                buffer.decode_unknown (wire_type);
         }
     }
 
