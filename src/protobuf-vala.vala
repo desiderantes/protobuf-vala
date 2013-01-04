@@ -84,12 +84,12 @@ namespace Protobuf
     
         public GLib.ByteArray decode_bytes (size_t length)
         {
-            var value = new GLib.ByteArray.sized ((uint) length);
+            var data = new uint8[length];
             for (var i = 0; i < length; i++)
-                value.data[i] = buffer[read_index + i];
+                data[i] = buffer[read_index + i];
             read_index += length;
     
-            return value;
+            return new ByteArray.take (data);
         }
     
         public uint32 decode_uint32 ()

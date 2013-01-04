@@ -65,7 +65,9 @@ public static int main (string[] args)
     check_decode_string ("", "");
     check_decode_string ("313233", "123");
 
-    // FIXME: bytes
+    check_decode_bytes ("", "");
+    check_decode_bytes ("AA", "AA");
+    check_decode_bytes ("AABBCC", "AABBCC");
 
     check_decode_uint32 ("00", 0);
     check_decode_uint32 ("01", 1);
@@ -222,6 +224,19 @@ private void check_decode_string (string data, string expected)
         stderr.printf ("decode_string (\"%s\") -> \"%s\", expected \"%s\"\n", data, result, expected);
 }
 
+private void check_decode_bytes (string data, string expected)
+{
+    var buffer = string_to_buffer (data);
+    var r = buffer.decode_bytes (buffer.buffer.length);
+    var result = array_to_string (r.data);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_bytes (\"%s\") -> \"%s\", expected \"%s\"\n", data, result, expected);
+}
+
 private void check_decode_uint32 (string data, uint32 expected)
 {
     var buffer = string_to_buffer (data);
@@ -278,4 +293,14 @@ private uint8 str_to_int (char c)
         return c - 'A' + 10;
     else
         return 0;
+}
+
+private string array_to_string (uint8[] value)
+{
+    var text = "";
+
+    for (var i = 0; i < value.length; i++)
+        text += "%02X".printf (value[i]);
+
+    return text;
 }

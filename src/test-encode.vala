@@ -64,7 +64,9 @@ public static int main (string[] args)
     check_encode_string ("", "");
     check_encode_string ("123", "313233");
 
-    // FIXME: bytes
+    check_encode_bytes ("", "");
+    check_encode_bytes ("AA", "AA");
+    check_encode_bytes ("AABBCC", "AABBCC");
 
     check_encode_uint32 (0, "00");
     check_encode_uint32 (1, "01");
@@ -231,6 +233,21 @@ private void check_encode_string (string value, string expected)
         stderr.printf ("encode_string (%s) -> \"%s\", expected \"%s\"\n", value.to_string (), result, expected);
 }
 
+private void check_encode_bytes (string value, string expected)
+{
+    var v = new ByteArray.take (string_to_array (value));
+
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_bytes (v);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_bytes (%s) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
 private void check_encode_uint32 (uint32 value, string expected)
 {
     var buffer = new Protobuf.EncodeBuffer (100);
@@ -279,4 +296,26 @@ private string buffer_to_string (Protobuf.EncodeBuffer buffer)
         value += "%02X".printf (data[i]);
 
     return value;
+}
+
+private uint8[] string_to_array (string data)
+{
+    var value = new uint8[data.length / 2];
+
+    for (var i = 0; i < data.length; i++)
+        value[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
+
+    return value;
+}
+
+private uint8 str_to_int (char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    else if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    else if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    else
+        return 0;
 }
