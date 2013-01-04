@@ -99,14 +99,14 @@ namespace Protobuf
     
         public int32 decode_sfixed32 ()
         {
-            read_index += 4;
-            return 0; // FIXME
+            var v = decode_fixed32 ();
+            return *((int32*) (&v));
         }
     
         public int64 decode_sfixed64 ()
         {
-            read_index += 8;
-            return 0; // FIXME
+            var v = decode_fixed64 ();
+            return *((int64*) (&v));
         }
     
         public int32 decode_sint32 ()
@@ -280,16 +280,12 @@ namespace Protobuf
 
         public size_t encode_sfixed32 (int32 value)
         {
-            write_index -= 4;
-            // FIXME
-            return 4;
+            return encode_fixed32 (*((uint32*) (&value)));
         }
 
         public size_t encode_sfixed64 (int64 value)
         {
-            write_index -= 8;
-            // FIXME
-            return 8;
+            return encode_fixed64 (*((uint64*) (&value)));
         }
 
         public size_t encode_sint32 (int32 value)

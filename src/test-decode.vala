@@ -73,9 +73,17 @@ public static int main (string[] args)
     check_decode_uint32 ("01", 1);
     check_decode_uint32 ("FFFFFFFF0F", uint32.MAX);
 
-    // FIXME: sfixed32
+    check_decode_sfixed32 ("00000000", 0);
+    check_decode_sfixed32 ("01000000", 1);
+    check_decode_sfixed32 ("FFFFFFFF", -1);
+    check_decode_sfixed32 ("00000080", int32.MIN);
+    check_decode_sfixed32 ("FFFFFF7F", int32.MAX);
 
-    // FIXME: sfixed64
+    check_decode_sfixed64 ("0000000000000000", 0);
+    check_decode_sfixed64 ("0100000000000000", 1);
+    check_decode_sfixed64 ("FFFFFFFFFFFFFFFF", -1);
+    check_decode_sfixed64 ("0000000000000080", int64.MIN);
+    check_decode_sfixed64 ("FFFFFFFFFFFFFF7F", int64.MAX);
 
     check_decode_sint32 ("00", 0);
     check_decode_sint32 ("02", 1);
@@ -247,6 +255,30 @@ private void check_decode_uint32 (string data, uint32 expected)
         n_passed++;
     else
         stderr.printf ("decode_uint32 (\"%s\") -> %u, expected %u\n", data, result, expected);
+}
+
+private void check_decode_sfixed32 (string data, int32 expected)
+{
+    var buffer = string_to_buffer (data);
+    var result = buffer.decode_sfixed32 ();
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_sfixed32 (\"%s\") -> %i, expected %i\n", data, result, expected);
+}
+
+private void check_decode_sfixed64 (string data, int64 expected)
+{
+    var buffer = string_to_buffer (data);
+    var result = buffer.decode_sfixed64 ();
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_sfixed64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
 }
 
 private void check_decode_sint32 (string data, int32 expected)

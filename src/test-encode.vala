@@ -72,9 +72,17 @@ public static int main (string[] args)
     check_encode_uint32 (1, "01");
     check_encode_uint32 (uint32.MAX, "FFFFFFFF0F");
 
-    // FIXME: sfixed32
+    check_encode_sfixed32 (0, "00000000");
+    check_encode_sfixed32 (1, "01000000");
+    check_encode_sfixed32 (-1, "FFFFFFFF");
+    check_encode_sfixed32 (int32.MIN, "00000080");
+    check_encode_sfixed32 (int32.MAX, "FFFFFF7F");
 
-    // FIXME: sfixed64
+    check_encode_sfixed64 (0, "0000000000000000");
+    check_encode_sfixed64 (1, "0100000000000000");
+    check_encode_sfixed64 (-1, "FFFFFFFFFFFFFFFF");
+    check_encode_sfixed64 (int64.MIN, "0000000000000080");
+    check_encode_sfixed64 (int64.MAX, "FFFFFFFFFFFFFF7F");
 
     check_encode_sint32 (0, "00");
     check_encode_sint32 (1, "02");
@@ -259,6 +267,32 @@ private void check_encode_uint32 (uint32 value, string expected)
         n_passed++;
     else
         stderr.printf ("encode_uint32 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_sfixed32 (int32 value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_sfixed32 (value);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_sfixed32 (%i) -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_encode_sfixed64 (int64 value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer (100);
+    buffer.encode_sfixed64 (value);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_sfixed64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_sint32 (int32 value, string expected)
