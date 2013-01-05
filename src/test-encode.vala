@@ -111,7 +111,14 @@ public static int main (string[] args)
     check_buffer_resize (2, 3);
     check_buffer_resize (8, 1);
 
+    check_encode_message (0, "", "08001200");
     check_encode_message (1, "TEST", "0802120454455354");
+
+    check_encode_optional_message (0, "", "");
+    check_encode_optional_message (1, "TEST", "0802120454455354");
+
+    check_encode_optional_defaults_message (0, "", "08001200");
+    check_encode_optional_defaults_message (1, "TEST", "");
 
     if (n_passed != n_tests)
     {
@@ -366,6 +373,40 @@ private void check_encode_message (int32 int_value, string string_value, string 
         n_passed++;
     else
         stderr.printf ("encode_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
+}
+
+private void check_encode_optional_message (int32 int_value, string string_value, string expected)
+{
+    var value = new TestOptionalMessage ();
+    value.int_value = int_value;
+    value.string_value = string_value;
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_optional_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
+}
+
+private void check_encode_optional_defaults_message (int32 int_value, string string_value, string expected)
+{
+    var value = new TestOptionalDefaultsMessage ();
+    value.int_value = int_value;
+    value.string_value = string_value;
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_optional_defaults_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)
