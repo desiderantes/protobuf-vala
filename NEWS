@@ -1,3 +1,7 @@
+Overview of changed in protoc-gen-vala 0.0.3
+
+  * Fix sint64 encoding on 32 bit systems
+
 Overview of changed in protoc-gen-vala 0.0.2
 
   * Support all basic data types
