@@ -292,14 +292,17 @@ namespace Protobuf
         public size_t encode_sint32 (int32 value)
         {
             if (value < 0)
-                return encode_varint ((uint64) (- (int64) value) * 2 - 1);
+                return encode_varint ((uint32) (-value) * 2 - 1);
             else
-                return encode_varint ((uint64) value * 2);
+                return encode_varint ((uint32) value * 2);
         }
 
         public size_t encode_sint64 (int64 value)
         {
-            return encode_varint ((size_t) ((value << 1) ^ (value >> 63)));
+            if (value < 0)
+                return encode_varint ((uint64) (-value) * 2 - 1);
+            else
+                return encode_varint ((uint64) value * 2);
         }
 
         // FIXME: Double size when run out of space
