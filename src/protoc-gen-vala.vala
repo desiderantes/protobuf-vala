@@ -70,7 +70,9 @@ private static string write_class (DescriptorProto type, string indent = "")
     foreach (var nested_type in type.nested_type)
         text += write_class (nested_type, indent + "    ");
     foreach (var field in type.field)
-        text += indent + "    public %s %s;\n".printf (get_type_name (field), field.name);
+    {
+        text += indent + "    public %s %s = %s;\n".printf (get_type_name (field), field.name, get_default_value (field));
+    }
     text += "\n";
     text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)\n".printf (type.name);
     text += indent + "    {\n";
@@ -196,7 +198,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
         {
-            text += indent + "        if (this.%s != null)\n".printf (field.name);
+            text += indent + "        if (this.%s != %s)\n".printf (field.name, get_default_value (field));
             text += indent + "        {\n";
             indent2 += "    ";
         }
@@ -309,7 +311,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         var indent2 = indent;
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        if (this.%s != null)\n".printf (field.name);
+            text += indent + "        if (this.%s != %s)\n".printf (field.name, get_default_value (field));
             text += indent + "        {\n";
             indent2 += "    ";
         }
@@ -355,6 +357,7 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
 {
     var type_name = "";
     var needs_box = false;
+    var nullable = false;
     switch (field.type)
     {
     case FieldDescriptorProto.Type.TYPE_DOUBLE:
@@ -410,6 +413,9 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
         needs_box = true;
         break;
     case FieldDescriptorProto.Type.TYPE_MESSAGE:
+        type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+        nullable = true;
+        break;
     case FieldDescriptorProto.Type.TYPE_ENUM:
         type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
         break;
@@ -429,9 +435,69 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
         else
             return "List<%s>".printf (type_name);
     case FieldDescriptorProto.Label.LABEL_OPTIONAL:
-        return "%s?".printf (type_name);
+        if (nullable)
+            return "%s?".printf (type_name);
+        else
+            return type_name;
     default:
     case FieldDescriptorProto.Label.LABEL_REQUIRED:
-        return type_name;
+        return type_name;    
+    }
+}
+
+private static string get_default_value (FieldDescriptorProto field)
+{
+    switch (field.label)
+    {
+    case FieldDescriptorProto.Label.LABEL_REPEATED:
+        return "null";
+    default:
+    case FieldDescriptorProto.Label.LABEL_REQUIRED:
+    case FieldDescriptorProto.Label.LABEL_OPTIONAL:
+        break;
+    }
+
+    switch (field.type)
+    {
+    case FieldDescriptorProto.Type.TYPE_DOUBLE:
+        return "0d";
+    case FieldDescriptorProto.Type.TYPE_FLOAT:
+        return "0f";
+    case FieldDescriptorProto.Type.TYPE_INT64:
+    case FieldDescriptorProto.Type.TYPE_SINT64:
+    case FieldDescriptorProto.Type.TYPE_UINT64:
+    case FieldDescriptorProto.Type.TYPE_FIXED64:
+    case FieldDescriptorProto.Type.TYPE_SFIXED64:
+    case FieldDescriptorProto.Type.TYPE_INT32:
+    case FieldDescriptorProto.Type.TYPE_SINT32:
+    case FieldDescriptorProto.Type.TYPE_UINT32:
+    case FieldDescriptorProto.Type.TYPE_FIXED32:
+    case FieldDescriptorProto.Type.TYPE_SFIXED32:
+        if (field.default_value != "")
+            return field.default_value;
+        else
+            return "0";
+    case FieldDescriptorProto.Type.TYPE_BOOL:
+        if (field.default_value != "")
+            return field.default_value;
+        else
+            return "false";
+    case FieldDescriptorProto.Type.TYPE_STRING:
+        if (field.default_value != "")
+        {
+            var value = field.default_value;
+            value = value.replace ("\\", "\\\\");
+            value = value.replace ("\"", "\\\"");
+            return "\"%s\"".printf (value);
+        }
+        else
+            return "\"\"";
+    case FieldDescriptorProto.Type.TYPE_BYTES:
+    case FieldDescriptorProto.Type.TYPE_MESSAGE:
+        return "null";
+    case FieldDescriptorProto.Type.TYPE_ENUM:
+        return "0"; // FIXME
+    default:
+        return "UNKNOWN_TYPE%d".printf (field.type);
     }
 }

@@ -2,9 +2,9 @@
 
 public class CodeGeneratorRequest
 {
-    public List<string> file_to_generate;
-    public string? parameter;
-    public List<FileDescriptorProto> proto_file;
+    public List<string> file_to_generate = null;
+    public string parameter = "";
+    public List<FileDescriptorProto> proto_file = null;
 
     public CodeGeneratorRequest.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -42,7 +42,7 @@ public class CodeGeneratorRequest
             n_written += buffer.encode_varint (proto_file_length);
             n_written += buffer.encode_varint (122);
         }
-        if (this.parameter != null)
+        if (this.parameter != "")
         {
             var parameter_length = buffer.encode_string (this.parameter);
             n_written += parameter_length;
@@ -71,7 +71,7 @@ public class CodeGeneratorRequest
                 text += "\"%s\";\n".printf (v);
         }
 
-        if (this.parameter != null)
+        if (this.parameter != "")
         {
             text += "parameter = ";
             text += "\"%s\";\n".printf (this.parameter);
@@ -93,9 +93,9 @@ public class CodeGeneratorResponse
 {
     public class File
     {
-        public string? name;
-        public string? insertion_point;
-        public string? content;
+        public string name = "";
+        public string insertion_point = "";
+        public string content = "";
 
         public File.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
@@ -126,21 +126,21 @@ public class CodeGeneratorResponse
         {
             size_t n_written = 0;
 
-            if (this.content != null)
+            if (this.content != "")
             {
                 var content_length = buffer.encode_string (this.content);
                 n_written += content_length;
                 n_written += buffer.encode_varint (content_length);
                 n_written += buffer.encode_varint (122);
             }
-            if (this.insertion_point != null)
+            if (this.insertion_point != "")
             {
                 var insertion_point_length = buffer.encode_string (this.insertion_point);
                 n_written += insertion_point_length;
                 n_written += buffer.encode_varint (insertion_point_length);
                 n_written += buffer.encode_varint (18);
             }
-            if (this.name != null)
+            if (this.name != "")
             {
                 var name_length = buffer.encode_string (this.name);
                 n_written += name_length;
@@ -155,19 +155,19 @@ public class CodeGeneratorResponse
         {
             var text = "{\n";
 
-            if (this.name != null)
+            if (this.name != "")
             {
                 text += "name = ";
                 text += "\"%s\";\n".printf (this.name);
             }
 
-            if (this.insertion_point != null)
+            if (this.insertion_point != "")
             {
                 text += "insertion_point = ";
                 text += "\"%s\";\n".printf (this.insertion_point);
             }
 
-            if (this.content != null)
+            if (this.content != "")
             {
                 text += "content = ";
                 text += "\"%s\";\n".printf (this.content);
@@ -177,8 +177,8 @@ public class CodeGeneratorResponse
             return text;
         }
     }
-    public string? error;
-    public List<File> file;
+    public string error = "";
+    public List<File> file = null;
 
     public CodeGeneratorResponse.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -214,7 +214,7 @@ public class CodeGeneratorResponse
             n_written += buffer.encode_varint (file_length);
             n_written += buffer.encode_varint (122);
         }
-        if (this.error != null)
+        if (this.error != "")
         {
             var error_length = buffer.encode_string (this.error);
             n_written += error_length;
@@ -229,7 +229,7 @@ public class CodeGeneratorResponse
     {
         var text = "{\n";
 
-        if (this.error != null)
+        if (this.error != "")
         {
             text += "error = ";
             text += "\"%s\";\n".printf (this.error);

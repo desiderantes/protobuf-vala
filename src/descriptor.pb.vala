@@ -2,7 +2,7 @@
 
 public class FileDescriptorSet
 {
-    public List<FileDescriptorProto> file;
+    public List<FileDescriptorProto> file = null;
 
     public FileDescriptorSet.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -58,15 +58,15 @@ public class FileDescriptorSet
 
 public class FileDescriptorProto
 {
-    public string? name;
-    public string? package;
-    public List<string> dependency;
-    public List<DescriptorProto> message_type;
-    public List<EnumDescriptorProto> enum_type;
-    public List<ServiceDescriptorProto> service;
-    public List<FieldDescriptorProto> extension;
-    public FileOptions? options;
-    public SourceCodeInfo? source_code_info;
+    public string name = "";
+    public string package = "";
+    public List<string> dependency = null;
+    public List<DescriptorProto> message_type = null;
+    public List<EnumDescriptorProto> enum_type = null;
+    public List<ServiceDescriptorProto> service = null;
+    public List<FieldDescriptorProto> extension = null;
+    public FileOptions? options = null;
+    public SourceCodeInfo? source_code_info = null;
 
     public FileDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -158,14 +158,14 @@ public class FileDescriptorProto
             n_written += buffer.encode_varint (dependency_length);
             n_written += buffer.encode_varint (26);
         }
-        if (this.package != null)
+        if (this.package != "")
         {
             var package_length = buffer.encode_string (this.package);
             n_written += package_length;
             n_written += buffer.encode_varint (package_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -180,13 +180,13 @@ public class FileDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
         }
 
-        if (this.package != null)
+        if (this.package != "")
         {
             text += "package = ";
             text += "\"%s\";\n".printf (this.package);
@@ -248,8 +248,8 @@ public class DescriptorProto
 {
     public class ExtensionRange
     {
-        public int32? start;
-        public int32? end;
+        public int32 start = 0;
+        public int32 end = 0;
 
         public ExtensionRange.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
@@ -278,12 +278,12 @@ public class DescriptorProto
         {
             size_t n_written = 0;
 
-            if (this.end != null)
+            if (this.end != 0)
             {
                 n_written += buffer.encode_int32 (this.end);
                 n_written += buffer.encode_varint (16);
             }
-            if (this.start != null)
+            if (this.start != 0)
             {
                 n_written += buffer.encode_int32 (this.start);
                 n_written += buffer.encode_varint (8);
@@ -296,13 +296,13 @@ public class DescriptorProto
         {
             var text = "{\n";
 
-            if (this.start != null)
+            if (this.start != 0)
             {
                 text += "start = ";
                 text += "%s;\n".printf (this.start.to_string ());
             }
 
-            if (this.end != null)
+            if (this.end != 0)
             {
                 text += "end = ";
                 text += "%s;\n".printf (this.end.to_string ());
@@ -312,13 +312,13 @@ public class DescriptorProto
             return text;
         }
     }
-    public string? name;
-    public List<FieldDescriptorProto> field;
-    public List<FieldDescriptorProto> extension;
-    public List<DescriptorProto> nested_type;
-    public List<EnumDescriptorProto> enum_type;
-    public List<ExtensionRange> extension_range;
-    public MessageOptions? options;
+    public string name = "";
+    public List<FieldDescriptorProto> field = null;
+    public List<FieldDescriptorProto> extension = null;
+    public List<DescriptorProto> nested_type = null;
+    public List<EnumDescriptorProto> enum_type = null;
+    public List<ExtensionRange> extension_range = null;
+    public MessageOptions? options = null;
 
     public DescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -399,7 +399,7 @@ public class DescriptorProto
             n_written += buffer.encode_varint (field_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -414,7 +414,7 @@ public class DescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
@@ -495,14 +495,14 @@ public class FieldDescriptorProto
         LABEL_REQUIRED = 2,
         LABEL_REPEATED = 3,
     }
-    public string? name;
-    public int32? number;
-    public Label? label;
-    public Type? type;
-    public string? type_name;
-    public string? extendee;
-    public string? default_value;
-    public FieldOptions? options;
+    public string name = "";
+    public int32 number = 0;
+    public Label label = 0;
+    public Type type = 0;
+    public string type_name = "";
+    public string extendee = "";
+    public string default_value = "";
+    public FieldOptions? options = null;
 
     public FieldDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -550,43 +550,43 @@ public class FieldDescriptorProto
             n_written += buffer.encode_varint (options_length);
             n_written += buffer.encode_varint (66);
         }
-        if (this.default_value != null)
+        if (this.default_value != "")
         {
             var default_value_length = buffer.encode_string (this.default_value);
             n_written += default_value_length;
             n_written += buffer.encode_varint (default_value_length);
             n_written += buffer.encode_varint (58);
         }
-        if (this.extendee != null)
+        if (this.extendee != "")
         {
             var extendee_length = buffer.encode_string (this.extendee);
             n_written += extendee_length;
             n_written += buffer.encode_varint (extendee_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.type_name != null)
+        if (this.type_name != "")
         {
             var type_name_length = buffer.encode_string (this.type_name);
             n_written += type_name_length;
             n_written += buffer.encode_varint (type_name_length);
             n_written += buffer.encode_varint (50);
         }
-        if (this.type != null)
+        if (this.type != 0)
         {
             n_written += buffer.encode_varint (this.type);
             n_written += buffer.encode_varint (40);
         }
-        if (this.label != null)
+        if (this.label != 0)
         {
             n_written += buffer.encode_varint (this.label);
             n_written += buffer.encode_varint (32);
         }
-        if (this.number != null)
+        if (this.number != 0)
         {
             n_written += buffer.encode_int32 (this.number);
             n_written += buffer.encode_varint (24);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -601,43 +601,43 @@ public class FieldDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
         }
 
-        if (this.number != null)
+        if (this.number != 0)
         {
             text += "number = ";
             text += "%s;\n".printf (this.number.to_string ());
         }
 
-        if (this.label != null)
+        if (this.label != 0)
         {
             text += "label = ";
             text += "%s;\n".printf (this.label.to_string ());
         }
 
-        if (this.type != null)
+        if (this.type != 0)
         {
             text += "type = ";
             text += "%s;\n".printf (this.type.to_string ());
         }
 
-        if (this.type_name != null)
+        if (this.type_name != "")
         {
             text += "type_name = ";
             text += "\"%s\";\n".printf (this.type_name);
         }
 
-        if (this.extendee != null)
+        if (this.extendee != "")
         {
             text += "extendee = ";
             text += "\"%s\";\n".printf (this.extendee);
         }
 
-        if (this.default_value != null)
+        if (this.default_value != "")
         {
             text += "default_value = ";
             text += "\"%s\";\n".printf (this.default_value);
@@ -656,9 +656,9 @@ public class FieldDescriptorProto
 
 public class EnumDescriptorProto
 {
-    public string? name;
-    public List<EnumValueDescriptorProto> value;
-    public EnumOptions? options;
+    public string name = "";
+    public List<EnumValueDescriptorProto> value = null;
+    public EnumOptions? options = null;
 
     public EnumDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -703,7 +703,7 @@ public class EnumDescriptorProto
             n_written += buffer.encode_varint (value_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -718,7 +718,7 @@ public class EnumDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
@@ -744,9 +744,9 @@ public class EnumDescriptorProto
 
 public class EnumValueDescriptorProto
 {
-    public string? name;
-    public int32? number;
-    public EnumValueOptions? options;
+    public string name = "";
+    public int32 number = 0;
+    public EnumValueOptions? options = null;
 
     public EnumValueDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -784,12 +784,12 @@ public class EnumValueDescriptorProto
             n_written += buffer.encode_varint (options_length);
             n_written += buffer.encode_varint (26);
         }
-        if (this.number != null)
+        if (this.number != 0)
         {
             n_written += buffer.encode_int32 (this.number);
             n_written += buffer.encode_varint (16);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -804,13 +804,13 @@ public class EnumValueDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
         }
 
-        if (this.number != null)
+        if (this.number != 0)
         {
             text += "number = ";
             text += "%s;\n".printf (this.number.to_string ());
@@ -829,9 +829,9 @@ public class EnumValueDescriptorProto
 
 public class ServiceDescriptorProto
 {
-    public string? name;
-    public List<MethodDescriptorProto> method;
-    public ServiceOptions? options;
+    public string name = "";
+    public List<MethodDescriptorProto> method = null;
+    public ServiceOptions? options = null;
 
     public ServiceDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -876,7 +876,7 @@ public class ServiceDescriptorProto
             n_written += buffer.encode_varint (method_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -891,7 +891,7 @@ public class ServiceDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
@@ -917,10 +917,10 @@ public class ServiceDescriptorProto
 
 public class MethodDescriptorProto
 {
-    public string? name;
-    public string? input_type;
-    public string? output_type;
-    public MethodOptions? options;
+    public string name = "";
+    public string input_type = "";
+    public string output_type = "";
+    public MethodOptions? options = null;
 
     public MethodDescriptorProto.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -960,21 +960,21 @@ public class MethodDescriptorProto
             n_written += buffer.encode_varint (options_length);
             n_written += buffer.encode_varint (34);
         }
-        if (this.output_type != null)
+        if (this.output_type != "")
         {
             var output_type_length = buffer.encode_string (this.output_type);
             n_written += output_type_length;
             n_written += buffer.encode_varint (output_type_length);
             n_written += buffer.encode_varint (26);
         }
-        if (this.input_type != null)
+        if (this.input_type != "")
         {
             var input_type_length = buffer.encode_string (this.input_type);
             n_written += input_type_length;
             n_written += buffer.encode_varint (input_type_length);
             n_written += buffer.encode_varint (18);
         }
-        if (this.name != null)
+        if (this.name != "")
         {
             var name_length = buffer.encode_string (this.name);
             n_written += name_length;
@@ -989,19 +989,19 @@ public class MethodDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != null)
+        if (this.name != "")
         {
             text += "name = ";
             text += "\"%s\";\n".printf (this.name);
         }
 
-        if (this.input_type != null)
+        if (this.input_type != "")
         {
             text += "input_type = ";
             text += "\"%s\";\n".printf (this.input_type);
         }
 
-        if (this.output_type != null)
+        if (this.output_type != "")
         {
             text += "output_type = ";
             text += "\"%s\";\n".printf (this.output_type);
@@ -1026,15 +1026,15 @@ public class FileOptions
         CODE_SIZE = 2,
         LITE_RUNTIME = 3,
     }
-    public string? java_package;
-    public string? java_outer_classname;
-    public bool? java_multiple_files;
-    public bool? java_generate_equals_and_hash;
-    public OptimizeMode? optimize_for;
-    public bool? cc_generic_services;
-    public bool? java_generic_services;
-    public bool? py_generic_services;
-    public List<UninterpretedOption> uninterpreted_option;
+    public string java_package = "";
+    public string java_outer_classname = "";
+    public bool java_multiple_files = false;
+    public bool java_generate_equals_and_hash = false;
+    public OptimizeMode optimize_for = 0;
+    public bool cc_generic_services = false;
+    public bool java_generic_services = false;
+    public bool py_generic_services = false;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public FileOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1084,44 +1084,44 @@ public class FileOptions
             n_written += buffer.encode_varint (uninterpreted_option_length);
             n_written += buffer.encode_varint (7994);
         }
-        if (this.py_generic_services != null)
+        if (this.py_generic_services != false)
         {
             n_written += buffer.encode_bool (this.py_generic_services);
             n_written += buffer.encode_varint (144);
         }
-        if (this.java_generic_services != null)
+        if (this.java_generic_services != false)
         {
             n_written += buffer.encode_bool (this.java_generic_services);
             n_written += buffer.encode_varint (136);
         }
-        if (this.cc_generic_services != null)
+        if (this.cc_generic_services != false)
         {
             n_written += buffer.encode_bool (this.cc_generic_services);
             n_written += buffer.encode_varint (128);
         }
-        if (this.optimize_for != null)
+        if (this.optimize_for != 0)
         {
             n_written += buffer.encode_varint (this.optimize_for);
             n_written += buffer.encode_varint (72);
         }
-        if (this.java_generate_equals_and_hash != null)
+        if (this.java_generate_equals_and_hash != false)
         {
             n_written += buffer.encode_bool (this.java_generate_equals_and_hash);
             n_written += buffer.encode_varint (160);
         }
-        if (this.java_multiple_files != null)
+        if (this.java_multiple_files != false)
         {
             n_written += buffer.encode_bool (this.java_multiple_files);
             n_written += buffer.encode_varint (80);
         }
-        if (this.java_outer_classname != null)
+        if (this.java_outer_classname != "")
         {
             var java_outer_classname_length = buffer.encode_string (this.java_outer_classname);
             n_written += java_outer_classname_length;
             n_written += buffer.encode_varint (java_outer_classname_length);
             n_written += buffer.encode_varint (66);
         }
-        if (this.java_package != null)
+        if (this.java_package != "")
         {
             var java_package_length = buffer.encode_string (this.java_package);
             n_written += java_package_length;
@@ -1136,49 +1136,49 @@ public class FileOptions
     {
         var text = "{\n";
 
-        if (this.java_package != null)
+        if (this.java_package != "")
         {
             text += "java_package = ";
             text += "\"%s\";\n".printf (this.java_package);
         }
 
-        if (this.java_outer_classname != null)
+        if (this.java_outer_classname != "")
         {
             text += "java_outer_classname = ";
             text += "\"%s\";\n".printf (this.java_outer_classname);
         }
 
-        if (this.java_multiple_files != null)
+        if (this.java_multiple_files != false)
         {
             text += "java_multiple_files = ";
             text += "%s;\n".printf (this.java_multiple_files.to_string ());
         }
 
-        if (this.java_generate_equals_and_hash != null)
+        if (this.java_generate_equals_and_hash != false)
         {
             text += "java_generate_equals_and_hash = ";
             text += "%s;\n".printf (this.java_generate_equals_and_hash.to_string ());
         }
 
-        if (this.optimize_for != null)
+        if (this.optimize_for != 0)
         {
             text += "optimize_for = ";
             text += "%s;\n".printf (this.optimize_for.to_string ());
         }
 
-        if (this.cc_generic_services != null)
+        if (this.cc_generic_services != false)
         {
             text += "cc_generic_services = ";
             text += "%s;\n".printf (this.cc_generic_services.to_string ());
         }
 
-        if (this.java_generic_services != null)
+        if (this.java_generic_services != false)
         {
             text += "java_generic_services = ";
             text += "%s;\n".printf (this.java_generic_services.to_string ());
         }
 
-        if (this.py_generic_services != null)
+        if (this.py_generic_services != false)
         {
             text += "py_generic_services = ";
             text += "%s;\n".printf (this.py_generic_services.to_string ());
@@ -1198,9 +1198,9 @@ public class FileOptions
 
 public class MessageOptions
 {
-    public bool? message_set_wire_format;
-    public bool? no_standard_descriptor_accessor;
-    public List<UninterpretedOption> uninterpreted_option;
+    public bool message_set_wire_format = false;
+    public bool no_standard_descriptor_accessor = false;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public MessageOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1238,12 +1238,12 @@ public class MessageOptions
             n_written += buffer.encode_varint (uninterpreted_option_length);
             n_written += buffer.encode_varint (7994);
         }
-        if (this.no_standard_descriptor_accessor != null)
+        if (this.no_standard_descriptor_accessor != false)
         {
             n_written += buffer.encode_bool (this.no_standard_descriptor_accessor);
             n_written += buffer.encode_varint (16);
         }
-        if (this.message_set_wire_format != null)
+        if (this.message_set_wire_format != false)
         {
             n_written += buffer.encode_bool (this.message_set_wire_format);
             n_written += buffer.encode_varint (8);
@@ -1256,13 +1256,13 @@ public class MessageOptions
     {
         var text = "{\n";
 
-        if (this.message_set_wire_format != null)
+        if (this.message_set_wire_format != false)
         {
             text += "message_set_wire_format = ";
             text += "%s;\n".printf (this.message_set_wire_format.to_string ());
         }
 
-        if (this.no_standard_descriptor_accessor != null)
+        if (this.no_standard_descriptor_accessor != false)
         {
             text += "no_standard_descriptor_accessor = ";
             text += "%s;\n".printf (this.no_standard_descriptor_accessor.to_string ());
@@ -1288,11 +1288,11 @@ public class FieldOptions
         CORD = 1,
         STRING_PIECE = 2,
     }
-    public CType? ctype;
-    public bool? packed;
-    public bool? deprecated;
-    public string? experimental_map_key;
-    public List<UninterpretedOption> uninterpreted_option;
+    public CType ctype = 0;
+    public bool packed = false;
+    public bool deprecated = false;
+    public string experimental_map_key = "";
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public FieldOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1334,24 +1334,24 @@ public class FieldOptions
             n_written += buffer.encode_varint (uninterpreted_option_length);
             n_written += buffer.encode_varint (7994);
         }
-        if (this.experimental_map_key != null)
+        if (this.experimental_map_key != "")
         {
             var experimental_map_key_length = buffer.encode_string (this.experimental_map_key);
             n_written += experimental_map_key_length;
             n_written += buffer.encode_varint (experimental_map_key_length);
             n_written += buffer.encode_varint (74);
         }
-        if (this.deprecated != null)
+        if (this.deprecated != false)
         {
             n_written += buffer.encode_bool (this.deprecated);
             n_written += buffer.encode_varint (24);
         }
-        if (this.packed != null)
+        if (this.packed != false)
         {
             n_written += buffer.encode_bool (this.packed);
             n_written += buffer.encode_varint (16);
         }
-        if (this.ctype != null)
+        if (this.ctype != 0)
         {
             n_written += buffer.encode_varint (this.ctype);
             n_written += buffer.encode_varint (8);
@@ -1364,25 +1364,25 @@ public class FieldOptions
     {
         var text = "{\n";
 
-        if (this.ctype != null)
+        if (this.ctype != 0)
         {
             text += "ctype = ";
             text += "%s;\n".printf (this.ctype.to_string ());
         }
 
-        if (this.packed != null)
+        if (this.packed != false)
         {
             text += "packed = ";
             text += "%s;\n".printf (this.packed.to_string ());
         }
 
-        if (this.deprecated != null)
+        if (this.deprecated != false)
         {
             text += "deprecated = ";
             text += "%s;\n".printf (this.deprecated.to_string ());
         }
 
-        if (this.experimental_map_key != null)
+        if (this.experimental_map_key != "")
         {
             text += "experimental_map_key = ";
             text += "\"%s\";\n".printf (this.experimental_map_key);
@@ -1402,7 +1402,7 @@ public class FieldOptions
 
 public class EnumOptions
 {
-    public List<UninterpretedOption> uninterpreted_option;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public EnumOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1458,7 +1458,7 @@ public class EnumOptions
 
 public class EnumValueOptions
 {
-    public List<UninterpretedOption> uninterpreted_option;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public EnumValueOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1514,7 +1514,7 @@ public class EnumValueOptions
 
 public class ServiceOptions
 {
-    public List<UninterpretedOption> uninterpreted_option;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public ServiceOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1570,7 +1570,7 @@ public class ServiceOptions
 
 public class MethodOptions
 {
-    public List<UninterpretedOption> uninterpreted_option;
+    public List<UninterpretedOption> uninterpreted_option = null;
 
     public MethodOptions.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1628,8 +1628,8 @@ public class UninterpretedOption
 {
     public class NamePart
     {
-        public string name_part;
-        public bool is_extension;
+        public string name_part = "";
+        public bool is_extension = false;
 
         public NamePart.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
@@ -1682,13 +1682,13 @@ public class UninterpretedOption
             return text;
         }
     }
-    public List<NamePart> name;
-    public string? identifier_value;
-    public uint64? positive_int_value;
-    public int64? negative_int_value;
-    public double? double_value;
-    public GLib.ByteArray? string_value;
-    public string? aggregate_value;
+    public List<NamePart> name = null;
+    public string identifier_value = "";
+    public uint64 positive_int_value = 0;
+    public int64 negative_int_value = 0;
+    public double double_value = 0d;
+    public GLib.ByteArray string_value = null;
+    public string aggregate_value = "";
 
     public UninterpretedOption.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
@@ -1727,7 +1727,7 @@ public class UninterpretedOption
     {
         size_t n_written = 0;
 
-        if (this.aggregate_value != null)
+        if (this.aggregate_value != "")
         {
             var aggregate_value_length = buffer.encode_string (this.aggregate_value);
             n_written += aggregate_value_length;
@@ -1741,22 +1741,22 @@ public class UninterpretedOption
             n_written += buffer.encode_varint (string_value_length);
             n_written += buffer.encode_varint (58);
         }
-        if (this.double_value != null)
+        if (this.double_value != 0d)
         {
             n_written += buffer.encode_double (this.double_value);
             n_written += buffer.encode_varint (48);
         }
-        if (this.negative_int_value != null)
+        if (this.negative_int_value != 0)
         {
             n_written += buffer.encode_int64 (this.negative_int_value);
             n_written += buffer.encode_varint (40);
         }
-        if (this.positive_int_value != null)
+        if (this.positive_int_value != 0)
         {
             n_written += buffer.encode_uint64 (this.positive_int_value);
             n_written += buffer.encode_varint (32);
         }
-        if (this.identifier_value != null)
+        if (this.identifier_value != "")
         {
             var identifier_value_length = buffer.encode_string (this.identifier_value);
             n_written += identifier_value_length;
@@ -1785,25 +1785,25 @@ public class UninterpretedOption
                 text += "%s;\n".printf (v.to_string ());
         }
 
-        if (this.identifier_value != null)
+        if (this.identifier_value != "")
         {
             text += "identifier_value = ";
             text += "\"%s\";\n".printf (this.identifier_value);
         }
 
-        if (this.positive_int_value != null)
+        if (this.positive_int_value != 0)
         {
             text += "positive_int_value = ";
             text += "%s;\n".printf (this.positive_int_value.to_string ());
         }
 
-        if (this.negative_int_value != null)
+        if (this.negative_int_value != 0)
         {
             text += "negative_int_value = ";
             text += "%s;\n".printf (this.negative_int_value.to_string ());
         }
 
-        if (this.double_value != null)
+        if (this.double_value != 0d)
         {
             text += "double_value = ";
             text += "%s;\n".printf (this.double_value.to_string ());
@@ -1817,7 +1817,7 @@ public class UninterpretedOption
             text += "\n";
         }
 
-        if (this.aggregate_value != null)
+        if (this.aggregate_value != "")
         {
             text += "aggregate_value = ";
             text += "\"%s\";\n".printf (this.aggregate_value);
@@ -1832,8 +1832,8 @@ public class SourceCodeInfo
 {
     public class Location
     {
-        public List<int32> path;
-        public List<int32> span;
+        public List<int32> path = null;
+        public List<int32> span = null;
 
         public Location.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
         {
@@ -1898,7 +1898,7 @@ public class SourceCodeInfo
             return text;
         }
     }
-    public List<Location> location;
+    public List<Location> location = null;
 
     public SourceCodeInfo.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)
     {
