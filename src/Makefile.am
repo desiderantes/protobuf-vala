@@ -25,6 +25,9 @@ noinst_PROGRAMS = test-encode test-decode
 
 TESTS = test-encode test-decode
 
+test.pb.vala: protoc-gen-vala test.proto
+	PATH=.:$(PATH) protoc --vala_out=. test.proto
+
 protoc_gen_vala_SOURCES = \
 	descriptor.pb.vala \
 	plugin.pb.vala \
@@ -44,7 +47,8 @@ protoc_gen_vala_LDADD = \
 	$(PROTOC_GEN_VALA_LIBS)
 
 test_encode_SOURCES = \
-	test-encode.vala
+	test-encode.vala \
+	test.pb.vala
 
 test_encode_VALAFLAGS = \
 	--pkg posix \
@@ -60,7 +64,8 @@ test_encode_LDADD = \
 	$(PROTOC_GEN_VALA_LIBS)
 
 test_decode_SOURCES = \
-	test-decode.vala
+	test-decode.vala \
+	test.pb.vala
 
 test_decode_VALAFLAGS = \
 	--pkg posix \
@@ -79,6 +84,9 @@ CLEANFILES = \
 	$(patsubst %.vala,%.c,$(filter %.vala, $(SOURCES))) \
 	*_vala.stamp \
 	protobuf-vala.h \
-	protobuf-vala.vapi
+	protobuf-vala.vapi \
+	test.pb.vala
+
+EXTRA_DIST = test.proto    
 
 DISTCLEANFILES = Makefile.in

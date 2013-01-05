@@ -1,0 +1,5 @@
+message TestMessage
+{
+    required sint32 int_value = 1;
+    required string string_value = 2;
+}

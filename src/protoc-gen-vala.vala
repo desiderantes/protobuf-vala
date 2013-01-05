@@ -187,7 +187,7 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += "\n";
     text += indent + "    public size_t encode (Protobuf.EncodeBuffer buffer)\n";
     text += indent + "    {\n";
-    text += indent + "        var start = buffer.write_index;\n";
+    text += indent + "        size_t n_written = 0;\n";
     text += "\n";
     for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
     {
@@ -221,6 +221,8 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent2 + "        ";
         if (encode_length)
             text += "var %s_length = ".printf (field.name);
+        else
+            text += "n_written += ";
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
@@ -279,19 +281,22 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         }
         if (encode_length)
-            text += indent2 + "        buffer.encode_varint (%s_length);\n".printf (field.name);
+        {
+            text += indent2 + "        n_written += %s_length;\n".printf (field.name);
+            text += indent2 + "        n_written += buffer.encode_varint (%s_length);\n".printf (field.name);
+        }
 
         /* Encode key */
         var n = field.number << 3;
         if (encode_length)
             n |= 2;     
-        text += indent2 + "        buffer.encode_varint (%d);\n".printf (n);
+        text += indent2 + "        n_written += buffer.encode_varint (%d);\n".printf (n);
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "        }\n";
     }
     text += "\n";
-    text += indent + "        return start - buffer.write_index;\n";
+    text += indent + "        return n_written;\n";
     text += indent + "    }\n";
     text += "\n";
     text += indent + "    public string to_string (string indent = \"\")\n";
