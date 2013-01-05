@@ -123,7 +123,7 @@ private void check_encode_varint (uint64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_varint (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_varint (%" + uint64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_double (double value, string expected)
@@ -162,7 +162,7 @@ private void check_encode_int64 (int64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_int64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_int64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_uint64 (uint64 value, string expected)
@@ -175,7 +175,7 @@ private void check_encode_uint64 (uint64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_uint64 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_uint64 (%" + uint64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_int32 (int32 value, string expected)
@@ -201,7 +201,7 @@ private void check_encode_fixed64 (uint64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_fixed64 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_fixed64 (%" + uint64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_fixed32 (uint32 value, string expected)
@@ -268,7 +268,7 @@ private void check_encode_uint32 (uint32 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_uint32 (%llu) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_uint32 (%u) -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_sfixed32 (int32 value, string expected)
@@ -294,7 +294,7 @@ private void check_encode_sfixed64 (int64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_sfixed64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_sfixed64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private void check_encode_sint32 (int32 value, string expected)
@@ -320,7 +320,7 @@ private void check_encode_sint64 (int64 value, string expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_sint64 (%lli) -> \"%s\", expected \"%s\"\n", value, result, expected);
+        stderr.printf ("encode_sint64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)

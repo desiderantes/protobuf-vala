@@ -148,7 +148,7 @@ namespace Protobuf
                 read_index += 4;
                 break;
             default: //FIXME: throw error
-                GLib.stderr.printf ("Unknown wire type %llu\n", wire_type);
+                GLib.stderr.printf ("Unknown wire type %" + uint64.FORMAT + "\n", wire_type);
                 break;
             }
         }

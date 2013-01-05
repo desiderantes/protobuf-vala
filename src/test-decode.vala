@@ -124,7 +124,7 @@ private void check_decode_varint (string data, uint64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_varint (\"%s\") -> %llu, expected %llu\n", data, result, expected);
+        stderr.printf ("decode_varint (\"%s\") -> %" + uint64.FORMAT + ", expected %" + uint64.FORMAT + "\n", data, result, expected);
 }
 
 private void check_decode_double (string data, double expected)
@@ -160,7 +160,7 @@ private void check_decode_int64 (string data, int64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_int64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
+        stderr.printf ("decode_int64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
 private void check_decode_uint64 (string data, uint64 expected)
@@ -172,7 +172,7 @@ private void check_decode_uint64 (string data, uint64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_uint64 (\"%s\") -> %llu, expected %llu\n", data, result, expected);
+        stderr.printf ("decode_uint64 (\"%s\") -> %" + uint64.FORMAT + ", expected %" + uint64.FORMAT + "\n", data, result, expected);
 }
 
 private void check_decode_int32 (string data, int32 expected)
@@ -196,7 +196,7 @@ private void check_decode_fixed64 (string data, uint64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_fixed64 (\"%s\") -> %llu, expected %llu\n", data, result, expected);
+        stderr.printf ("decode_fixed64 (\"%s\") -> %" + uint64.FORMAT + ", expected %" + uint64.FORMAT + "\n", data, result, expected);
 }
 
 private void check_decode_fixed32 (string data, uint32 expected)
@@ -281,7 +281,7 @@ private void check_decode_sfixed64 (string data, int64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_sfixed64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
+        stderr.printf ("decode_sfixed64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
 private void check_decode_sint32 (string data, int32 expected)
@@ -305,7 +305,7 @@ private void check_decode_sint64 (string data, int64 expected)
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("decode_sint64 (\"%s\") -> %lli, expected %lli\n", data, result, expected);
+        stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
 private Protobuf.DecodeBuffer string_to_buffer (string data)
