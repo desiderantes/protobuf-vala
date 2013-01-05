@@ -104,6 +104,8 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
+    check_decode_message ("0802120454455354", 1, "TEST");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -306,6 +308,20 @@ private void check_decode_sint64 (string data, int64 expected)
         n_passed++;
     else
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
+}
+
+private void check_decode_message (string data, int32 int_value, string string_value)
+{
+    var result = new TestMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer, buffer.buffer.length);
+
+    n_tests++;
+    if (result.int_value == int_value && result.string_value == string_value)
+        n_passed++;
+    else
+        stderr.printf ("decode_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
+                       data, result.int_value, result.string_value, int_value, string_value);
 }
 
 private Protobuf.DecodeBuffer string_to_buffer (string data)
