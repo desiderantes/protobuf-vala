@@ -4,7 +4,7 @@ namespace Protobuf
     {
         public uint8[] buffer;
         public size_t read_index;
-
+        
         public DecodeBuffer (size_t size)
         {
             buffer = new uint8[size];
@@ -163,21 +163,23 @@ namespace Protobuf
         {
             get
             {
-                unowned uint8[] v = (uint8[]) ((uint8*) buffer + write_index + 1);
-                v.length = buffer.length - (int) write_index - 1;
+                unowned uint8[] v = (uint8[]) ((uint8*) buffer + write_index);
+                v.length = buffer.length - (int) write_index;
                 return v;
             }
         }
 
-        public EncodeBuffer (size_t size)
+        public EncodeBuffer (size_t size = 1024)
         {
+            if (size < 1)
+                size = 1;
             buffer = new uint8[size];
             reset ();
         }
 
         public void reset ()
         {
-            write_index = buffer.length - 1;
+            write_index = buffer.length;
         }
 
         public size_t encode_varint (uint64 value)
@@ -189,15 +191,17 @@ namespace Protobuf
                 v >>= 7;
                 n_octets++;
             } while (v != 0);
+
+            allocate (n_octets);
             write_index -= n_octets;
 
             v = value;
             for (var i = 0; i < n_octets - 1; i++)
             {
-                buffer[write_index + i + 1] = 0x80 | (uint8) (v & 0x7F);
+                buffer[write_index + i] = 0x80 | (uint8) (v & 0x7F);
                 v >>= 7;
             }
-            buffer[write_index + n_octets] = (uint8) (v & 0x7F);
+            buffer[write_index + n_octets - 1] = (uint8) (v & 0x7F);
 
             return n_octets;
         }
@@ -229,25 +233,27 @@ namespace Protobuf
 
         public size_t encode_fixed64 (uint64 value)
         {
+            allocate (8);
             write_index -= 8;
-            buffer[write_index + 1] = (uint8) value;
-            buffer[write_index + 2] = (uint8) (value >> 8);
-            buffer[write_index + 3] = (uint8) (value >> 16);
-            buffer[write_index + 4] = (uint8) (value >> 24);
-            buffer[write_index + 5] = (uint8) (value >> 32);
-            buffer[write_index + 6] = (uint8) (value >> 40);
-            buffer[write_index + 7] = (uint8) (value >> 48);
-            buffer[write_index + 8] = (uint8) (value >> 56);
+            buffer[write_index] = (uint8) value;
+            buffer[write_index + 1] = (uint8) (value >> 8);
+            buffer[write_index + 2] = (uint8) (value >> 16);
+            buffer[write_index + 3] = (uint8) (value >> 24);
+            buffer[write_index + 4] = (uint8) (value >> 32);
+            buffer[write_index + 5] = (uint8) (value >> 40);
+            buffer[write_index + 6] = (uint8) (value >> 48);
+            buffer[write_index + 7] = (uint8) (value >> 56);
             return 8;
         }
 
         public size_t encode_fixed32 (uint32 value)
         {
+            allocate (4);
             write_index -= 4;
-            buffer[write_index + 1] = (uint8) value;
-            buffer[write_index + 2] = (uint8) (value >> 8);
-            buffer[write_index + 3] = (uint8) (value >> 16);
-            buffer[write_index + 4] = (uint8) (value >> 24);
+            buffer[write_index] = (uint8) value;
+            buffer[write_index + 1] = (uint8) (value >> 8);
+            buffer[write_index + 2] = (uint8) (value >> 16);
+            buffer[write_index + 3] = (uint8) (value >> 24);
             return 4;
         }
 
@@ -258,18 +264,21 @@ namespace Protobuf
 
         public size_t encode_string (string value)
         {
-            write_index -= value.length;
-            for (var i = 0; value[i] != '\0'; i++)
-                buffer[write_index + i + 1] = value[i];
+            var length = value.length;
+            allocate (length);
+            write_index -= length;
+            for (var i = 0; i < length; i++)
+                buffer[write_index + i] = value[i];
 
-            return value.length;
+            return length;
         }
 
         public size_t encode_bytes (GLib.ByteArray value)
         {
+            allocate (value.len);
             write_index -= value.len;
             for (var i = 0; i < value.len; i++)
-                buffer[write_index + i + 1] = value.data[i];
+                buffer[write_index + i] = value.data[i];
 
             return value.len;
         }
@@ -305,9 +314,26 @@ namespace Protobuf
                 return encode_varint ((uint64) value * 2);
         }
 
-        // FIXME: Double size when run out of space
         private void allocate (size_t size)
         {
+            var required = size + (buffer.length - write_index);
+            if (required <= buffer.length)
+                return;
+
+            /* Double buffer until enough space */
+            var new_length = buffer.length;
+            while (required > new_length)
+                new_length *= 2;
+
+            /* Create new buffer and copy over data */
+            var new_buffer = new uint8[new_length];
+            var write_offset = new_buffer.length - buffer.length;
+            for (var i = write_index; i < buffer.length; i++)
+                new_buffer[i + write_offset] = buffer[i];
+
+            /* Switch buffers */
+            buffer = (owned) new_buffer;
+            write_index += write_offset;
         }
     }
 }

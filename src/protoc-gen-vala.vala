@@ -38,7 +38,7 @@ public static int main (string[] args)
         resp.file.append (out_file);
     }
 
-    var resp_buf = new Protobuf.EncodeBuffer (655350);
+    var resp_buf = new Protobuf.EncodeBuffer ();
     resp.encode (resp_buf);
 
     stdout.write (resp_buf.data);

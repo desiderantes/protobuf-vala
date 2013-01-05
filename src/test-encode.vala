@@ -101,7 +101,16 @@ public static int main (string[] args)
     check_encode_sint64 (-2, "03");
     check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01");
     check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01");
-    
+
+    /* Check buffer resizing works */
+    check_buffer_resize (0, 0);
+    check_buffer_resize (0, 1);
+    check_buffer_resize (2, 0);
+    check_buffer_resize (2, 1);
+    check_buffer_resize (2, 2);
+    check_buffer_resize (2, 3);
+    check_buffer_resize (8, 1);
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -115,7 +124,7 @@ public static int main (string[] args)
 
 private void check_encode_varint (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_varint (value);
     var result = buffer_to_string (buffer);
 
@@ -128,7 +137,7 @@ private void check_encode_varint (uint64 value, string expected)
 
 private void check_encode_double (double value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_double (value);
     var result = buffer_to_string (buffer);
 
@@ -141,7 +150,7 @@ private void check_encode_double (double value, string expected)
 
 private void check_encode_float (float value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_float (value);
     var result = buffer_to_string (buffer);
 
@@ -154,7 +163,7 @@ private void check_encode_float (float value, string expected)
 
 private void check_encode_int64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_int64 (value);
     var result = buffer_to_string (buffer);
 
@@ -167,7 +176,7 @@ private void check_encode_int64 (int64 value, string expected)
 
 private void check_encode_uint64 (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_uint64 (value);
     var result = buffer_to_string (buffer);
 
@@ -180,7 +189,7 @@ private void check_encode_uint64 (uint64 value, string expected)
 
 private void check_encode_int32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_int32 (value);
     var result = buffer_to_string (buffer);
 
@@ -193,7 +202,7 @@ private void check_encode_int32 (int32 value, string expected)
 
 private void check_encode_fixed64 (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_fixed64 (value);
     var result = buffer_to_string (buffer);
 
@@ -206,7 +215,7 @@ private void check_encode_fixed64 (uint64 value, string expected)
 
 private void check_encode_fixed32 (uint32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_fixed32 (value);
     var result = buffer_to_string (buffer);
 
@@ -219,7 +228,7 @@ private void check_encode_fixed32 (uint32 value, string expected)
 
 private void check_encode_bool (bool value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_bool (value);
     var result = buffer_to_string (buffer);
 
@@ -232,7 +241,7 @@ private void check_encode_bool (bool value, string expected)
 
 private void check_encode_string (string value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_string (value);
     var result = buffer_to_string (buffer);
 
@@ -247,7 +256,7 @@ private void check_encode_bytes (string value, string expected)
 {
     var v = new ByteArray.take (string_to_array (value));
 
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_bytes (v);
     var result = buffer_to_string (buffer);
 
@@ -260,7 +269,7 @@ private void check_encode_bytes (string value, string expected)
 
 private void check_encode_uint32 (uint32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_uint32 (value);
     var result = buffer_to_string (buffer);
 
@@ -273,7 +282,7 @@ private void check_encode_uint32 (uint32 value, string expected)
 
 private void check_encode_sfixed32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_sfixed32 (value);
     var result = buffer_to_string (buffer);
 
@@ -286,7 +295,7 @@ private void check_encode_sfixed32 (int32 value, string expected)
 
 private void check_encode_sfixed64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_sfixed64 (value);
     var result = buffer_to_string (buffer);
 
@@ -299,7 +308,7 @@ private void check_encode_sfixed64 (int64 value, string expected)
 
 private void check_encode_sint32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_sint32 (value);
     var result = buffer_to_string (buffer);
 
@@ -312,7 +321,7 @@ private void check_encode_sint32 (int32 value, string expected)
 
 private void check_encode_sint64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer (100);
+    var buffer = new Protobuf.EncodeBuffer ();
     buffer.encode_sint64 (value);
     var result = buffer_to_string (buffer);
 
@@ -321,6 +330,23 @@ private void check_encode_sint64 (int64 value, string expected)
         n_passed++;
     else
         stderr.printf ("encode_sint64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
+}
+
+private void check_buffer_resize (size_t value_length, size_t buffer_length)
+{
+    var buffer = new Protobuf.EncodeBuffer (buffer_length);
+    var value = "";
+    for (var i = 0; i < value_length; i++)
+        value += "FF";
+    var v = new ByteArray.take (string_to_array (value));
+    buffer.encode_bytes (v);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == value)
+        n_passed++;
+    else
+        stderr.printf ("buffer_resize (%zu, %zu) -> \"%s\", expected \"%s\"\n", value_length, buffer_length, result, value);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)
