@@ -111,6 +111,11 @@ public static int main (string[] args)
     check_buffer_resize (2, 3);
     check_buffer_resize (8, 1);
 
+    var message = new TestMessage ();
+    message.int_value = 1;
+    message.string_value = "TEST";
+    check_encode_message (message, "0802120454455354");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -347,6 +352,19 @@ private void check_buffer_resize (size_t value_length, size_t buffer_length)
         n_passed++;
     else
         stderr.printf ("buffer_resize (%zu, %zu) -> \"%s\", expected \"%s\"\n", value_length, buffer_length, result, value);
+}
+
+private void check_encode_message (TestMessage value, string expected)
+{
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_message () -> \"%s\", expected \"%s\"\n", result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)
