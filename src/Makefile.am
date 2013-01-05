@@ -16,7 +16,6 @@ libprotobuf_vala_la_LIBADD = \
 	$(LIBPROTOBUF_LIBS)
 
 libprotobuf_vala_la_VALAFLAGS = \
-	-g \
 	--vapi protobuf-vala.vapi \
 	-h protobuf-vala.h
 
@@ -35,7 +34,6 @@ protoc_gen_vala_SOURCES = \
 
 protoc_gen_vala_VALAFLAGS = \
 	--pkg protobuf-vala \
-	-g \
 	--vapidir .
 
 protoc_gen_vala_CFLAGS = \
@@ -53,7 +51,6 @@ test_encode_SOURCES = \
 test_encode_VALAFLAGS = \
 	--pkg posix \
 	--pkg protobuf-vala \
-	-g \
 	--vapidir .
 
 test_encode_CFLAGS = \
@@ -70,7 +67,6 @@ test_decode_SOURCES = \
 test_decode_VALAFLAGS = \
 	--pkg posix \
 	--pkg protobuf-vala \
-	-g \
 	--vapidir .
 
 test_decode_CFLAGS = \
