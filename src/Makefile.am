@@ -24,8 +24,8 @@ noinst_PROGRAMS = test-encode test-decode
 
 TESTS = test-encode test-decode
 
-test.pb.vala: protoc-gen-vala test.proto
-	PATH=.:$(PATH) protoc --vala_out=. test.proto
+test.pb.vala: protoc-gen-vala $(srcdir)/test.proto
+	PATH=.:$(PATH) protoc --vala_out=. --proto_path=$(srcdir) $(srcdir)/test.proto
 
 protoc_gen_vala_SOURCES = \
 	descriptor.pb.vala \
