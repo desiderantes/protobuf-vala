@@ -115,9 +115,13 @@ public static int main (string[] args)
     check_encode_message (1, "TEST", "0802120454455354");
 
     check_encode_optional_message (0, "", "");
+    check_encode_optional_message (1, "", "0802");
+    check_encode_optional_message (0, "TEST", "120454455354");
     check_encode_optional_message (1, "TEST", "0802120454455354");
 
     check_encode_optional_defaults_message (0, "", "08001200");
+    check_encode_optional_defaults_message (1, "", "1200");
+    check_encode_optional_defaults_message (0, "TEST", "0800");
     check_encode_optional_defaults_message (1, "TEST", "");
 
     if (n_passed != n_tests)

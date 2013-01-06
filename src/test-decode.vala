@@ -129,9 +129,13 @@ public static int main (string[] args)
     check_decode_message ("08021204544553541A04313233", 1, "TEST");
 
     check_decode_optional_message ("", 0, "");
+    //check_decode_optional_message ("0802", 1, "");
+    check_decode_optional_message ("120454455354", 0, "TEST");
     check_decode_optional_message ("0802120454455354", 1, "TEST");
 
     check_decode_optional_defaults_message ("08001200", 0, "");
+    check_decode_optional_defaults_message ("1200", 1, "");
+    check_decode_optional_defaults_message ("0800", 0, "TEST");
     check_decode_optional_defaults_message ("", 1, "TEST");
 
     if (n_passed != n_tests)
