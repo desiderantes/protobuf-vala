@@ -122,8 +122,11 @@ public static int main (string[] args)
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
     check_decode_message ("", 0, "", true);
+    check_decode_message ("0800", 0, "", true);
+    check_decode_message ("1200", 0, "", true);
     check_decode_message ("08001200", 0, "");
     check_decode_message ("0802120454455354", 1, "TEST");
+    check_decode_message ("08021204544553541A04313233", 1, "TEST");
 
     check_decode_optional_message ("", 0, "");
     check_decode_optional_message ("0802120454455354", 1, "TEST");
