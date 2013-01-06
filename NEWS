@@ -2,6 +2,7 @@ Overview of changed in protobuf-vala 0.0.4
 
   * Auto-resize encode buffer
   * Rename to protobuf-vala
+  * Stop distributing generated C code
 
 Overview of changed in protoc-gen-vala 0.0.3
 
