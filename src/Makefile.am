@@ -41,7 +41,7 @@ protoc_gen_vala_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
 
 protoc_gen_vala_LDADD = \
-	libprotobuf-vala.la
+	libprotobuf-vala.la \
 	$(PROTOC_GEN_VALA_LIBS)
 
 test_encode_SOURCES = \
@@ -57,7 +57,7 @@ test_encode_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
 
 test_encode_LDADD = \
-	libprotobuf-vala.la
+	libprotobuf-vala.la \
 	$(PROTOC_GEN_VALA_LIBS)
 
 test_decode_SOURCES = \
@@ -73,7 +73,7 @@ test_decode_CFLAGS = \
 	$(PROTOC_GEN_VALA_CFLAGS)
 
 test_decode_LDADD = \
-	libprotobuf-vala.la
+	libprotobuf-vala.la \
 	$(PROTOC_GEN_VALA_LIBS)
 
 CLEANFILES = \
