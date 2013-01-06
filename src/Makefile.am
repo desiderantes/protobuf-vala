@@ -26,7 +26,7 @@ TESTS = test-encode test-decode
 test.pb.vala: protoc-gen-vala $(srcdir)/test.proto
 	protoc --plugin=protoc-gen-vala --vala_out=. --proto_path=$(srcdir) $(srcdir)/test.proto
 
-protoc-gen-vala.c descriptor.pb.c plugin.pb.c: $(srcdir)/protoc-gen-vala.vala $(srcdir)/descriptor.pb.vala $(srcdir)/plugin.pb.vala
+protoc-gen-vala.c descriptor.pb.c plugin.pb.c: protobuf-vala.vapi $(srcdir)/protoc-gen-vala.vala $(srcdir)/descriptor.pb.vala $(srcdir)/plugin.pb.vala
 	$(VALAC) -C --pkg posix --vapidir . --pkg protobuf-vala $(srcdir)/protoc-gen-vala.vala $(srcdir)/descriptor.pb.vala $(srcdir)/plugin.pb.vala
 
 nodist_protoc_gen_vala_SOURCES = \
@@ -42,7 +42,7 @@ protoc_gen_vala_LDADD = \
 	libprotobuf-vala.la \
 	$(PROTOC_GEN_VALA_LIBS)
 
-test-encode.c test.pb.c: $(srcdir)/test-encode.vala test.pb.vala
+test-encode.c test.pb.c: protobuf-vala.vapi $(srcdir)/test-encode.vala test.pb.vala
 	$(VALAC) -C --pkg posix --vapidir . --pkg protobuf-vala $(srcdir)/test-encode.vala test.pb.vala
 
 nodist_test_encode_SOURCES = \
@@ -56,7 +56,7 @@ test_encode_LDADD = \
 	libprotobuf-vala.la \
 	$(PROTOC_GEN_VALA_LIBS)
 
-test-decode.c test.pb.c: $(srcdir)/test-decode.vala test.pb.vala
+test-decode.c test.pb.c: protobuf-vala.vapi $(srcdir)/test-decode.vala test.pb.vala
 	$(VALAC) -C --pkg posix --vapidir . --pkg protobuf-vala $(srcdir)/test-decode.vala test.pb.vala
 
 nodist_test_decode_SOURCES = \
@@ -83,7 +83,6 @@ EXTRA_DIST = \
 	protoc-gen-vala.vala \
 	test-decode.vala \
 	test-encode.vala \
-	test.pb.vala \
 	test.proto
 
 DISTCLEANFILES = Makefile.in
