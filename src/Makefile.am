@@ -24,7 +24,8 @@ noinst_PROGRAMS = test-encode test-decode
 
 TESTS = test-encode test-decode
 
-test.pb.vala: protoc-gen-vala $(srcdir)/test.proto
+# FIXME: This should depends on protoc-gen-vala but autotools gets confused and fails the distcheck
+test.pb.vala: $(srcdir)/test.proto
 	protoc --plugin=protoc-gen-vala --vala_out=. --proto_path=$(srcdir) $(srcdir)/test.proto
 
 protoc_gen_vala_SOURCES = \
