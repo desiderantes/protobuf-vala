@@ -198,10 +198,12 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "            else\n";
     text += indent + "                buffer.decode_unknown (wire_type);\n";
     text += indent + "        }\n";
+    text += "\n";
+    text += indent + "        if (buffer.read_index != end)\n";
+    text += indent + "            buffer.error = true;\n";
     if (required_field_check != "")
     {
-        text += "\n";
-        text += indent + "        if (%s)\n".printf (required_field_check);
+        text += indent + "        else if (%s)\n".printf (required_field_check);
         text += indent + "            buffer.error = true;\n";
     }
     // FIXME
