@@ -129,7 +129,7 @@ public static int main (string[] args)
     check_decode_message ("08021204544553541A03313233", 1, "TEST");
 
     check_decode_optional_message ("", 0, "");
-    //check_decode_optional_message ("0802", 1, "");
+    check_decode_optional_message ("0802", 1, "");
     check_decode_optional_message ("120454455354", 0, "TEST");
     check_decode_optional_message ("0802120454455354", 1, "TEST");
 
@@ -417,7 +417,7 @@ private Protobuf.DecodeBuffer string_to_buffer (string data)
 {
     var value = new Protobuf.DecodeBuffer (data.length / 2);
 
-    for (var i = 0; i < data.length; i++)
+    for (var i = 0; i < value.buffer.length; i++)
         value.buffer[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
 
     return value;
