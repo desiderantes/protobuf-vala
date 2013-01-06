@@ -121,7 +121,7 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
-    //check_decode_message ("", 0, "", true); // FIXME: Need to check required fields present
+    check_decode_message ("", 0, "", true);
     check_decode_message ("08001200", 0, "");
     check_decode_message ("0802120454455354", 1, "TEST");
 

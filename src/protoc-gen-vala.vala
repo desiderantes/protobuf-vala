@@ -82,6 +82,17 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)\n";
     text += indent + "    {\n";
     text += indent + "        var end = buffer.read_index + data_length;\n";
+    var required_field_check = "";
+    foreach (var field in type.field)
+    {
+        if (field.label != FieldDescriptorProto.Label.LABEL_REQUIRED)
+            continue;
+        text += indent + "        var have_%s = false;\n".printf (field.name);
+        if (required_field_check != "")
+            required_field_check += " || ";
+        required_field_check += "!have_%s".printf (field.name);
+    }
+    text += "\n";
     text += indent + "        while (buffer.read_index < end)\n";
     text += indent + "        {\n";
     text += indent + "            var key = buffer.decode_varint ();\n";
@@ -172,6 +183,13 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent + "            %s (field_number == %d && wire_type == %d)\n".printf (first ? "if" : "else if", field.number, wire_type);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
+        else if (field.label == FieldDescriptorProto.Label.LABEL_REQUIRED)
+        {
+            text += indent + "            {\n";
+            text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
+            text += indent + "                have_%s = true;\n".printf (field.name);
+            text += indent + "            }\n";
+        }
         else
             text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
 
@@ -180,6 +198,12 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "            else\n";
     text += indent + "                buffer.decode_unknown (wire_type);\n";
     text += indent + "        }\n";
+    if (required_field_check != "")
+    {
+        text += "\n";
+        text += indent + "        if (%s)\n".printf (required_field_check);
+        text += indent + "            buffer.error = true;\n";
+    }
     // FIXME
     //
     //if (buffer.read_offset != end)
