@@ -4,10 +4,18 @@ namespace Protobuf
     {
         public uint8[] buffer;
         public size_t read_index;
+        public bool error;
         
         public DecodeBuffer (size_t size)
         {
             buffer = new uint8[size];
+            reset ();
+        }
+        
+        public void reset ()
+        {
+            read_index = 0;
+            error = false;
         }
 
         public uint64 decode_varint ()
@@ -15,7 +23,7 @@ namespace Protobuf
             uint64 value = 0;
             var shift = 0;
     
-            while (true)
+            while (read_index < buffer.length)
             {
                 var b = (uint64) buffer[read_index];
                 read_index++;
@@ -24,6 +32,9 @@ namespace Protobuf
                     return value;
                 shift += 7;
             }
+
+            error = true;
+            return 0;
         }
     
         public double decode_double ()
@@ -56,6 +67,13 @@ namespace Protobuf
     
         public uint64 decode_fixed64 ()
         {
+            if (read_index + 8 > buffer.length)
+            {
+                read_index = buffer.length;
+                error = true;
+                return 0;
+            }
+
             var v = (uint64) buffer[read_index] | (uint64) buffer[read_index+1] << 8 | (uint64) buffer[read_index+2] << 16 | (uint64) buffer[read_index+3] << 24 | (uint64) buffer[read_index+4] << 32 | (uint64) buffer[read_index+5] << 40 | (uint64) buffer[read_index+6] << 48 | (uint64) buffer[read_index+7] << 56;
             read_index += 8;
             return v;
@@ -63,6 +81,13 @@ namespace Protobuf
     
         public uint32 decode_fixed32 ()
         {
+            if (read_index + 4 > buffer.length)
+            {
+                read_index = buffer.length;
+                error = true;
+                return 0;
+            }
+
             var v = (uint32) buffer[read_index] | (uint32) buffer[read_index+1] << 8 | (uint32) buffer[read_index+2] << 16 | (uint32) buffer[read_index+3] << 24;
             read_index += 4;
             return v;
@@ -75,6 +100,13 @@ namespace Protobuf
     
         public string decode_string (size_t length)
         {
+            if (read_index + length > buffer.length)
+            {
+                read_index = buffer.length;
+                error = true;
+                return "";
+            }
+
             var value = new GLib.StringBuilder.sized (length);
             for (var i = 0; i < length; i++)
                 value.append_c ((char) buffer[read_index + i]);
@@ -85,6 +117,13 @@ namespace Protobuf
     
         public GLib.ByteArray decode_bytes (size_t length)
         {
+            if (read_index + length > buffer.length)
+            {
+                read_index = buffer.length;
+                error = true;
+                return new ByteArray ();
+            }
+
             var data = new uint8[length];
             for (var i = 0; i < length; i++)
                 data[i] = buffer[read_index + i];

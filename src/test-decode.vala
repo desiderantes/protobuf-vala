@@ -3,10 +3,12 @@ private int n_passed = 0;
 
 public static int main (string[] args)
 {
+    check_decode_varint ("", 0, true);
     check_decode_varint ("00", 0);
     check_decode_varint ("01", 1);
     check_decode_varint ("03", 3);
     check_decode_varint ("7F", 127);
+    check_decode_varint ("FF", 0, true);
     check_decode_varint ("8001", 128);
     check_decode_varint ("8E02", 270);
     check_decode_varint ("FF7F", 16383);
@@ -16,15 +18,21 @@ public static int main (string[] args)
     check_decode_varint ("FFFFFFFF0F", 0xFFFFFFFF);
     check_decode_varint ("FFFFFFFFFFFFFFFFFF01", 0xFFFFFFFFFFFFFFFF);
 
-    check_decode_double ("0000000000000000", 0f);
-    check_decode_double ("0000000000000080", -0f);
-    check_decode_double ("000000000000F03F", 1f);
-    check_decode_double ("000000000000F0BF", -1f);
+    check_decode_double ("", 0d, true);
+    check_decode_double ("00", 0d, true);
+    check_decode_double ("00000000000000", 0d, true);
+    check_decode_double ("0000000000000000", 0d);
+    check_decode_double ("0000000000000080", -0d);
+    check_decode_double ("000000000000F03F", 1d);
+    check_decode_double ("000000000000F0BF", -1d);
     check_decode_double ("FFFFFFFFFFFFEF7F", double.MAX);
     check_decode_double ("FFFFFFFFFFFFEFFF", -double.MAX);
     check_decode_double ("000000000000F07F", double.INFINITY);
     check_decode_double ("000000000000F0FF", -double.INFINITY);
 
+    check_decode_float ("", 0f, true);
+    check_decode_float ("00", 0f, true);
+    check_decode_float ("000000", 0f, true);
     check_decode_float ("00000000", 0f);
     check_decode_float ("00000080", -0f);
     check_decode_float ("0000803F", 1f);
@@ -61,16 +69,25 @@ public static int main (string[] args)
     check_decode_fixed32 ("67452301", 0x01234567);
     check_decode_fixed32 ("FFFFFFFF", uint32.MAX);
 
+    check_decode_bool ("", false, true);
     check_decode_bool ("00", false);
     check_decode_bool ("01", true);
     check_decode_bool ("7F", true);
+    check_decode_bool ("FF", false, true);
 
-    check_decode_string ("", "");
-    check_decode_string ("313233", "123");
+    check_decode_string ("", 0, "");
+    check_decode_string ("", 1, "", true);
+    check_decode_string ("31", 1, "1");
+    check_decode_string ("31", 3, "", true);
+    check_decode_string ("313233", 3, "123");
+    check_decode_string ("313233", 5, "", true);
 
-    check_decode_bytes ("", "");
-    check_decode_bytes ("AA", "AA");
-    check_decode_bytes ("AABBCC", "AABBCC");
+    check_decode_bytes ("", 0, "");
+    check_decode_bytes ("", 1, "", true);
+    check_decode_bytes ("AA", 1, "AA");
+    check_decode_bytes ("AA", 3, "", true);
+    check_decode_bytes ("AABBCC", 3, "AABBCC");
+    check_decode_bytes ("AABBCC", 5, "", true);
 
     check_decode_uint32 ("00", 0);
     check_decode_uint32 ("01", 1);
@@ -104,6 +121,7 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
+    //check_decode_message ("", 0, "", true); // FIXME: Need to check required fields present
     check_decode_message ("08001200", 0, "");
     check_decode_message ("0802120454455354", 1, "TEST");
 
@@ -124,38 +142,51 @@ public static int main (string[] args)
     return Posix.EXIT_SUCCESS;
 }
 
-private void check_decode_varint (string data, uint64 expected)
+private void check_decode_varint (string data, uint64 expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
     var result = buffer.decode_varint ();
 
     n_tests++;
-    if (result == expected)
+
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_varint (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_varint (\"%s\") -> %" + uint64.FORMAT + ", expected %" + uint64.FORMAT + "\n", data, result, expected);
 }
 
-private void check_decode_double (string data, double expected)
+private void check_decode_double (string data, double expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
     var result = buffer.decode_double ();
 
     n_tests++;
-    if (result == expected)
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_double (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_double (\"%s\") -> %f, expected %f\n", data, result, expected);
 }
 
-private void check_decode_float (string data, float expected)
+private void check_decode_float (string data, float expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
     var result = buffer.decode_float ();
 
     n_tests++;
-    if (result == expected)
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_float (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_float (\"%s\") -> %f, expected %f\n", data, result, expected);
 }
@@ -220,41 +251,53 @@ private void check_decode_fixed32 (string data, uint32 expected)
         stderr.printf ("decode_fixed32 (\"%s\") -> %u, expected %u\n", data, result, expected);
 }
 
-private void check_decode_bool (string data, bool expected)
+private void check_decode_bool (string data, bool expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
     var result = buffer.decode_bool ();
 
     n_tests++;
-    if (result == expected)
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_bool (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_bool (\"%s\") -> %s, expected %s\n", data, result.to_string (), expected.to_string ());
 }
 
-private void check_decode_string (string data, string expected)
+private void check_decode_string (string data, size_t length, string expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
-    var result = buffer.decode_string (buffer.buffer.length);
+    var result = buffer.decode_string (length);
 
     n_tests++;
-    if (result == expected)
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_string (\"%s\", %zu) -> error %s, expected error %s\n", data, length, buffer.error.to_string (), error.to_string ());
     else
-        stderr.printf ("decode_string (\"%s\") -> \"%s\", expected \"%s\"\n", data, result, expected);
+        stderr.printf ("decode_string (\"%s\", %zu) -> \"%s\", expected \"%s\"\n", data, length, result, expected);
 }
 
-private void check_decode_bytes (string data, string expected)
+private void check_decode_bytes (string data, size_t length, string expected, bool error = false)
 {
     var buffer = string_to_buffer (data);
-    var r = buffer.decode_bytes (buffer.buffer.length);
+    var r = buffer.decode_bytes (length);
     var result = array_to_string (r.data);
 
     n_tests++;
-    if (result == expected)
+    if (!error && !buffer.error && result == expected)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_bytes (\"%s\", %zu) -> error %s, expected error %s\n", data, length, buffer.error.to_string (), error.to_string ());
     else
-        stderr.printf ("decode_bytes (\"%s\") -> \"%s\", expected \"%s\"\n", data, result, expected);
+        stderr.printf ("decode_bytes (\"%s\", %zu) -> \"%s\", expected \"%s\"\n", data, length, result, expected);
 }
 
 private void check_decode_uint32 (string data, uint32 expected)
@@ -317,15 +360,19 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
-private void check_decode_message (string data, int32 int_value, string string_value)
+private void check_decode_message (string data, int32 int_value, string string_value, bool error = false)
 {
     var result = new TestMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer, buffer.buffer.length);
 
     n_tests++;
-    if (result.int_value == int_value && result.string_value == string_value)
+    if (!error && !buffer.error && result.int_value == int_value && result.string_value == string_value)
         n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
