@@ -1,6 +1,8 @@
 Overview of changed in protobuf-vala 0.0.5
 
-  * Handle buffer underflows
+  * Handle buffer over/underflows
+  * Check if required fields are present
+  * Fix crash in decode test
   * Fix build from unnecessarily calling valac
 
 Overview of changed in protobuf-vala 0.0.4
