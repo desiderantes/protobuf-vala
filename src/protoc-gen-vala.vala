@@ -10,7 +10,7 @@ public static int main (string[] args)
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
 
-    stderr.printf ("request = {\n%s}\n", req.to_string ("  "));
+    //stderr.printf ("request = {\n%s}\n", req.to_string ("  "));
 
     var resp = new CodeGeneratorResponse ();
     
