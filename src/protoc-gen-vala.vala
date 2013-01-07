@@ -10,7 +10,7 @@ public static int main (string[] args)
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
 
-    //stderr.printf ("request =\n%s\n", req.to_string ());
+    stderr.printf ("request = {\n%s\n}\n", req.to_string ("  "));
 
     var resp = new CodeGeneratorResponse ();
     
@@ -366,30 +366,38 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += "\n";
     text += indent + "    public string to_string (string indent = \"\")\n";
     text += indent + "    {\n";
-    text += indent + "        var text = \"{\\n\";\n";
+    text += indent + "        var text = \"\";\n";
     text += "\n";
     foreach (var field in type.field)
     {
         var field_name = "this.%s".printf (field.name);
+        var indent2 = indent;
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        text += indent + \"    %s =\\n\";\n".printf (field.name);
-            text += indent + "        text += indent + \"    [\\n\";\n";
             text += indent + "        foreach (unowned %s v in this.%s)\n".printf (get_type_name (field, false), field.name);
-            text += indent + "            text += indent + \"        %%s,\\n\".printf (%s);\n".printf (get_to_string_method (field, "v", "        "));
-            text += indent + "        text += indent + \"    ];\\n\";\n";
+            text += indent + "        {\n";
+            indent2 += "    ";
+            field_name = "v";
         }
         else if (field.type == FieldDescriptorProto.Type.TYPE_MESSAGE)
         {
             text += indent + "        if (%s != null)\n".printf (field.name);
-            text += indent + "            text += indent + \"    %s = %%s;\\n\".printf (%s);".printf (field.name, get_to_string_method (field, field_name));
+            text += indent + "        {\n";
+            indent2 += "    ";
+        }
+
+        if (field.type == FieldDescriptorProto.Type.TYPE_MESSAGE)
+        {
+            text += indent2 + "        text += indent + \"%s {\\n\";\n".printf (field.name);
+            text += indent2 + "        text += \"%%s\".printf (%s);\n".printf (get_to_string_method (field, field_name, "  "));
+            text += indent2 + "        text += indent + \"}\\n\";\n";
         }
         else
-            text += indent + "        text += indent + \"    %s = %%s;\\n\".printf (%s);".printf (field.name, get_to_string_method (field, field_name));
-        text += "\n";
+            text += indent2 + "        text += indent + \"%s: %%s\\n\".printf (%s);\n".printf (field.name, get_to_string_method (field, field_name));
+
+        if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED || field.type == FieldDescriptorProto.Type.TYPE_MESSAGE)
+            text += indent + "        }\n";
     }
-    text += "\n";
-    text += indent + "        text += indent + \"}\";\n";
     text += "\n";
     text += indent + "        return text;\n";
     text += indent + "    }\n";
@@ -547,7 +555,7 @@ private static string get_default_value (FieldDescriptorProto field)
     }
 }
 
-private static string get_to_string_method (FieldDescriptorProto field, string field_name, string indent = "    ")
+private static string get_to_string_method (FieldDescriptorProto field, string field_name, string indent = "")
 {
     switch (field.type)
     {
