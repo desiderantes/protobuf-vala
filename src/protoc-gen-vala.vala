@@ -215,23 +215,23 @@ private static string write_class (DescriptorProto type, string indent = "")
                 text += indent + "                var %s_length = buffer.decode_varint ();\n".printf (field.name);
                 text += indent + "                var %s_end = buffer.read_index + %s_length;\n".printf (field.name, field.name);
                 text += indent + "                while (buffer.read_index < %s_end)\n".printf (field.name);
-                text += indent + "                    this.%s.append (%s);\n".printf (field.name, decode_method);
+                text += indent + "                    this.%s.append (%s);\n".printf (get_field_name (field), decode_method);
                 text += indent + "                if (buffer.read_index != %s_end)\n".printf (field.name);
                 text += indent + "                    buffer.error = true;\n";
                 text += indent + "            }\n";
             }
             else
-                text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
+                text += indent + "                this.%s.append (%s);\n".printf (get_field_name (field), decode_method);
         }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REQUIRED)
         {
             text += indent + "            {\n";
-            text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
+            text += indent + "                this.%s = %s;\n".printf (get_field_name (field), decode_method);
             text += indent + "                have_%s = true;\n".printf (field.name);
             text += indent + "            }\n";
         }
         else
-            text += indent + "                this.%s = %s;\n".printf (field.name, decode_method);
+            text += indent + "                this.%s = %s;\n".printf (get_field_name (field), decode_method);
 
         first = false;
     }
@@ -259,10 +259,10 @@ private static string write_class (DescriptorProto type, string indent = "")
         var field = i.data;
         var packed = field.options != null && field.options.packed;
         var indent2 = indent;
-        var field_name = "this.%s".printf (field.name);
+        var field_name = "this.%s".printf (get_field_name (field));
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
         {
-            text += indent + "        if (this.%s != %s)\n".printf (field.name, get_default_value (field));
+            text += indent + "        if (%s != %s)\n".printf (field_name, get_default_value (field));
             text += indent + "        {\n";
             indent2 += "    ";
         }
@@ -270,7 +270,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         {
             if (packed)
                 text += indent + "        size_t %s_length = 0;\n".printf (field.name);
-            text += indent + "        for (unowned %s i = this.%s.last (); i != null; i = i.prev)\n".printf (get_type_name (field), field.name);
+            text += indent + "        for (unowned %s i = %s.last (); i != null; i = i.prev)\n".printf (get_type_name (field), field_name);
             text += indent + "        {\n";
             indent2 += "    ";
             field_name = "i.data";
@@ -397,11 +397,11 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += "\n";
     foreach (var field in type.field)
     {
-        var field_name = "this.%s".printf (field.name);
+        var field_name = "this.%s".printf (get_field_name (field));
         var indent2 = indent;
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent + "        foreach (unowned %s v in this.%s)\n".printf (get_type_name (field, false), field.name);
+            text += indent + "        foreach (unowned %s v in %s)\n".printf (get_type_name (field, false), field_name);
             text += indent + "        {\n";
             indent2 += "    ";
             field_name = "v";
@@ -527,32 +527,38 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
 
 private static string get_field_name (FieldDescriptorProto field)
 {
-    string[] reserved_names =
+    string[] reserved_names = { "dynamic", "owned", "unowned", "weak" };
+
+    string[] c_reserved_names =
     {
-        "abstract", "as", "async",
-        "base", "break",
-        "case", "catch", "class", "const", "construct", "continue",
-        "default", "delegate", "delete", "do", "dynamic",
-        "else", "enum", "ensures", "errordomain", "extern",
-        "false", "finally", "for", "foreach",
-        "get", "global",
-        "if", "in", "inline", "interface", "internal", "is",
-        "lock",
-        "namespace", "new", "null",
-        "out", "owned", "override",
-        "public", "private", "protected",
-        "ref", "requires", "return",
-        "set", "signal", "sizeof", "static", "struct", "switch",
-        "this", "throw", "throws", "true", "try", "typeof",
-        "unowned", "using",
-        "value", "var", "void", "virtual",
-        "weak", "while",
-        "yield"
+        "break",
+        "case",
+        "const",
+        "continue",
+        "default",
+        "do",
+        "else",
+        "enum",
+        "extern",
+        "for",
+        "if",
+        "inline",
+        "return",
+        "sizeof",
+        "static",
+        "struct",
+        "switch",
+        "typeof",
+        "void",
+        "while"
     };
 
     foreach (var n in reserved_names)
         if (field.name == n)
             return "@%s".printf (field.name);
+    foreach (var n in c_reserved_names)
+        if (field.name == n)
+            return "%s_".printf (field.name);
 
     return field.name;
 }
