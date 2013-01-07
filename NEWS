@@ -1,3 +1,7 @@
+Overview of changed in protobuf-vala 0.0.6
+
+  * Fix crash in encode test
+
 Overview of changed in protobuf-vala 0.0.5
 
   * Handle buffer over/underflows
