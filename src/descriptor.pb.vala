@@ -48,14 +48,15 @@ public class FileDescriptorSet
     {
         var text = "{\n";
 
-        if (this.file != null)
-        {
-            text += "file = ";
-            foreach (unowned FileDescriptorProto v in this.file)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    file =\n";
+        text += indent + "    [\n";
+        foreach (unowned FileDescriptorProto v in this.file)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }
@@ -188,66 +189,45 @@ public class FileDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    package = %s;\n".printf ("\"%s\"".printf (this.package));
+        text += indent + "    dependency =\n";
+        text += indent + "    [\n";
+        foreach (unowned string v in this.dependency)
+            text += indent + "        %s,\n".printf ("\"%s\"".printf (v));
+        text += indent + "    ];\n";
 
-        if (this.package != "")
-        {
-            text += "package = ";
-            text += "\"%s\";\n".printf (this.package);
-        }
+        text += indent + "    message_type =\n";
+        text += indent + "    [\n";
+        foreach (unowned DescriptorProto v in this.message_type)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.dependency != null)
-        {
-            text += "dependency = ";
-            foreach (unowned string v in this.dependency)
-                text += "\"%s\";\n".printf (v);
-        }
+        text += indent + "    enum_type =\n";
+        text += indent + "    [\n";
+        foreach (unowned EnumDescriptorProto v in this.enum_type)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.message_type != null)
-        {
-            text += "message_type = ";
-            foreach (unowned DescriptorProto v in this.message_type)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    service =\n";
+        text += indent + "    [\n";
+        foreach (unowned ServiceDescriptorProto v in this.service)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.enum_type != null)
-        {
-            text += "enum_type = ";
-            foreach (unowned EnumDescriptorProto v in this.enum_type)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    extension =\n";
+        text += indent + "    [\n";
+        foreach (unowned FieldDescriptorProto v in this.extension)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.service != null)
-        {
-            text += "service = ";
-            foreach (unowned ServiceDescriptorProto v in this.service)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
+        if (source_code_info != null)
+            text += indent + "    source_code_info = %s;\n".printf (this.source_code_info.to_string (indent + "    "));
 
-        if (this.extension != null)
-        {
-            text += "extension = ";
-            foreach (unowned FieldDescriptorProto v in this.extension)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
-
-        if (this.source_code_info != null)
-        {
-            text += "source_code_info = ";
-            text += "%s;\n".printf (this.source_code_info.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -308,19 +288,11 @@ public class DescriptorProto
         {
             var text = "{\n";
 
-            if (this.start != 0)
-            {
-                text += "start = ";
-                text += "%s;\n".printf (this.start.to_string ());
-            }
+            text += indent + "    start = %s;\n".printf (this.start.to_string ());
+            text += indent + "    end = %s;\n".printf (this.end.to_string ());
 
-            if (this.end != 0)
-            {
-                text += "end = ";
-                text += "%s;\n".printf (this.end.to_string ());
-            }
+            text += indent + "}";
 
-            text += "}";
             return text;
         }
     }
@@ -430,54 +402,42 @@ public class DescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    field =\n";
+        text += indent + "    [\n";
+        foreach (unowned FieldDescriptorProto v in this.field)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.field != null)
-        {
-            text += "field = ";
-            foreach (unowned FieldDescriptorProto v in this.field)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    extension =\n";
+        text += indent + "    [\n";
+        foreach (unowned FieldDescriptorProto v in this.extension)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.extension != null)
-        {
-            text += "extension = ";
-            foreach (unowned FieldDescriptorProto v in this.extension)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    nested_type =\n";
+        text += indent + "    [\n";
+        foreach (unowned DescriptorProto v in this.nested_type)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.nested_type != null)
-        {
-            text += "nested_type = ";
-            foreach (unowned DescriptorProto v in this.nested_type)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    enum_type =\n";
+        text += indent + "    [\n";
+        foreach (unowned EnumDescriptorProto v in this.enum_type)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.enum_type != null)
-        {
-            text += "enum_type = ";
-            foreach (unowned EnumDescriptorProto v in this.enum_type)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    extension_range =\n";
+        text += indent + "    [\n";
+        foreach (unowned ExtensionRange v in this.extension_range)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.extension_range != null)
-        {
-            text += "extension_range = ";
-            foreach (unowned ExtensionRange v in this.extension_range)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
+        text += indent + "}";
 
-        text += "}";
         return text;
     }
 }
@@ -621,55 +581,18 @@ public class FieldDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    number = %s;\n".printf (this.number.to_string ());
+        text += indent + "    label = %s;\n".printf (this.label.to_string ());
+        text += indent + "    type = %s;\n".printf (this.type.to_string ());
+        text += indent + "    type_name = %s;\n".printf ("\"%s\"".printf (this.type_name));
+        text += indent + "    extendee = %s;\n".printf ("\"%s\"".printf (this.extendee));
+        text += indent + "    default_value = %s;\n".printf ("\"%s\"".printf (this.default_value));
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.number != 0)
-        {
-            text += "number = ";
-            text += "%s;\n".printf (this.number.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.label != 0)
-        {
-            text += "label = ";
-            text += "%s;\n".printf (this.label.to_string ());
-        }
-
-        if (this.type != 0)
-        {
-            text += "type = ";
-            text += "%s;\n".printf (this.type.to_string ());
-        }
-
-        if (this.type_name != "")
-        {
-            text += "type_name = ";
-            text += "\"%s\";\n".printf (this.type_name);
-        }
-
-        if (this.extendee != "")
-        {
-            text += "extendee = ";
-            text += "\"%s\";\n".printf (this.extendee);
-        }
-
-        if (this.default_value != "")
-        {
-            text += "default_value = ";
-            text += "\"%s\";\n".printf (this.default_value);
-        }
-
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -742,26 +665,18 @@ public class EnumDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    value =\n";
+        text += indent + "    [\n";
+        foreach (unowned EnumValueDescriptorProto v in this.value)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.value != null)
-        {
-            text += "value = ";
-            foreach (unowned EnumValueDescriptorProto v in this.value)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
+        text += indent + "}";
 
-        text += "}";
         return text;
     }
 }
@@ -832,25 +747,13 @@ public class EnumValueDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    number = %s;\n".printf (this.number.to_string ());
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.number != 0)
-        {
-            text += "number = ";
-            text += "%s;\n".printf (this.number.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -923,26 +826,18 @@ public class ServiceDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    method =\n";
+        text += indent + "    [\n";
+        foreach (unowned MethodDescriptorProto v in this.method)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.method != null)
-        {
-            text += "method = ";
-            foreach (unowned MethodDescriptorProto v in this.method)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
+        text += indent + "}";
 
-        text += "}";
         return text;
     }
 }
@@ -1025,31 +920,14 @@ public class MethodDescriptorProto
     {
         var text = "{\n";
 
-        if (this.name != "")
-        {
-            text += "name = ";
-            text += "\"%s\";\n".printf (this.name);
-        }
+        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    input_type = %s;\n".printf ("\"%s\"".printf (this.input_type));
+        text += indent + "    output_type = %s;\n".printf ("\"%s\"".printf (this.output_type));
+        if (options != null)
+            text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
-        if (this.input_type != "")
-        {
-            text += "input_type = ";
-            text += "\"%s\";\n".printf (this.input_type);
-        }
+        text += indent + "}";
 
-        if (this.output_type != "")
-        {
-            text += "output_type = ";
-            text += "\"%s\";\n".printf (this.output_type);
-        }
-
-        if (this.options != null)
-        {
-            text += "options = ";
-            text += "%s;\n".printf (this.options.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -1176,62 +1054,23 @@ public class FileOptions
     {
         var text = "{\n";
 
-        if (this.java_package != "")
-        {
-            text += "java_package = ";
-            text += "\"%s\";\n".printf (this.java_package);
-        }
+        text += indent + "    java_package = %s;\n".printf ("\"%s\"".printf (this.java_package));
+        text += indent + "    java_outer_classname = %s;\n".printf ("\"%s\"".printf (this.java_outer_classname));
+        text += indent + "    java_multiple_files = %s;\n".printf (this.java_multiple_files.to_string ());
+        text += indent + "    java_generate_equals_and_hash = %s;\n".printf (this.java_generate_equals_and_hash.to_string ());
+        text += indent + "    optimize_for = %s;\n".printf (this.optimize_for.to_string ());
+        text += indent + "    cc_generic_services = %s;\n".printf (this.cc_generic_services.to_string ());
+        text += indent + "    java_generic_services = %s;\n".printf (this.java_generic_services.to_string ());
+        text += indent + "    py_generic_services = %s;\n".printf (this.py_generic_services.to_string ());
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.java_outer_classname != "")
-        {
-            text += "java_outer_classname = ";
-            text += "\"%s\";\n".printf (this.java_outer_classname);
-        }
 
-        if (this.java_multiple_files != false)
-        {
-            text += "java_multiple_files = ";
-            text += "%s;\n".printf (this.java_multiple_files.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.java_generate_equals_and_hash != false)
-        {
-            text += "java_generate_equals_and_hash = ";
-            text += "%s;\n".printf (this.java_generate_equals_and_hash.to_string ());
-        }
-
-        if (this.optimize_for != 0)
-        {
-            text += "optimize_for = ";
-            text += "%s;\n".printf (this.optimize_for.to_string ());
-        }
-
-        if (this.cc_generic_services != false)
-        {
-            text += "cc_generic_services = ";
-            text += "%s;\n".printf (this.cc_generic_services.to_string ());
-        }
-
-        if (this.java_generic_services != false)
-        {
-            text += "java_generic_services = ";
-            text += "%s;\n".printf (this.java_generic_services.to_string ());
-        }
-
-        if (this.py_generic_services != false)
-        {
-            text += "py_generic_services = ";
-            text += "%s;\n".printf (this.py_generic_services.to_string ());
-        }
-
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -1300,26 +1139,17 @@ public class MessageOptions
     {
         var text = "{\n";
 
-        if (this.message_set_wire_format != false)
-        {
-            text += "message_set_wire_format = ";
-            text += "%s;\n".printf (this.message_set_wire_format.to_string ());
-        }
+        text += indent + "    message_set_wire_format = %s;\n".printf (this.message_set_wire_format.to_string ());
+        text += indent + "    no_standard_descriptor_accessor = %s;\n".printf (this.no_standard_descriptor_accessor.to_string ());
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.no_standard_descriptor_accessor != false)
-        {
-            text += "no_standard_descriptor_accessor = ";
-            text += "%s;\n".printf (this.no_standard_descriptor_accessor.to_string ());
-        }
 
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "}";
 
-        text += "}";
         return text;
     }
 }
@@ -1412,38 +1242,19 @@ public class FieldOptions
     {
         var text = "{\n";
 
-        if (this.ctype != 0)
-        {
-            text += "ctype = ";
-            text += "%s;\n".printf (this.ctype.to_string ());
-        }
+        text += indent + "    ctype = %s;\n".printf (this.ctype.to_string ());
+        text += indent + "    packed = %s;\n".printf (this.packed.to_string ());
+        text += indent + "    deprecated = %s;\n".printf (this.deprecated.to_string ());
+        text += indent + "    experimental_map_key = %s;\n".printf ("\"%s\"".printf (this.experimental_map_key));
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.packed != false)
-        {
-            text += "packed = ";
-            text += "%s;\n".printf (this.packed.to_string ());
-        }
 
-        if (this.deprecated != false)
-        {
-            text += "deprecated = ";
-            text += "%s;\n".printf (this.deprecated.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.experimental_map_key != "")
-        {
-            text += "experimental_map_key = ";
-            text += "\"%s\";\n".printf (this.experimental_map_key);
-        }
-
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -1496,14 +1307,15 @@ public class EnumOptions
     {
         var text = "{\n";
 
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }
@@ -1556,14 +1368,15 @@ public class EnumValueOptions
     {
         var text = "{\n";
 
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }
@@ -1616,14 +1429,15 @@ public class ServiceOptions
     {
         var text = "{\n";
 
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }
@@ -1676,14 +1490,15 @@ public class MethodOptions
     {
         var text = "{\n";
 
-        if (this.uninterpreted_option != null)
-        {
-            text += "uninterpreted_option = ";
-            foreach (unowned UninterpretedOption v in this.uninterpreted_option)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    uninterpreted_option =\n";
+        text += indent + "    [\n";
+        foreach (unowned UninterpretedOption v in this.uninterpreted_option)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }
@@ -1750,13 +1565,11 @@ public class UninterpretedOption
         {
             var text = "{\n";
 
-            text += "name_part = ";
-            text += "\"%s\";\n".printf (this.name_part);
+            text += indent + "    name_part = %s;\n".printf ("\"%s\"".printf (this.name_part));
+            text += indent + "    is_extension = %s;\n".printf (this.is_extension.to_string ());
 
-            text += "is_extension = ";
-            text += "%s;\n".printf (this.is_extension.to_string ());
+            text += indent + "}";
 
-            text += "}";
             return text;
         }
     }
@@ -1860,52 +1673,21 @@ public class UninterpretedOption
     {
         var text = "{\n";
 
-        if (this.name != null)
-        {
-            text += "name = ";
-            foreach (unowned NamePart v in this.name)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    name =\n";
+        text += indent + "    [\n";
+        foreach (unowned NamePart v in this.name)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.identifier_value != "")
-        {
-            text += "identifier_value = ";
-            text += "\"%s\";\n".printf (this.identifier_value);
-        }
+        text += indent + "    identifier_value = %s;\n".printf ("\"%s\"".printf (this.identifier_value));
+        text += indent + "    positive_int_value = %s;\n".printf (this.positive_int_value.to_string ());
+        text += indent + "    negative_int_value = %s;\n".printf (this.negative_int_value.to_string ());
+        text += indent + "    double_value = %s;\n".printf (this.double_value.to_string ());
+        text += indent + "    string_value = %s;\n".printf (Protobuf.bytes_to_string (this.string_value));
+        text += indent + "    aggregate_value = %s;\n".printf ("\"%s\"".printf (this.aggregate_value));
 
-        if (this.positive_int_value != 0)
-        {
-            text += "positive_int_value = ";
-            text += "%s;\n".printf (this.positive_int_value.to_string ());
-        }
+        text += indent + "}";
 
-        if (this.negative_int_value != 0)
-        {
-            text += "negative_int_value = ";
-            text += "%s;\n".printf (this.negative_int_value.to_string ());
-        }
-
-        if (this.double_value != 0d)
-        {
-            text += "double_value = ";
-            text += "%s;\n".printf (this.double_value.to_string ());
-        }
-
-        if (this.string_value != null)
-        {
-            text += "string_value = ";
-            for (var i = 0; i < this.string_value.len; i++)
-                text += "%02X".printf (this.string_value.data[i]);
-            text += "\n";
-        }
-
-        if (this.aggregate_value != "")
-        {
-            text += "aggregate_value = ";
-            text += "\"%s\";\n".printf (this.aggregate_value);
-        }
-
-        text += "}";
         return text;
     }
 }
@@ -1966,21 +1748,21 @@ public class SourceCodeInfo
         {
             var text = "{\n";
 
-            if (this.path != null)
-            {
-                text += "path = ";
-                foreach (unowned int32 v in this.path)
-                    text += "%s;\n".printf (v.to_string ());
-            }
+            text += indent + "    path =\n";
+            text += indent + "    [\n";
+            foreach (unowned int32 v in this.path)
+                text += indent + "        %s,\n".printf (v.to_string ());
+            text += indent + "    ];\n";
 
-            if (this.span != null)
-            {
-                text += "span = ";
-                foreach (unowned int32 v in this.span)
-                    text += "%s;\n".printf (v.to_string ());
-            }
+            text += indent + "    span =\n";
+            text += indent + "    [\n";
+            foreach (unowned int32 v in this.span)
+                text += indent + "        %s,\n".printf (v.to_string ());
+            text += indent + "    ];\n";
 
-            text += "}";
+
+            text += indent + "}";
+
             return text;
         }
     }
@@ -2030,14 +1812,15 @@ public class SourceCodeInfo
     {
         var text = "{\n";
 
-        if (this.location != null)
-        {
-            text += "location = ";
-            foreach (unowned Location v in this.location)
-                text += "%s;\n".printf (v.to_string ());
-        }
+        text += indent + "    location =\n";
+        text += indent + "    [\n";
+        foreach (unowned Location v in this.location)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        text += "}";
+
+        text += indent + "}";
+
         return text;
     }
 }

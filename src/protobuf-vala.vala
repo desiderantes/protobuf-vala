@@ -375,4 +375,12 @@ namespace Protobuf
             write_index += write_offset;
         }
     }
+
+    public static string bytes_to_string (ByteArray value)
+    {
+        var text = "";
+        for (var i = 0; i < value.len; i++)
+            text += "%02X".printf (value.data[i]);
+        return text;
+    }
 }

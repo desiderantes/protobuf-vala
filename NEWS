@@ -1,6 +1,7 @@
 Overview of changed in protobuf-vala 0.0.6
 
   * Fix crash in encode test
+  * Correctly indent to_string method output
 
 Overview of changed in protobuf-vala 0.0.5
 

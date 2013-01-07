@@ -10,7 +10,7 @@ public static int main (string[] args)
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
 
-    //stderr.printf ("{ %s }\n", req.to_string ());
+    //stderr.printf ("request =\n%s\n", req.to_string ());
 
     var resp = new CodeGeneratorResponse ();
     
@@ -330,48 +330,30 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "    public string to_string (string indent = \"\")\n";
     text += indent + "    {\n";
     text += indent + "        var text = \"{\\n\";\n";
+    text += "\n";
     foreach (var field in type.field)
     {
-        text += "\n";
-
-        var indent2 = indent;
-        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
-        {
-            text += indent + "        if (this.%s != %s)\n".printf (field.name, get_default_value (field));
-            text += indent + "        {\n";
-            indent2 += "    ";
-        }
-
-        text += indent2 + "        text += \"%s = \";\n".printf (field.name);
-
         var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
-            text += indent2 + "        foreach (unowned %s v in this.%s)\n".printf (get_type_name (field, false), field.name);
-            indent2 += "    ";
-            field_name = "v";
+            text += indent + "        text += indent + \"    %s =\\n\";\n".printf (field.name);
+            text += indent + "        text += indent + \"    [\\n\";\n";
+            text += indent + "        foreach (unowned %s v in this.%s)\n".printf (get_type_name (field, false), field.name);
+            text += indent + "            text += indent + \"        %%s,\\n\".printf (%s);\n".printf (get_to_string_method (field, "v", "        "));
+            text += indent + "        text += indent + \"    ];\\n\";\n";
         }
-
-        switch (field.type)
+        else if (field.type == FieldDescriptorProto.Type.TYPE_MESSAGE)
         {
-        case FieldDescriptorProto.Type.TYPE_STRING:
-            text += indent2 + "        text += \"\\\"%%s\\\";\\n\".printf (%s);\n".printf (field_name);
-            break;
-        case FieldDescriptorProto.Type.TYPE_BYTES:
-            text += indent2 + "        for (var i = 0; i < %s.len; i++)\n".printf (field_name);
-            text += indent2 + "            text += \"%%02X\".printf (%s.data[i]);\n".printf (field_name);
-            text += indent2 + "        text += \"\\n\";\n";
-            break;
-        default:
-            text += indent2 + "        text += \"%%s;\\n\".printf (%s.to_string ());\n".printf (field_name);
-            break;
+            text += indent + "        if (%s != null)\n".printf (field.name);
+            text += indent + "            text += indent + \"    %s = %%s;\\n\".printf (%s);".printf (field.name, get_to_string_method (field, field_name));
         }
-
-        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
-            text += indent + "        }\n";
+        else
+            text += indent + "        text += indent + \"    %s = %%s;\\n\".printf (%s);".printf (field.name, get_to_string_method (field, field_name));
+        text += "\n";
     }
     text += "\n";
-    text += indent + "        text += \"}\";\n";
+    text += indent + "        text += indent + \"}\";\n";
+    text += "\n";
     text += indent + "        return text;\n";
     text += indent + "    }\n";
     text += indent + "}\n";
@@ -525,5 +507,20 @@ private static string get_default_value (FieldDescriptorProto field)
         return "0"; // FIXME
     default:
         return "UNKNOWN_TYPE%d".printf (field.type);
+    }
+}
+
+private static string get_to_string_method (FieldDescriptorProto field, string field_name, string indent = "    ")
+{
+    switch (field.type)
+    {
+    case FieldDescriptorProto.Type.TYPE_STRING:
+        return "\"\\\"%%s\\\"\".printf (%s)".printf (field_name);
+    case FieldDescriptorProto.Type.TYPE_BYTES:
+        return "Protobuf.bytes_to_string (%s)".printf (field_name);
+    case FieldDescriptorProto.Type.TYPE_MESSAGE:
+        return "%s.to_string (indent + \"%s\")".printf (field_name, indent);
+    default:
+        return "%s.to_string ()".printf (field_name);
     }
 }

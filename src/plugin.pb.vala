@@ -68,27 +68,22 @@ public class CodeGeneratorRequest
     {
         var text = "{\n";
 
-        if (this.file_to_generate != null)
-        {
-            text += "file_to_generate = ";
-            foreach (unowned string v in this.file_to_generate)
-                text += "\"%s\";\n".printf (v);
-        }
+        text += indent + "    file_to_generate =\n";
+        text += indent + "    [\n";
+        foreach (unowned string v in this.file_to_generate)
+            text += indent + "        %s,\n".printf ("\"%s\"".printf (v));
+        text += indent + "    ];\n";
 
-        if (this.parameter != "")
-        {
-            text += "parameter = ";
-            text += "\"%s\";\n".printf (this.parameter);
-        }
+        text += indent + "    parameter = %s;\n".printf ("\"%s\"".printf (this.parameter));
+        text += indent + "    proto_file =\n";
+        text += indent + "    [\n";
+        foreach (unowned FileDescriptorProto v in this.proto_file)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.proto_file != null)
-        {
-            text += "proto_file = ";
-            foreach (unowned FileDescriptorProto v in this.proto_file)
-                text += "%s;\n".printf (v.to_string ());
-        }
 
-        text += "}";
+        text += indent + "}";
+
         return text;
     }
 }
@@ -163,25 +158,12 @@ public class CodeGeneratorResponse
         {
             var text = "{\n";
 
-            if (this.name != "")
-            {
-                text += "name = ";
-                text += "\"%s\";\n".printf (this.name);
-            }
+            text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+            text += indent + "    insertion_point = %s;\n".printf ("\"%s\"".printf (this.insertion_point));
+            text += indent + "    content = %s;\n".printf ("\"%s\"".printf (this.content));
 
-            if (this.insertion_point != "")
-            {
-                text += "insertion_point = ";
-                text += "\"%s\";\n".printf (this.insertion_point);
-            }
+            text += indent + "}";
 
-            if (this.content != "")
-            {
-                text += "content = ";
-                text += "\"%s\";\n".printf (this.content);
-            }
-
-            text += "}";
             return text;
         }
     }
@@ -241,20 +223,16 @@ public class CodeGeneratorResponse
     {
         var text = "{\n";
 
-        if (this.error != "")
-        {
-            text += "error = ";
-            text += "\"%s\";\n".printf (this.error);
-        }
+        text += indent + "    error = %s;\n".printf ("\"%s\"".printf (this.error));
+        text += indent + "    file =\n";
+        text += indent + "    [\n";
+        foreach (unowned File v in this.file)
+            text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
+        text += indent + "    ];\n";
 
-        if (this.file != null)
-        {
-            text += "file = ";
-            foreach (unowned File v in this.file)
-                text += "%s;\n".printf (v.to_string ());
-        }
 
-        text += "}";
+        text += indent + "}";
+
         return text;
     }
 }
