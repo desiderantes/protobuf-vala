@@ -1,6 +1,7 @@
 Overview of changed in protobuf-vala 0.0.7
 
   * Use the existing protoc text format for to_string()
+  * Correctly implement enum defaults
 
 Overview of changed in protobuf-vala 0.0.6
 

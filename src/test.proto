@@ -9,7 +9,6 @@ message TestMessage
 {
     required sint32 int_value = 1;
     required string string_value = 2;
-    required TestEnum enum_value = 3;
 }
 
 message TestOptionalMessage
@@ -32,4 +31,12 @@ message TestRepeatedMessage
 message TestRepeatedPackedMessage
 {
     repeated uint32 value = 1 [packed = true];
+}
+
+message TestEnumMessage
+{
+    required TestEnum enum_value = 1;
+    optional TestEnum enum_value_o = 2;
+    optional TestEnum enum_value_od = 3 [default = TWO];
+    repeated TestEnum enum_value_r = 4;
 }

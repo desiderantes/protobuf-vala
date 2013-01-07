@@ -121,12 +121,12 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
-    check_decode_message ("", 0, "", TestEnum.ONE, true);
-    check_decode_message ("0800", 0, "", TestEnum.ONE, true);
-    check_decode_message ("1200", 0, "", TestEnum.ONE, true);
-    check_decode_message ("080012001802", 0, "", TestEnum.TWO);
-    check_decode_message ("08021204544553541802", 1, "TEST", TestEnum.TWO);
-    check_decode_message ("080218021204544553541A03313233", 1, "TEST", TestEnum.TWO);
+    check_decode_message ("", 0, "", true);
+    check_decode_message ("0800", 0, "", true);
+    check_decode_message ("1200", 0, "", true);
+    check_decode_message ("08001200", 0, "");
+    check_decode_message ("0802120454455354", 1, "TEST");
+    check_decode_message ("08021204544553541A03313233", 1, "TEST");
 
     check_decode_optional_message ("", 0, "");
     check_decode_optional_message ("0802", 1, "");
@@ -158,6 +158,10 @@ public static int main (string[] args)
     check_decode_repeated_packed_message ("0A0101", "1");
     check_decode_repeated_packed_message ("0A0401020304", "1 2 3 4");
     check_decode_repeated_packed_message ("0A0201020A020304", "1 2 3 4");
+
+    check_decode_enum_message ("08011801", TestEnum.ONE, TestEnum.ONE, TestEnum.ONE);
+    check_decode_enum_message ("08021002", TestEnum.TWO, TestEnum.TWO, TestEnum.TWO);
+    check_decode_enum_message ("080310031803", TestEnum.THREE, TestEnum.THREE, TestEnum.THREE);
 
     if (n_passed != n_tests)
     {
@@ -388,22 +392,22 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
-private void check_decode_message (string data, int32 int_value, string string_value, TestEnum enum_value, bool error = false)
+private void check_decode_message (string data, int32 int_value, string string_value, bool error = false)
 {
     var result = new TestMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer, buffer.buffer.length);
 
     n_tests++;
-    if (!error && !buffer.error && result.int_value == int_value && result.string_value == string_value && result.enum_value == enum_value)
+    if (!error && !buffer.error && result.int_value == int_value && result.string_value == string_value)
         n_passed++;
     else if (error && buffer.error)
         n_passed++;
     else if (buffer.error != error)
         stderr.printf ("decode_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
-        stderr.printf ("decode_message (\"%s\") -> int_value=%d string_value=\"%s\" enum_value=%s, expected int_value=%d string_value=\"%s\" enum_value=%s\n",
-                       data, result.int_value, result.string_value, TestEnum_to_string (result.enum_value), int_value, string_value, TestEnum_to_string (enum_value));
+        stderr.printf ("decode_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
+                       data, result.int_value, result.string_value, int_value, string_value);
 }
 
 private void check_decode_optional_message (string data, int32 int_value, string string_value)
@@ -432,6 +436,24 @@ private void check_decode_optional_defaults_message (string data, int32 int_valu
     else
         stderr.printf ("decode_optional_defaults_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
+}
+
+private void check_decode_enum_message (string data, TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, bool error = false)
+{
+    var result = new TestEnumMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer, buffer.buffer.length);
+
+    n_tests++;
+    if (!error && !buffer.error && result.enum_value == enum_value && result.enum_value_o == enum_value_o && result.enum_value_od == enum_value_od)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_enum_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else
+        stderr.printf ("decode_enum_message (\"%s\") -> enum_value=%s enum_value_o=%s enum_value_od=%s, expected enum_value=%s enum_value_o=%s enum_value_od=%s\n",
+                       data, TestEnum_to_string (result.enum_value), TestEnum_to_string (result.enum_value_o), TestEnum_to_string (result.enum_value_od), TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od));
 }
 
 private void check_decode_repeated_message (string data, string expected)

@@ -1028,7 +1028,7 @@ public class FileOptions
     public string java_outer_classname = "";
     public bool java_multiple_files = false;
     public bool java_generate_equals_and_hash = false;
-    public OptimizeMode optimize_for = 0;
+    public OptimizeMode optimize_for = OptimizeMode.SPEED;
     public bool cc_generic_services = false;
     public bool java_generic_services = false;
     public bool py_generic_services = false;
@@ -1101,7 +1101,7 @@ public class FileOptions
             n_written += buffer.encode_bool (this.cc_generic_services);
             n_written += buffer.encode_varint (128);
         }
-        if (this.optimize_for != 0)
+        if (this.optimize_for != OptimizeMode.SPEED)
         {
             n_written += buffer.encode_varint (this.optimize_for);
             n_written += buffer.encode_varint (72);
@@ -1256,7 +1256,7 @@ public class FieldOptions
             return "%d".printf (value);
         }
     }
-    public CType ctype = 0;
+    public CType ctype = CType.STRING;
     public bool packed = false;
     public bool deprecated = false;
     public string experimental_map_key = "";
@@ -1323,7 +1323,7 @@ public class FieldOptions
             n_written += buffer.encode_bool (this.packed);
             n_written += buffer.encode_varint (16);
         }
-        if (this.ctype != 0)
+        if (this.ctype != CType.STRING)
         {
             n_written += buffer.encode_varint (this.ctype);
             n_written += buffer.encode_varint (8);
