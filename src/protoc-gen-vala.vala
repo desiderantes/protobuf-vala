@@ -89,7 +89,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += write_class (nested_type, indent + "    ");
     foreach (var field in type.field)
     {
-        text += indent + "    public %s %s = %s;\n".printf (get_type_name (field), field.name, get_default_value (field));
+        text += indent + "    public %s %s = %s;\n".printf (get_type_name (field), get_field_name (field), get_default_value (field));
     }
     text += "\n";
     text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1)\n".printf (type.name);
@@ -523,6 +523,38 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
     case FieldDescriptorProto.Label.LABEL_REQUIRED:
         return type_name;    
     }
+}
+
+private static string get_field_name (FieldDescriptorProto field)
+{
+    string[] reserved_names =
+    {
+        "abstract", "as", "async",
+        "base", "break",
+        "case", "catch", "class", "const", "construct", "continue",
+        "default", "delegate", "delete", "do", "dynamic",
+        "else", "enum", "ensures", "errordomain", "extern",
+        "false", "finally", "for", "foreach",
+        "get", "global",
+        "if", "in", "inline", "interface", "internal", "is",
+        "lock",
+        "namespace", "new", "null",
+        "out", "owned", "override",
+        "public", "private", "protected",
+        "ref", "requires", "return",
+        "set", "signal", "sizeof", "static", "struct", "switch",
+        "this", "throw", "throws", "true", "try", "typeof",
+        "unowned", "using",
+        "value", "var", "void", "virtual",
+        "weak", "while",
+        "yield"
+    };
+
+    foreach (var n in reserved_names)
+        if (field.name == n)
+            return "@%s".printf (field.name);
+
+    return field.name;
 }
 
 private static string get_default_value (FieldDescriptorProto field)

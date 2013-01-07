@@ -1,3 +1,7 @@
+Overview of changed in protobuf-vala 0.0.8
+
+  * Allow fields that use keywords for names
+
 Overview of changed in protobuf-vala 0.0.7
 
   * Use the existing protoc text format for to_string()
