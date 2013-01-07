@@ -293,13 +293,16 @@ private static string write_class (DescriptorProto type, string indent = "")
             text += "%s_length += ".printf (field.name);
         else
             text += "n_written += ";
+        var wire_type = 0;
         switch (field.type)
         {
         case FieldDescriptorProto.Type.TYPE_DOUBLE:
             text += "buffer.encode_double (%s);\n".printf (field_name);
+            wire_type = 1;
             break;
         case FieldDescriptorProto.Type.TYPE_FLOAT:
             text += "buffer.encode_float (%s);\n".printf (field_name);
+            wire_type = 5;
             break;
         case FieldDescriptorProto.Type.TYPE_INT64:
             text += "buffer.encode_int64 (%s);\n".printf (field_name);
@@ -312,27 +315,33 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED64:
             text += "buffer.encode_fixed64 (%s);\n".printf (field_name);
+            wire_type = 1;
             break;
         case FieldDescriptorProto.Type.TYPE_FIXED32:
             text += "buffer.encode_fixed32 (%s);\n".printf (field_name);
+            wire_type = 5;
             break;
         case FieldDescriptorProto.Type.TYPE_BOOL:
             text += "buffer.encode_bool (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_STRING:
             text += "buffer.encode_string (%s);\n".printf (field_name);
+            wire_type = 2;
             break;
         case FieldDescriptorProto.Type.TYPE_BYTES:
             text += "buffer.encode_bytes (%s);\n".printf (field_name);
+            wire_type = 2;
             break;
         case FieldDescriptorProto.Type.TYPE_UINT32:
             text += "buffer.encode_uint32 (%s);\n".printf (field_name);
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED64:
             text += "buffer.encode_sfixed64 (%s);\n".printf (field_name);
+            wire_type = 1;
             break;
         case FieldDescriptorProto.Type.TYPE_SFIXED32:
             text += "buffer.encode_sfixed32 (%s);\n".printf (field_name);
+            wire_type = 5;
             break;
         case FieldDescriptorProto.Type.TYPE_SINT64:
             text += "buffer.encode_sint64 (%s);\n".printf (field_name);
@@ -342,6 +351,7 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
             text += "%s.encode (buffer);\n".printf (field_name);
+            wire_type = 2;
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
             text += "buffer.encode_varint (%s);\n".printf (field_name);
@@ -359,9 +369,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         /* Encode key */
         if (!packed)
         {
-            var n = field.number << 3;
-            if (encode_length)
-                n |= 2;
+            var n = (field.number << 3) | wire_type;
             text += indent2 + "        n_written += buffer.encode_varint (%d);\n".printf (n);
         }
 
@@ -370,7 +378,7 @@ private static string write_class (DescriptorProto type, string indent = "")
 
         if (packed)
         {
-            var n = field.number << 3 | 2;
+            var n = (field.number << 3) | 2;
             text += indent2 + "    if (%s_length != 0)\n".printf (field.name);
             text += indent2 + "    {\n";
             text += indent2 + "        n_written += %s_length;\n".printf (field.name);

@@ -7,6 +7,26 @@ enum TestEnum
 
 message TestMessage
 {
+    required int32 value_int32 = 1;
+    required uint32 value_uint32 = 2;
+    required sint32 value_sint32 = 3;
+    required fixed32 value_fixed32 = 4;
+    required sfixed32 value_sfixed32 = 5;
+    required int64 value_int64 = 6;
+    required uint64 value_uint64 = 7;
+    required sint64 value_sint64 = 8;
+    required fixed64 value_fixed64 = 9;
+    required sfixed64 value_sfixed64 = 10;
+    required bool value_bool = 11;
+    required TestEnum value_enum = 12;
+    required string value_string = 13;
+    required bytes value_bytes = 14;
+    required double value_double = 15;
+    required float value_float = 16;
+}
+
+message TestRequiredMessage
+{
     required sint32 int_value = 1;
     required string string_value = 2;
 }

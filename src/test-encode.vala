@@ -111,8 +111,10 @@ public static int main (string[] args)
     check_buffer_resize (2, 3);
     check_buffer_resize (8, 1);
 
-    check_encode_message (0, "", "08001200");
-    check_encode_message (1, "TEST", "0802120454455354");
+    check_encode_message ("08FFFFFFFFFFFFFFFFFF011001180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
+
+    check_encode_required_message (0, "", "08001200");
+    check_encode_required_message (1, "TEST", "0802120454455354");
 
     check_encode_optional_message (0, "", "");
     check_encode_optional_message (1, "", "0802");
@@ -374,9 +376,40 @@ private void check_buffer_resize (size_t value_length, size_t buffer_length)
         stderr.printf ("buffer_resize (%zu, %zu) -> \"%s\", expected \"%s\"\n", value_length, buffer_length, result, value);
 }
 
-private void check_encode_message (int32 int_value, string string_value, string expected)
+private void check_encode_message (string expected)
 {
     var value = new TestMessage ();
+    value.value_int32 = -1;
+    value.value_uint32 = 1;
+    value.value_sint32 = -1;
+    value.value_fixed32 = 1;
+    value.value_sfixed32 = -1;
+    value.value_int64 = -1;
+    value.value_uint64 = 1;
+    value.value_sint64 = -1;
+    value.value_fixed64 = 1;
+    value.value_sfixed64 = -1;
+    value.value_bool = true;
+    value.value_enum = TestEnum.ONE;
+    value.value_string = "TEST";
+    value.value_bytes = new ByteArray.take (string_to_array ("BEEF"));
+    value.value_double = 1.0d;
+    value.value_float = 1.0f;
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_message () -> \"%s\", expected \"%s\"\n", result, expected);
+}
+
+private void check_encode_required_message (int32 int_value, string string_value, string expected)
+{
+    var value = new TestRequiredMessage ();
     value.int_value = int_value;
     value.string_value = string_value;
 
@@ -388,7 +421,7 @@ private void check_encode_message (int32 int_value, string string_value, string 
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
+        stderr.printf ("encode_required_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
 }
 
 private void check_encode_optional_message (int32 int_value, string string_value, string expected)

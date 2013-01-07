@@ -121,12 +121,14 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
-    check_decode_message ("", 0, "", true);
-    check_decode_message ("0800", 0, "", true);
-    check_decode_message ("1200", 0, "", true);
-    check_decode_message ("08001200", 0, "");
-    check_decode_message ("0802120454455354", 1, "TEST");
-    check_decode_message ("08021204544553541A03313233", 1, "TEST");
+    check_decode_message ("08FFFFFFFFFFFFFFFFFF011001180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
+
+    check_decode_required_message ("", 0, "", true);
+    check_decode_required_message ("0800", 0, "", true);
+    check_decode_required_message ("1200", 0, "", true);
+    check_decode_required_message ("08001200", 0, "");
+    check_decode_required_message ("0802120454455354", 1, "TEST");
+    check_decode_required_message ("08021204544553541A03313233", 1, "TEST");
 
     check_decode_optional_message ("", 0, "");
     check_decode_optional_message ("0802", 1, "");
@@ -392,9 +394,44 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
-private void check_decode_message (string data, int32 int_value, string string_value, bool error = false)
+private void check_decode_message (string data, bool error = false)
 {
     var result = new TestMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+    var result_value_bytes = array_to_string (result.value_bytes.data);
+
+    var matches = result.value_int32 == -1 &&
+                  result.value_uint32 == 1 &&
+                  result.value_sint32 == -1 &&
+                  result.value_fixed32 == 1 &&
+                  result.value_sfixed32 == -1 &&
+                  result.value_int64 == -1 &&
+                  result.value_uint64 == 1 &&
+                  result.value_sint64 == -1 &&
+                  result.value_fixed64 == 1 &&
+                  result.value_sfixed64 == -1 &&
+                  result.value_bool == true &&
+                  result.value_enum == TestEnum.ONE &&
+                  result.value_string == "TEST" &&
+                  result_value_bytes == "BEEF" &&
+                  result.value_double == 1.0d &&
+                  result.value_float == 1.0f;
+
+    n_tests++;
+    if (!error && !buffer.error && matches)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else
+        stderr.printf ("decode_message (\"%s\") -> ?\n", data);
+}
+
+private void check_decode_required_message (string data, int32 int_value, string string_value, bool error = false)
+{
+    var result = new TestRequiredMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -404,9 +441,9 @@ private void check_decode_message (string data, int32 int_value, string string_v
     else if (error && buffer.error)
         n_passed++;
     else if (buffer.error != error)
-        stderr.printf ("decode_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+        stderr.printf ("decode_required_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
-        stderr.printf ("decode_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
+        stderr.printf ("decode_required_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
 }
 

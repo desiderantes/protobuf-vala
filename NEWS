@@ -5,6 +5,7 @@ Overview of changed in protobuf-vala 0.0.7
   * Messages now extend Protobuf.Message
   * Make data length optional when decoding
   * Return success on decode methods
+  * Fix encoding of fixed width 32 and 64 bit types
 
 Overview of changed in protobuf-vala 0.0.6
 
