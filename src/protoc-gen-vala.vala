@@ -179,10 +179,28 @@ private static string write_class (DescriptorProto type, string indent = "")
             decode_method = "buffer.DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
             break;
         }
-        
+
+        var packed = field.options != null && field.options.packed;
+        if (packed)
+            wire_type = 2;
+
         text += indent + "            %s (field_number == %d && wire_type == %d)\n".printf (first ? "if" : "else if", field.number, wire_type);
         if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
-            text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
+        {
+            if (packed)
+            {
+                text += indent + "            {\n";
+                text += indent + "                var %s_length = buffer.decode_varint ();\n".printf (field.name);
+                text += indent + "                var %s_end = buffer.read_index + %s_length;\n".printf (field.name, field.name);
+                text += indent + "                while (buffer.read_index < %s_end)\n".printf (field.name);
+                text += indent + "                    this.%s.append (%s);\n".printf (field.name, decode_method);
+                text += indent + "                if (buffer.read_index != %s_end)\n".printf (field.name);
+                text += indent + "                    buffer.error = true;\n";
+                text += indent + "            }\n";
+            }
+            else
+                text += indent + "                this.%s.append (%s);\n".printf (field.name, decode_method);
+        }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REQUIRED)
         {
             text += indent + "            {\n";
@@ -220,6 +238,7 @@ private static string write_class (DescriptorProto type, string indent = "")
     for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
     {
         var field = i.data;
+        var packed = field.options != null && field.options.packed;
         var indent2 = indent;
         var field_name = "this.%s".printf (field.name);
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
@@ -230,6 +249,8 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
         else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
         {
+            if (packed)
+                text += indent + "        size_t %s_length = 0;\n".printf (field.name);
             text += indent + "        for (unowned %s i = this.%s.last (); i != null; i = i.prev)\n".printf (get_type_name (field), field.name);
             text += indent + "        {\n";
             indent2 += "    ";
@@ -249,6 +270,8 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent2 + "        ";
         if (encode_length)
             text += "var %s_length = ".printf (field.name);
+        else if (packed)
+            text += "%s_length += ".printf (field.name);
         else
             text += "n_written += ";
         switch (field.type)
@@ -315,13 +338,27 @@ private static string write_class (DescriptorProto type, string indent = "")
         }
 
         /* Encode key */
-        var n = field.number << 3;
-        if (encode_length)
-            n |= 2;     
-        text += indent2 + "        n_written += buffer.encode_varint (%d);\n".printf (n);
+        if (!packed)
+        {
+            var n = field.number << 3;
+            if (encode_length)
+                n |= 2;
+            text += indent2 + "        n_written += buffer.encode_varint (%d);\n".printf (n);
+        }
 
         if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
             text += indent + "        }\n";
+
+        if (packed)
+        {
+            var n = field.number << 3 | 2;
+            text += indent2 + "    if (%s_length != 0)\n".printf (field.name);
+            text += indent2 + "    {\n";
+            text += indent2 + "        n_written += %s_length;\n".printf (field.name);
+            text += indent2 + "        n_written += buffer.encode_varint (%s_length);\n".printf (field.name);
+            text += indent2 + "        n_written += buffer.encode_varint (%d);\n".printf (n);
+            text += indent2 + "    }\n";
+        }
     }
     text += "\n";
     text += indent + "        return n_written;\n";

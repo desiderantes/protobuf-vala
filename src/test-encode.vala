@@ -128,6 +128,10 @@ public static int main (string[] args)
     check_encode_repeated_message ("1", "0801");
     check_encode_repeated_message ("1 2 3 4", "0801080208030804");
 
+    check_encode_repeated_packed_message ("", "");
+    check_encode_repeated_packed_message ("1", "0A0101");
+    check_encode_repeated_packed_message ("1 2 3 4", "0A0401020304");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -433,6 +437,24 @@ private void check_encode_repeated_message (string repeated_value, string expect
         n_passed++;
     else
         stderr.printf ("encode_repeated_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
+}
+
+private void check_encode_repeated_packed_message (string repeated_value, string expected)
+{
+    var value = new TestRepeatedPackedMessage ();
+    var values = repeated_value.split (" ");
+    for (var i = 0; i < values.length; i++)
+        value.value.append (int.parse (values[i]));
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_repeated_packed_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)

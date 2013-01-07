@@ -142,6 +142,23 @@ public static int main (string[] args)
     check_decode_repeated_message ("0801", "1");
     check_decode_repeated_message ("0801080208030804", "1 2 3 4");
 
+    check_decode_repeated_message ("", "");
+    check_decode_repeated_message ("0801", "1");
+    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
+
+    check_decode_repeated_message ("", "");
+    check_decode_repeated_message ("0801", "1");
+    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
+
+    check_decode_repeated_message ("", "");
+    check_decode_repeated_message ("0801", "1");
+    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
+
+    check_decode_repeated_packed_message ("", "");
+    check_decode_repeated_packed_message ("0A0101", "1");
+    check_decode_repeated_packed_message ("0A0401020304", "1 2 3 4");
+    check_decode_repeated_packed_message ("0A0201020A020304", "1 2 3 4");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -435,7 +452,28 @@ private void check_decode_repeated_message (string data, string expected)
     if (result_value == expected)
         n_passed++;
     else
-        stderr.printf ("decode_optional_message (\"%s\") -> %s, expected %s\n", data, result_value, expected);
+        stderr.printf ("decode_repeated_message (\"%s\") -> %s, expected %s\n", data, result_value, expected);
+}
+
+private void check_decode_repeated_packed_message (string data, string expected)
+{
+    var result = new TestRepeatedPackedMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer, buffer.buffer.length);
+
+    var result_value = "";
+    foreach (var v in result.value)
+    {
+        if (result_value != "")
+            result_value += " ";
+        result_value += "%u".printf (v);
+    }
+
+    n_tests++;
+    if (result_value == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_repeated_packed_message (\"%s\") -> %s, expected %s\n", data, result_value, expected);
 }
 
 private Protobuf.DecodeBuffer string_to_buffer (string data)

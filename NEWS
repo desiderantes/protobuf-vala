@@ -2,6 +2,7 @@ Overview of changed in protobuf-vala 0.0.6
 
   * Fix crash in encode test
   * Correctly indent to_string method output
+  * Support packed repeated fields
 
 Overview of changed in protobuf-vala 0.0.5
 

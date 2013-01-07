@@ -20,3 +20,8 @@ message TestRepeatedMessage
 {
     repeated uint32 value = 1;
 }
+
+message TestRepeatedPackedMessage
+{
+    repeated uint32 value = 1 [packed = true];
+}
