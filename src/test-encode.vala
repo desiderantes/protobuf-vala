@@ -428,7 +428,7 @@ private uint8[] string_to_array (string data)
 {
     var value = new uint8[data.length / 2];
 
-    for (var i = 0; i < data.length; i++)
+    for (var i = 0; i < value.length; i++)
         value[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
 
     return value;
