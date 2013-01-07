@@ -10,7 +10,7 @@ public static int main (string[] args)
     var req = new CodeGeneratorRequest ();
     req.decode (buf, n_read);
 
-    stderr.printf ("request = {\n%s\n}\n", req.to_string ("  "));
+    stderr.printf ("request = {\n%s}\n", req.to_string ("  "));
 
     var resp = new CodeGeneratorResponse ();
     
@@ -55,6 +55,19 @@ private static string write_enum (EnumDescriptorProto type, string indent = "")
     text += indent + "{\n";
     foreach (var value in type.value)
         text += indent + "    %s = %d,\n".printf (value.name, value.number);
+    text += indent + "}\n";
+    text += indent + "public static string %s_to_string (%s value)\n".printf (type.name, type.name);
+    text += indent + "{\n";
+    text += indent + "    switch (value)\n";
+    text += indent + "    {\n";
+    foreach (var value in type.value)
+    {
+        text += indent + "    case %s.%s:\n".printf (type.name, value.name);
+        text += indent + "        return \"%s\";\n".printf (value.name);
+    }
+    text += indent + "    default:\n";
+    text += indent + "        return \"%d\".printf (value);\n";
+    text += indent + "    }\n";
     text += indent + "}\n";
 
     return text;
@@ -565,6 +578,9 @@ private static string get_to_string_method (FieldDescriptorProto field, string f
         return "Protobuf.bytes_to_string (%s)".printf (field_name);
     case FieldDescriptorProto.Type.TYPE_MESSAGE:
         return "%s.to_string (indent + \"%s\")".printf (field_name, indent);
+    case FieldDescriptorProto.Type.TYPE_ENUM:
+        var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
+        return "%s_to_string (%s)".printf (type_name, field_name);
     default:
         return "%s.to_string ()".printf (field_name);
     }

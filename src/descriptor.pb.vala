@@ -467,11 +467,69 @@ public class FieldDescriptorProto
         TYPE_SINT32 = 17,
         TYPE_SINT64 = 18,
     }
+    public static string Type_to_string (Type value)
+    {
+        switch (value)
+        {
+        case Type.TYPE_DOUBLE:
+            return "TYPE_DOUBLE";
+        case Type.TYPE_FLOAT:
+            return "TYPE_FLOAT";
+        case Type.TYPE_INT64:
+            return "TYPE_INT64";
+        case Type.TYPE_UINT64:
+            return "TYPE_UINT64";
+        case Type.TYPE_INT32:
+            return "TYPE_INT32";
+        case Type.TYPE_FIXED64:
+            return "TYPE_FIXED64";
+        case Type.TYPE_FIXED32:
+            return "TYPE_FIXED32";
+        case Type.TYPE_BOOL:
+            return "TYPE_BOOL";
+        case Type.TYPE_STRING:
+            return "TYPE_STRING";
+        case Type.TYPE_GROUP:
+            return "TYPE_GROUP";
+        case Type.TYPE_MESSAGE:
+            return "TYPE_MESSAGE";
+        case Type.TYPE_BYTES:
+            return "TYPE_BYTES";
+        case Type.TYPE_UINT32:
+            return "TYPE_UINT32";
+        case Type.TYPE_ENUM:
+            return "TYPE_ENUM";
+        case Type.TYPE_SFIXED32:
+            return "TYPE_SFIXED32";
+        case Type.TYPE_SFIXED64:
+            return "TYPE_SFIXED64";
+        case Type.TYPE_SINT32:
+            return "TYPE_SINT32";
+        case Type.TYPE_SINT64:
+            return "TYPE_SINT64";
+        default:
+            return "%d".printf (value);
+        }
+    }
     public enum Label
     {
         LABEL_OPTIONAL = 1,
         LABEL_REQUIRED = 2,
         LABEL_REPEATED = 3,
+    }
+    public static string Label_to_string (Label value)
+    {
+        switch (value)
+        {
+        case Label.LABEL_OPTIONAL:
+            return "LABEL_OPTIONAL";
+        case Label.LABEL_REQUIRED:
+            return "LABEL_REQUIRED";
+        case Label.LABEL_REPEATED:
+            return "LABEL_REPEATED";
+        default:
+            return "%d".printf (value);
+        }
     }
     public string name = "";
     public int32 number = 0;
@@ -585,8 +643,8 @@ public class FieldDescriptorProto
 
         text += indent + "name: %s\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "number: %s\n".printf (this.number.to_string ());
-        text += indent + "label: %s\n".printf (this.label.to_string ());
-        text += indent + "type: %s\n".printf (this.type.to_string ());
+        text += indent + "label: %s\n".printf (Label_to_string (this.label));
+        text += indent + "type: %s\n".printf (Type_to_string (this.type));
         text += indent + "type_name: %s\n".printf (Protobuf.string_to_string (this.type_name));
         text += indent + "extendee: %s\n".printf (Protobuf.string_to_string (this.extendee));
         text += indent + "default_value: %s\n".printf (Protobuf.string_to_string (this.default_value));
@@ -952,6 +1010,20 @@ public class FileOptions
         CODE_SIZE = 2,
         LITE_RUNTIME = 3,
     }
+    public static string OptimizeMode_to_string (OptimizeMode value)
+    {
+        switch (value)
+        {
+        case OptimizeMode.SPEED:
+            return "SPEED";
+        case OptimizeMode.CODE_SIZE:
+            return "CODE_SIZE";
+        case OptimizeMode.LITE_RUNTIME:
+            return "LITE_RUNTIME";
+        default:
+            return "%d".printf (value);
+        }
+    }
     public string java_package = "";
     public string java_outer_classname = "";
     public bool java_multiple_files = false;
@@ -1070,7 +1142,7 @@ public class FileOptions
         text += indent + "java_outer_classname: %s\n".printf (Protobuf.string_to_string (this.java_outer_classname));
         text += indent + "java_multiple_files: %s\n".printf (this.java_multiple_files.to_string ());
         text += indent + "java_generate_equals_and_hash: %s\n".printf (this.java_generate_equals_and_hash.to_string ());
-        text += indent + "optimize_for: %s\n".printf (this.optimize_for.to_string ());
+        text += indent + "optimize_for: %s\n".printf (OptimizeMode_to_string (this.optimize_for));
         text += indent + "cc_generic_services: %s\n".printf (this.cc_generic_services.to_string ());
         text += indent + "java_generic_services: %s\n".printf (this.java_generic_services.to_string ());
         text += indent + "py_generic_services: %s\n".printf (this.py_generic_services.to_string ());
@@ -1170,6 +1242,20 @@ public class FieldOptions
         CORD = 1,
         STRING_PIECE = 2,
     }
+    public static string CType_to_string (CType value)
+    {
+        switch (value)
+        {
+        case CType.STRING:
+            return "STRING";
+        case CType.CORD:
+            return "CORD";
+        case CType.STRING_PIECE:
+            return "STRING_PIECE";
+        default:
+            return "%d".printf (value);
+        }
+    }
     public CType ctype = 0;
     public bool packed = false;
     public bool deprecated = false;
@@ -1250,7 +1336,7 @@ public class FieldOptions
     {
         var text = "";
 
-        text += indent + "ctype: %s\n".printf (this.ctype.to_string ());
+        text += indent + "ctype: %s\n".printf (CType_to_string (this.ctype));
         text += indent + "packed: %s\n".printf (this.packed.to_string ());
         text += indent + "deprecated: %s\n".printf (this.deprecated.to_string ());
         text += indent + "experimental_map_key: %s\n".printf (Protobuf.string_to_string (this.experimental_map_key));
