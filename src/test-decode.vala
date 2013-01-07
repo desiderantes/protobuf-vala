@@ -138,6 +138,10 @@ public static int main (string[] args)
     check_decode_optional_defaults_message ("0800", 0, "TEST");
     check_decode_optional_defaults_message ("", 1, "TEST");
 
+    check_decode_repeated_message ("", "");
+    check_decode_repeated_message ("0801", "1");
+    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -411,6 +415,27 @@ private void check_decode_optional_defaults_message (string data, int32 int_valu
     else
         stderr.printf ("decode_optional_defaults_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
+}
+
+private void check_decode_repeated_message (string data, string expected)
+{
+    var result = new TestRepeatedMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer, buffer.buffer.length);
+
+    var result_value = "";
+    foreach (var v in result.value)
+    {
+        if (result_value != "")
+            result_value += " ";
+        result_value += "%u".printf (v);
+    }
+
+    n_tests++;
+    if (result_value == expected)
+        n_passed++;
+    else
+        stderr.printf ("decode_optional_message (\"%s\") -> %s, expected %s\n", data, result_value, expected);
 }
 
 private Protobuf.DecodeBuffer string_to_buffer (string data)

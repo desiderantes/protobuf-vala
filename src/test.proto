@@ -15,3 +15,8 @@ message TestOptionalDefaultsMessage
     optional sint32 int_value = 1 [default = 1];
     optional string string_value = 2 [default = "TEST"];
 }
+
+message TestRepeatedMessage
+{
+    repeated uint32 value = 1;
+}

@@ -124,6 +124,10 @@ public static int main (string[] args)
     check_encode_optional_defaults_message (0, "TEST", "0800");
     check_encode_optional_defaults_message (1, "TEST", "");
 
+    check_encode_repeated_message ("", "");
+    check_encode_repeated_message ("1", "0801");
+    check_encode_repeated_message ("1 2 3 4", "0801080208030804");
+
     if (n_passed != n_tests)
     {
         stderr.printf ("Failed %d/%d tests\n", n_tests - n_passed, n_tests);
@@ -411,6 +415,24 @@ private void check_encode_optional_defaults_message (int32 int_value, string str
         n_passed++;
     else
         stderr.printf ("encode_optional_defaults_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
+}
+
+private void check_encode_repeated_message (string repeated_value, string expected)
+{
+    var value = new TestRepeatedMessage ();
+    var values = repeated_value.split (" ");
+    for (var i = 0; i < values.length; i++)
+        value.value.append (int.parse (values[i]));
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_repeated_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)
