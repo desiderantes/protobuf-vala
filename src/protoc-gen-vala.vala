@@ -10,7 +10,7 @@ public static int main (string[] args)
         return 1;
     buf.buffer.length = (int) n_read;
     var req = new CodeGeneratorRequest ();
-    req.decode (buf, n_read);
+    req.decode (buf);
 
     //stderr.printf ("request = {\n%s}\n", req.to_string ("  "));
 
@@ -81,7 +81,7 @@ private static string write_enum (EnumDescriptorProto type, string indent = "")
 private static string write_class (DescriptorProto type, string indent = "")
 {
     var text = "";
-    text += indent + "public class %s\n".printf (type.name);
+    text += indent + "public class %s : Protobuf.Message\n".printf (type.name);
     text += indent + "{\n";
     foreach (var enum_type in type.enum_type)
         text += write_enum (enum_type, indent + "    ");
@@ -92,14 +92,18 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent + "    public %s %s = %s;\n".printf (get_type_name (field), field.name, get_default_value (field));
     }
     text += "\n";
-    text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, size_t data_length)\n".printf (type.name);
+    text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1)\n".printf (type.name);
     text += indent + "    {\n";
     text += indent + "        decode (buffer, data_length);\n";
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public void decode (Protobuf.DecodeBuffer buffer, size_t data_length)\n";
+    text += indent + "    public override bool decode (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1)\n";
     text += indent + "    {\n";
-    text += indent + "        var end = buffer.read_index + data_length;\n";
+    text += indent + "        size_t end;\n";
+    text += indent + "        if (data_length < 0)\n";
+    text += indent + "            end = buffer.buffer.length;\n";
+    text += indent + "        else\n";
+    text += indent + "            end = buffer.read_index + data_length;\n";
     var required_field_check = "";
     foreach (var field in type.field)
     {
@@ -166,7 +170,7 @@ private static string write_class (DescriptorProto type, string indent = "")
             break;
         case FieldDescriptorProto.Type.TYPE_MESSAGE:
             wire_type = 2;
-            decode_method = "new %s.from_data (buffer, (size_t) buffer.decode_varint ())".printf (get_type_name (field, false));
+            decode_method = "new %s.from_data (buffer, (ssize_t) buffer.decode_varint ())".printf (get_type_name (field, false));
             break;
         case FieldDescriptorProto.Type.TYPE_ENUM:
             wire_type = 0;
@@ -242,14 +246,11 @@ private static string write_class (DescriptorProto type, string indent = "")
         text += indent + "        else if (%s)\n".printf (required_field_check);
         text += indent + "            buffer.error = true;\n";
     }
-    // FIXME
-    //
-    //if (buffer.read_offset != end)
-    //    stderr.printf ("Unused %zu octets on end of X\n", offset - length);
-    //
+    text += "\n";
+    text += indent + "        return !buffer.error;\n";
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public size_t encode (Protobuf.EncodeBuffer buffer)\n";
+    text += indent + "    public override size_t encode (Protobuf.EncodeBuffer buffer)\n";
     text += indent + "    {\n";
     text += indent + "        size_t n_written = 0;\n";
     text += "\n";
@@ -382,7 +383,7 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "        return n_written;\n";
     text += indent + "    }\n";
     text += "\n";
-    text += indent + "    public string to_string (string indent = \"\")\n";
+    text += indent + "    public override string to_string (string indent = \"\")\n";
     text += indent + "    {\n";
     text += indent + "        var text = \"\";\n";
     text += "\n";

@@ -396,7 +396,7 @@ private void check_decode_message (string data, int32 int_value, string string_v
 {
     var result = new TestMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     n_tests++;
     if (!error && !buffer.error && result.int_value == int_value && result.string_value == string_value)
@@ -414,7 +414,7 @@ private void check_decode_optional_message (string data, int32 int_value, string
 {
     var result = new TestOptionalMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     n_tests++;
     if (result.int_value == int_value && result.string_value == string_value)
@@ -428,7 +428,7 @@ private void check_decode_optional_defaults_message (string data, int32 int_valu
 {
     var result = new TestOptionalDefaultsMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     n_tests++;
     if (result.int_value == int_value && result.string_value == string_value)
@@ -442,7 +442,7 @@ private void check_decode_enum_message (string data, TestEnum enum_value, TestEn
 {
     var result = new TestEnumMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     n_tests++;
     if (!error && !buffer.error && result.enum_value == enum_value && result.enum_value_o == enum_value_o && result.enum_value_od == enum_value_od)
@@ -460,7 +460,7 @@ private void check_decode_repeated_message (string data, string expected)
 {
     var result = new TestRepeatedMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     var result_value = "";
     foreach (var v in result.value)
@@ -481,7 +481,7 @@ private void check_decode_repeated_packed_message (string data, string expected)
 {
     var result = new TestRepeatedPackedMessage ();
     var buffer = string_to_buffer (data);
-    result.decode (buffer, buffer.buffer.length);
+    result.decode (buffer);
 
     var result_value = "";
     foreach (var v in result.value)

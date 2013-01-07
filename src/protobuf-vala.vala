@@ -1,5 +1,12 @@
 namespace Protobuf
 {
+    public abstract class Message
+    {
+        public abstract size_t encode (Protobuf.EncodeBuffer buffer);
+        public abstract bool decode (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1);
+        public abstract string to_string (string indent = "");
+    }
+
     public class DecodeBuffer
     {
         public uint8[] buffer;

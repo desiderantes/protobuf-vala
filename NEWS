@@ -2,6 +2,9 @@ Overview of changed in protobuf-vala 0.0.7
 
   * Use the existing protoc text format for to_string()
   * Correctly implement enum defaults
+  * Messages now extend Protobuf.Message
+  * Make data length optional when decoding
+  * Return success on decode methods
 
 Overview of changed in protobuf-vala 0.0.6
 
