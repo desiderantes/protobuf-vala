@@ -515,7 +515,7 @@ private static string get_to_string_method (FieldDescriptorProto field, string f
     switch (field.type)
     {
     case FieldDescriptorProto.Type.TYPE_STRING:
-        return "\"\\\"%%s\\\"\".printf (%s)".printf (field_name);
+        return "Protobuf.string_to_string (%s)".printf (field_name);
     case FieldDescriptorProto.Type.TYPE_BYTES:
         return "Protobuf.bytes_to_string (%s)".printf (field_name);
     case FieldDescriptorProto.Type.TYPE_MESSAGE:

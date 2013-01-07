@@ -383,4 +383,11 @@ namespace Protobuf
             text += "%02X".printf (value.data[i]);
         return text;
     }
+
+    public static string string_to_string (string value)
+    {
+        var v = value.replace ("\\", "\\\\");
+        v = value.replace ("\"", "\\\"");
+        return "\"%s\"".printf (v);
+    }
 }

@@ -71,10 +71,10 @@ public class CodeGeneratorRequest
         text += indent + "    file_to_generate =\n";
         text += indent + "    [\n";
         foreach (unowned string v in this.file_to_generate)
-            text += indent + "        %s,\n".printf ("\"%s\"".printf (v));
+            text += indent + "        %s,\n".printf (Protobuf.string_to_string (v));
         text += indent + "    ];\n";
 
-        text += indent + "    parameter = %s;\n".printf ("\"%s\"".printf (this.parameter));
+        text += indent + "    parameter = %s;\n".printf (Protobuf.string_to_string (this.parameter));
         text += indent + "    proto_file =\n";
         text += indent + "    [\n";
         foreach (unowned FileDescriptorProto v in this.proto_file)
@@ -158,9 +158,9 @@ public class CodeGeneratorResponse
         {
             var text = "{\n";
 
-            text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
-            text += indent + "    insertion_point = %s;\n".printf ("\"%s\"".printf (this.insertion_point));
-            text += indent + "    content = %s;\n".printf ("\"%s\"".printf (this.content));
+            text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
+            text += indent + "    insertion_point = %s;\n".printf (Protobuf.string_to_string (this.insertion_point));
+            text += indent + "    content = %s;\n".printf (Protobuf.string_to_string (this.content));
 
             text += indent + "}";
 
@@ -223,7 +223,7 @@ public class CodeGeneratorResponse
     {
         var text = "{\n";
 
-        text += indent + "    error = %s;\n".printf ("\"%s\"".printf (this.error));
+        text += indent + "    error = %s;\n".printf (Protobuf.string_to_string (this.error));
         text += indent + "    file =\n";
         text += indent + "    [\n";
         foreach (unowned File v in this.file)

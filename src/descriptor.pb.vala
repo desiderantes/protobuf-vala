@@ -189,12 +189,12 @@ public class FileDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
-        text += indent + "    package = %s;\n".printf ("\"%s\"".printf (this.package));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
+        text += indent + "    package = %s;\n".printf (Protobuf.string_to_string (this.package));
         text += indent + "    dependency =\n";
         text += indent + "    [\n";
         foreach (unowned string v in this.dependency)
-            text += indent + "        %s,\n".printf ("\"%s\"".printf (v));
+            text += indent + "        %s,\n".printf (Protobuf.string_to_string (v));
         text += indent + "    ];\n";
 
         text += indent + "    message_type =\n";
@@ -402,7 +402,7 @@ public class DescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "    field =\n";
         text += indent + "    [\n";
         foreach (unowned FieldDescriptorProto v in this.field)
@@ -581,13 +581,13 @@ public class FieldDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "    number = %s;\n".printf (this.number.to_string ());
         text += indent + "    label = %s;\n".printf (this.label.to_string ());
         text += indent + "    type = %s;\n".printf (this.type.to_string ());
-        text += indent + "    type_name = %s;\n".printf ("\"%s\"".printf (this.type_name));
-        text += indent + "    extendee = %s;\n".printf ("\"%s\"".printf (this.extendee));
-        text += indent + "    default_value = %s;\n".printf ("\"%s\"".printf (this.default_value));
+        text += indent + "    type_name = %s;\n".printf (Protobuf.string_to_string (this.type_name));
+        text += indent + "    extendee = %s;\n".printf (Protobuf.string_to_string (this.extendee));
+        text += indent + "    default_value = %s;\n".printf (Protobuf.string_to_string (this.default_value));
         if (options != null)
             text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
@@ -665,7 +665,7 @@ public class EnumDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "    value =\n";
         text += indent + "    [\n";
         foreach (unowned EnumValueDescriptorProto v in this.value)
@@ -747,7 +747,7 @@ public class EnumValueDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "    number = %s;\n".printf (this.number.to_string ());
         if (options != null)
             text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
@@ -826,7 +826,7 @@ public class ServiceDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
         text += indent + "    method =\n";
         text += indent + "    [\n";
         foreach (unowned MethodDescriptorProto v in this.method)
@@ -920,9 +920,9 @@ public class MethodDescriptorProto
     {
         var text = "{\n";
 
-        text += indent + "    name = %s;\n".printf ("\"%s\"".printf (this.name));
-        text += indent + "    input_type = %s;\n".printf ("\"%s\"".printf (this.input_type));
-        text += indent + "    output_type = %s;\n".printf ("\"%s\"".printf (this.output_type));
+        text += indent + "    name = %s;\n".printf (Protobuf.string_to_string (this.name));
+        text += indent + "    input_type = %s;\n".printf (Protobuf.string_to_string (this.input_type));
+        text += indent + "    output_type = %s;\n".printf (Protobuf.string_to_string (this.output_type));
         if (options != null)
             text += indent + "    options = %s;\n".printf (this.options.to_string (indent + "    "));
 
@@ -1054,8 +1054,8 @@ public class FileOptions
     {
         var text = "{\n";
 
-        text += indent + "    java_package = %s;\n".printf ("\"%s\"".printf (this.java_package));
-        text += indent + "    java_outer_classname = %s;\n".printf ("\"%s\"".printf (this.java_outer_classname));
+        text += indent + "    java_package = %s;\n".printf (Protobuf.string_to_string (this.java_package));
+        text += indent + "    java_outer_classname = %s;\n".printf (Protobuf.string_to_string (this.java_outer_classname));
         text += indent + "    java_multiple_files = %s;\n".printf (this.java_multiple_files.to_string ());
         text += indent + "    java_generate_equals_and_hash = %s;\n".printf (this.java_generate_equals_and_hash.to_string ());
         text += indent + "    optimize_for = %s;\n".printf (this.optimize_for.to_string ());
@@ -1245,7 +1245,7 @@ public class FieldOptions
         text += indent + "    ctype = %s;\n".printf (this.ctype.to_string ());
         text += indent + "    packed = %s;\n".printf (this.packed.to_string ());
         text += indent + "    deprecated = %s;\n".printf (this.deprecated.to_string ());
-        text += indent + "    experimental_map_key = %s;\n".printf ("\"%s\"".printf (this.experimental_map_key));
+        text += indent + "    experimental_map_key = %s;\n".printf (Protobuf.string_to_string (this.experimental_map_key));
         text += indent + "    uninterpreted_option =\n";
         text += indent + "    [\n";
         foreach (unowned UninterpretedOption v in this.uninterpreted_option)
@@ -1565,7 +1565,7 @@ public class UninterpretedOption
         {
             var text = "{\n";
 
-            text += indent + "    name_part = %s;\n".printf ("\"%s\"".printf (this.name_part));
+            text += indent + "    name_part = %s;\n".printf (Protobuf.string_to_string (this.name_part));
             text += indent + "    is_extension = %s;\n".printf (this.is_extension.to_string ());
 
             text += indent + "}";
@@ -1679,12 +1679,12 @@ public class UninterpretedOption
             text += indent + "        %s,\n".printf (v.to_string (indent + "        "));
         text += indent + "    ];\n";
 
-        text += indent + "    identifier_value = %s;\n".printf ("\"%s\"".printf (this.identifier_value));
+        text += indent + "    identifier_value = %s;\n".printf (Protobuf.string_to_string (this.identifier_value));
         text += indent + "    positive_int_value = %s;\n".printf (this.positive_int_value.to_string ());
         text += indent + "    negative_int_value = %s;\n".printf (this.negative_int_value.to_string ());
         text += indent + "    double_value = %s;\n".printf (this.double_value.to_string ());
         text += indent + "    string_value = %s;\n".printf (Protobuf.bytes_to_string (this.string_value));
-        text += indent + "    aggregate_value = %s;\n".printf ("\"%s\"".printf (this.aggregate_value));
+        text += indent + "    aggregate_value = %s;\n".printf (Protobuf.string_to_string (this.aggregate_value));
 
         text += indent + "}";
 
