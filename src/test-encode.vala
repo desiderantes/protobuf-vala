@@ -111,8 +111,8 @@ public static int main (string[] args)
     check_buffer_resize (2, 3);
     check_buffer_resize (8, 1);
 
-    check_encode_message (0, "", "08001200");
-    check_encode_message (1, "TEST", "0802120454455354");
+    check_encode_message (0, "", TestEnum.TWO, "080012001802");
+    check_encode_message (1, "TEST", TestEnum.TWO, "08021204544553541802");
 
     check_encode_optional_message (0, "", "");
     check_encode_optional_message (1, "", "0802");
@@ -370,11 +370,12 @@ private void check_buffer_resize (size_t value_length, size_t buffer_length)
         stderr.printf ("buffer_resize (%zu, %zu) -> \"%s\", expected \"%s\"\n", value_length, buffer_length, result, value);
 }
 
-private void check_encode_message (int32 int_value, string string_value, string expected)
+private void check_encode_message (int32 int_value, string string_value, TestEnum enum_value, string expected)
 {
     var value = new TestMessage ();
     value.int_value = int_value;
     value.string_value = string_value;
+    value.enum_value = enum_value;
 
     var buffer = new Protobuf.EncodeBuffer ();
     value.encode (buffer);
@@ -384,7 +385,7 @@ private void check_encode_message (int32 int_value, string string_value, string 
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_message (int_value=%d string_value=\"%s\") -> \"%s\", expected \"%s\"\n", int_value, string_value, result, expected);
+        stderr.printf ("encode_message (int_value=%d string_value=\"%s\" enum_value=%s) -> \"%s\", expected \"%s\"\n", int_value, string_value, TestEnum_to_string (enum_value), result, expected);
 }
 
 private void check_encode_optional_message (int32 int_value, string string_value, string expected)

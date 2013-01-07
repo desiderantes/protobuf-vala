@@ -1,7 +1,15 @@
+enum TestEnum
+{
+    ONE = 1;
+    TWO = 2;
+    THREE = 3;
+}
+
 message TestMessage
 {
     required sint32 int_value = 1;
     required string string_value = 2;
+    required TestEnum enum_value = 3;
 }
 
 message TestOptionalMessage
