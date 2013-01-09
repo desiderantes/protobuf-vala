@@ -88,10 +88,14 @@ private static string write_class (DescriptorProto type, string indent = "")
     foreach (var nested_type in type.nested_type)
         text += write_class (nested_type, indent + "    ");
     foreach (var field in type.field)
-    {
-        text += indent + "    public %s %s = %s;\n".printf (get_type_name (field), get_field_name (field), get_default_value (field));
-    }
+        text += indent + "    public %s %s;\n".printf (get_type_name (field), get_field_name (field));
     text += "\n";
+    text += indent + "    public %s ()\n".printf (type.name);
+    text += indent + "    {\n";
+    foreach (var field in type.field)
+        text += indent + "        this.%s = %s;\n".printf (get_field_name (field), get_default_value (field));
+    text += indent + "    }\n";
+    text += "\n";    
     text += indent + "    public %s.from_data (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1)\n".printf (type.name);
     text += indent + "    {\n";
     text += indent + "        decode (buffer, data_length);\n";
@@ -115,6 +119,8 @@ private static string write_class (DescriptorProto type, string indent = "")
         required_field_check += "!have_%s".printf (field.name);
     }
     text += "\n";
+    foreach (var field in type.field)
+        text += indent + "        this.%s = %s;\n".printf (get_field_name (field), get_default_value (field));
     text += indent + "        while (buffer.read_index < end)\n";
     text += indent + "        {\n";
     text += indent + "            var key = buffer.decode_varint ();\n";
@@ -565,15 +571,8 @@ private static string get_field_name (FieldDescriptorProto field)
 
 private static string get_default_value (FieldDescriptorProto field)
 {
-    switch (field.label)
-    {
-    case FieldDescriptorProto.Label.LABEL_REPEATED:
-        return "null";
-    default:
-    case FieldDescriptorProto.Label.LABEL_REQUIRED:
-    case FieldDescriptorProto.Label.LABEL_OPTIONAL:
-        break;
-    }
+    if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED)
+        return "new %s ()".printf (get_type_name (field));
 
     switch (field.type)
     {
@@ -611,8 +610,12 @@ private static string get_default_value (FieldDescriptorProto field)
         else
             return "\"\"";
     case FieldDescriptorProto.Type.TYPE_BYTES:
-    case FieldDescriptorProto.Type.TYPE_MESSAGE:
         return "null";
+    case FieldDescriptorProto.Type.TYPE_MESSAGE:
+        if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL)
+            return "null";
+        else
+            return "new %s ()".printf (get_type_name (field));
     case FieldDescriptorProto.Type.TYPE_ENUM:
         var type_name = field.type_name.substring (field.type_name.last_index_of (".") + 1);
         var enum_type = enums.lookup (field.type_name);

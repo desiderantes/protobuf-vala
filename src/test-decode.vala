@@ -134,6 +134,7 @@ public static int main (string[] args)
     check_decode_optional_message ("0802", 1, "");
     check_decode_optional_message ("120454455354", 0, "TEST");
     check_decode_optional_message ("0802120454455354", 1, "TEST");
+    check_decode_optional_message_twice ("120454455354", "0802", 1, "");
 
     check_decode_optional_defaults_message ("08001200", 0, "");
     check_decode_optional_defaults_message ("1200", 1, "");
@@ -459,6 +460,22 @@ private void check_decode_optional_message (string data, int32 int_value, string
     else
         stderr.printf ("decode_optional_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
+}
+
+private void check_decode_optional_message_twice (string data1, string data2, int32 int_value, string string_value)
+{
+    var result = new TestOptionalMessage ();
+    var buffer1 = string_to_buffer (data1);
+    result.decode (buffer1);
+    var buffer2 = string_to_buffer (data2);
+    result.decode (buffer2);
+
+    n_tests++;
+    if (result.int_value == int_value && result.string_value == string_value)
+        n_passed++;
+    else
+        stderr.printf ("decode_optional_message_twice (\"%s\", \"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
+                       data1, data2, result.int_value, result.string_value, int_value, string_value);
 }
 
 private void check_decode_optional_defaults_message (string data, int32 int_value, string string_value)

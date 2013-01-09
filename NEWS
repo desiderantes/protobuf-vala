@@ -1,6 +1,7 @@
 Overview of changed in protobuf-vala 0.0.8
 
   * Allow fields that use keywords for names
+  * Reset fields when decoding
 
 Overview of changed in protobuf-vala 0.0.7
 
