@@ -2,9 +2,17 @@ namespace Protobuf
 {
     public abstract class Message
     {
+        protected List<UnknownField> unknown_fields;
         public abstract size_t encode (Protobuf.EncodeBuffer buffer);
         public abstract bool decode (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1);
         public abstract string to_string (string indent = "");
+    }
+
+    public class UnknownField
+    {
+        public uint64 key;
+        public uint64 varint;
+        public ByteArray data;
     }
 
     public class DecodeBuffer
@@ -190,27 +198,32 @@ namespace Protobuf
                 return v;
         }
     
-        public void decode_unknown (uint64 wire_type)
+        public UnknownField decode_unknown_field (uint64 key)
         {
+            var value = new UnknownField ();
+            value.key = key;
+            var wire_type = key & 0x7;
             switch (wire_type)
             {
             case 0: //varint
-                decode_varint ();
+                value.varint = decode_varint ();
                 break;
             case 1: //64-bit
-                read_index += 8;
+                value.data = decode_bytes (8);
                 break;
             case 2: //length-delimited
                 var length = decode_varint ();
-                read_index += (size_t) length;
+                value.data = decode_bytes ((size_t) length);
                 break;
             case 5: //32-bit
-                read_index += 4;
+                value.data = decode_bytes (4);
                 break;
             default: //FIXME: throw error
                 GLib.stderr.printf ("Unknown wire type %" + uint64.FORMAT + "\n", wire_type);
                 break;
             }
+
+            return value;
         }
     }
 
@@ -372,6 +385,34 @@ namespace Protobuf
                 return encode_varint ((uint64) (-value) * 2 - 1);
             else
                 return encode_varint ((uint64) value * 2);
+        }
+
+        public size_t encode_unknown_field (UnknownField value)
+        {
+            size_t n_written = 0;
+
+            var wire_type = value.key & 0x7;
+            switch (wire_type)
+            {
+            case 0: //varint
+                n_written += encode_varint (value.varint);
+                break;
+            case 1: //64-bit
+            case 5: //32-bit
+                n_written += encode_bytes (value.data);
+                break;
+            case 2: //length-delimited
+                n_written += encode_bytes (value.data);
+                n_written += encode_varint (value.data.len);
+                break;
+            default: //FIXME: throw error
+                GLib.stderr.printf ("Unknown wire type %" + uint64.FORMAT + "\n", wire_type);
+                break;
+            }
+
+            n_written += encode_varint (value.key);
+
+            return n_written;
         }
 
         private void allocate (size_t size)

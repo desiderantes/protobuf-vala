@@ -134,6 +134,9 @@ public static int main (string[] args)
     check_decode_required_message ("0802120454455354", 1, "TEST");
     check_decode_required_message ("08021204544553541A03313233", 1, "TEST");
 
+    check_decode_required_message_reencode ("0802120454455354");
+    check_decode_required_message_reencode ("0802120454455354180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
+
     check_decode_optional_message ("", 0, "");
     check_decode_optional_message ("0802", 1, "");
     check_decode_optional_message ("120454455354", 0, "TEST");
@@ -474,6 +477,24 @@ private void check_decode_required_message (string data, int32 int_value, string
     else
         stderr.printf ("decode_required_message (\"%s\") -> int_value=%d string_value=\"%s\", expected int_value=%d string_value=\"%s\"\n",
                        data, result.int_value, result.string_value, int_value, string_value);
+}
+
+private void check_decode_required_message_reencode (string data)
+{
+    var result = new TestRequiredMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+
+    var encode_buffer = new Protobuf.EncodeBuffer ();
+    result.encode (encode_buffer);
+
+    var encode_data = array_to_string (encode_buffer.data);
+
+    n_tests++;
+    if (encode_data == data)
+        n_passed++;
+    else
+        stderr.printf ("decode_required_message_reencode (\"%s\") -> \"%s\"\n", data, encode_data);
 }
 
 private void check_decode_optional_message (string data, int32 int_value, string string_value)

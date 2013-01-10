@@ -242,7 +242,7 @@ private static string write_class (DescriptorProto type, string indent = "")
         first = false;
     }
     text += indent + "            else\n";
-    text += indent + "                buffer.decode_unknown (wire_type);\n";
+    text += indent + "                this.unknown_fields.prepend (buffer.decode_unknown_field (key));\n";
     text += indent + "        }\n";
     text += "\n";
     text += indent + "        if (buffer.read_index != end)\n";
@@ -260,6 +260,8 @@ private static string write_class (DescriptorProto type, string indent = "")
     text += indent + "    {\n";
     text += indent + "        size_t n_written = 0;\n";
     text += "\n";
+    text += indent + "        foreach (var f in this.unknown_fields)\n";
+    text += indent + "            n_written += buffer.encode_unknown_field (f);\n";
     for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev)
     {
         var field = i.data;
