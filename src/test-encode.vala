@@ -102,6 +102,10 @@ public static int main (string[] args)
     check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01");
     check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01");
 
+    check_encode_enum_message (TestEnum.ONE, TestEnum.ONE, TestEnum.ONE, "08011801");
+    check_encode_enum_message (TestEnum.TWO, TestEnum.TWO, TestEnum.TWO, "08021002");
+    check_encode_enum_message (TestEnum.THREE, TestEnum.THREE, TestEnum.THREE, "080310031803");
+
     /* Check buffer resizing works */
     check_buffer_resize (0, 0);
     check_buffer_resize (0, 1);
@@ -134,9 +138,14 @@ public static int main (string[] args)
     check_encode_repeated_packed_message ("1", "0A0101");
     check_encode_repeated_packed_message ("1 2 3 4", "0A0401020304");
 
-    check_encode_enum_message (TestEnum.ONE, TestEnum.ONE, TestEnum.ONE, "08011801");
-    check_encode_enum_message (TestEnum.TWO, TestEnum.TWO, TestEnum.TWO, "08021002");
-    check_encode_enum_message (TestEnum.THREE, TestEnum.THREE, TestEnum.THREE, "080310031803");
+    check_encode_required_nested_message (1, "0A020801");
+
+    check_encode_optional_nested_message (null, "");
+    check_encode_optional_nested_message (1, "0A020801");
+
+    check_encode_repeated_nested_message ("", "");
+    check_encode_repeated_nested_message ("1", "0A020801");
+    check_encode_repeated_nested_message ("1 2 3", "0A0208010A0208020A020803");
 
     if (n_passed != n_tests)
     {
@@ -359,6 +368,25 @@ private void check_encode_sint64 (int64 value, string expected)
         stderr.printf ("encode_sint64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
+private void check_encode_enum_message (TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, string expected)
+{
+    var value = new TestEnumMessage ();
+    value.enum_value = enum_value;
+    value.enum_value_o = enum_value_o;
+    value.enum_value_od = enum_value_od;
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_enum_message (enum_value=%s enum_value_o=%s enum_value_od=%s) -> \"%s\", expected \"%s\"\n",
+                       TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od), result, expected);
+}
+
 private void check_buffer_resize (size_t value_length, size_t buffer_length)
 {
     var buffer = new Protobuf.EncodeBuffer (buffer_length);
@@ -494,12 +522,10 @@ private void check_encode_repeated_packed_message (string repeated_value, string
         stderr.printf ("encode_repeated_packed_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
 }
 
-private void check_encode_enum_message (TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, string expected)
+private void check_encode_required_nested_message (uint32 v, string expected)
 {
-    var value = new TestEnumMessage ();
-    value.enum_value = enum_value;
-    value.enum_value_o = enum_value_o;
-    value.enum_value_od = enum_value_od;
+    var value = new TestRequiredNestedMessage ();
+    value.child.value = v;
 
     var buffer = new Protobuf.EncodeBuffer ();
     value.encode (buffer);
@@ -509,8 +535,51 @@ private void check_encode_enum_message (TestEnum enum_value, TestEnum enum_value
     if (result == expected)
         n_passed++;
     else
-        stderr.printf ("encode_enum_message (enum_value=%s enum_value_o=%s enum_value_od=%s) -> \"%s\", expected \"%s\"\n",
-                       TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od), result, expected);
+        stderr.printf ("encode_required_nested_message (value=%u) -> \"%s\", expected \"%s\"\n", v, result, expected);
+}
+
+private void check_encode_optional_nested_message (uint32? v, string expected)
+{
+    var value = new TestOptionalNestedMessage ();
+    if (v != null)
+    {
+        value.child = new TestChildMessage ();
+        value.child.value = v;
+    }
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else if (v == null)
+        stderr.printf ("encode_optional_nested_message (value=null) -> \"%s\", expected \"%s\"\n", result, expected);
+    else
+        stderr.printf ("encode_optional_nested_message (value=%u) -> \"%s\", expected \"%s\"\n", v, result, expected);
+}
+
+private void check_encode_repeated_nested_message (string repeated_value, string expected)
+{
+    var value = new TestRepeatedNestedMessage ();
+    var values = repeated_value.split (" ");
+    for (var i = 0; i < values.length; i++)
+    {
+        var m = new TestChildMessage ();
+        m.value = int.parse (values[i]);
+        value.children.append (m);
+    }
+
+    var buffer = new Protobuf.EncodeBuffer ();
+    value.encode (buffer);
+    var result = buffer_to_string (buffer);
+
+    n_tests++;
+    if (result == expected)
+        n_passed++;
+    else
+        stderr.printf ("encode_repeated_nested_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
 }
 
 private string buffer_to_string (Protobuf.EncodeBuffer buffer)

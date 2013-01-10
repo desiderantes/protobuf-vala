@@ -131,3 +131,24 @@ message TestReservedMessage
     required uint32 while = 66;
     required uint32 yield = 67;
 }
+
+message TestRequiredNestedMessage
+{
+    required TestChildMessage child = 1;
+}
+
+message TestOptionalNestedMessage
+{
+    optional TestChildMessage child = 1;
+}
+
+message TestRepeatedNestedMessage
+{
+    repeated TestChildMessage children = 1;
+}
+
+message TestChildMessage
+{
+    required uint32 value = 1;
+}
+

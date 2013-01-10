@@ -121,6 +121,10 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
+    check_decode_enum_message ("08011801", TestEnum.ONE, TestEnum.ONE, TestEnum.ONE);
+    check_decode_enum_message ("08021002", TestEnum.TWO, TestEnum.TWO, TestEnum.TWO);
+    check_decode_enum_message ("080310031803", TestEnum.THREE, TestEnum.THREE, TestEnum.THREE);
+
     check_decode_message ("08FFFFFFFFFFFFFFFFFF011001180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
 
     check_decode_required_message ("", 0, "", true);
@@ -145,26 +149,23 @@ public static int main (string[] args)
     check_decode_repeated_message ("0801", "1");
     check_decode_repeated_message ("0801080208030804", "1 2 3 4");
 
-    check_decode_repeated_message ("", "");
-    check_decode_repeated_message ("0801", "1");
-    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
-
-    check_decode_repeated_message ("", "");
-    check_decode_repeated_message ("0801", "1");
-    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
-
-    check_decode_repeated_message ("", "");
-    check_decode_repeated_message ("0801", "1");
-    check_decode_repeated_message ("0801080208030804", "1 2 3 4");
-
     check_decode_repeated_packed_message ("", "");
     check_decode_repeated_packed_message ("0A0101", "1");
     check_decode_repeated_packed_message ("0A0401020304", "1 2 3 4");
     check_decode_repeated_packed_message ("0A0201020A020304", "1 2 3 4");
 
-    check_decode_enum_message ("08011801", TestEnum.ONE, TestEnum.ONE, TestEnum.ONE);
-    check_decode_enum_message ("08021002", TestEnum.TWO, TestEnum.TWO, TestEnum.TWO);
-    check_decode_enum_message ("080310031803", TestEnum.THREE, TestEnum.THREE, TestEnum.THREE);
+    check_decode_required_nested_message ("", 0, true);
+    check_decode_required_nested_message ("0A00", 0, true);
+    check_decode_required_nested_message ("0A020801", 1);
+
+    check_decode_optional_nested_message ("", null);
+    check_decode_optional_nested_message ("0A00", 0, true);
+    check_decode_optional_nested_message ("0A020801", 1);
+
+    check_decode_repeated_nested_message ("",  "");
+    check_decode_repeated_nested_message ("0A00", "", true);
+    check_decode_repeated_nested_message ("0A020801", "1");
+    check_decode_repeated_nested_message ("0A0208010A0208020A020803", "1 2 3");
 
     if (n_passed != n_tests)
     {
@@ -395,6 +396,24 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
+private void check_decode_enum_message (string data, TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, bool error = false)
+{
+    var result = new TestEnumMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+
+    n_tests++;
+    if (!error && !buffer.error && result.enum_value == enum_value && result.enum_value_o == enum_value_o && result.enum_value_od == enum_value_od)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_enum_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else
+        stderr.printf ("decode_enum_message (\"%s\") -> enum_value=%s enum_value_o=%s enum_value_od=%s, expected enum_value=%s enum_value_o=%s enum_value_od=%s\n",
+                       data, TestEnum_to_string (result.enum_value), TestEnum_to_string (result.enum_value_o), TestEnum_to_string (result.enum_value_od), TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od));
+}
+
 private void check_decode_message (string data, bool error = false)
 {
     var result = new TestMessage ();
@@ -492,24 +511,6 @@ private void check_decode_optional_defaults_message (string data, int32 int_valu
                        data, result.int_value, result.string_value, int_value, string_value);
 }
 
-private void check_decode_enum_message (string data, TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, bool error = false)
-{
-    var result = new TestEnumMessage ();
-    var buffer = string_to_buffer (data);
-    result.decode (buffer);
-
-    n_tests++;
-    if (!error && !buffer.error && result.enum_value == enum_value && result.enum_value_o == enum_value_o && result.enum_value_od == enum_value_od)
-        n_passed++;
-    else if (error && buffer.error)
-        n_passed++;
-    else if (buffer.error != error)
-        stderr.printf ("decode_enum_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
-    else
-        stderr.printf ("decode_enum_message (\"%s\") -> enum_value=%s enum_value_o=%s enum_value_od=%s, expected enum_value=%s enum_value_o=%s enum_value_od=%s\n",
-                       data, TestEnum_to_string (result.enum_value), TestEnum_to_string (result.enum_value_o), TestEnum_to_string (result.enum_value_od), TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od));
-}
-
 private void check_decode_repeated_message (string data, string expected)
 {
     var result = new TestRepeatedMessage ();
@@ -550,6 +551,75 @@ private void check_decode_repeated_packed_message (string data, string expected)
         n_passed++;
     else
         stderr.printf ("decode_repeated_packed_message (\"%s\") -> %s, expected %s\n", data, result_value, expected);
+}
+
+private void check_decode_required_nested_message (string data, uint32 value, bool error = false)
+{
+    var result = new TestRequiredNestedMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+
+    n_tests++;
+    if (!error && !buffer.error && result.child != null && result.child.value == value)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_required_nested_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else if (result.child == null)
+        stderr.printf ("decode_required_nested_message (\"%s\") -> child=null, expected child.value=%u\n", data, value);
+    else
+        stderr.printf ("decode_required_nested_message (\"%s\") -> child.value=%ud, expected child.value=%u\n", data, result.child.value, value);
+}
+
+private void check_decode_optional_nested_message (string data, uint32? value, bool error = false)
+{
+    var result = new TestOptionalNestedMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+
+    uint32? child_value = null;
+    if (result.child != null)
+        child_value = result.child.value;
+
+    n_tests++;
+    if (!error && !buffer.error && child_value == value)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_optional_nested_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else if (result.child == null)
+        stderr.printf ("decode_optional_nested_message (\"%s\") -> child=null, expected child.value=%u\n", data, value);
+    else if (value == null)
+        stderr.printf ("decode_optional_nested_message (\"%s\") -> child.value=%ud, expected child=null\n", data, result.child.value);
+    else
+        stderr.printf ("decode_optional_nested_message (\"%s\") -> child.value=%ud, expected child.value=%u\n", data, result.child.value, value);
+}
+
+private void check_decode_repeated_nested_message (string data, string expected, bool error = false)
+{
+    var result = new TestRepeatedNestedMessage ();
+    var buffer = string_to_buffer (data);
+    result.decode (buffer);
+
+    var result_value = "";
+    foreach (var v in result.children)
+    {
+        if (result_value != "")
+            result_value += " ";
+        result_value += "%u".printf (v.value);
+    }
+
+    n_tests++;
+    if (!error && !buffer.error && result_value == expected)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_repeated_nested_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
+    else
+        stderr.printf ("decode_repeated_nested_message (\"%s\") -> \"%s\", expected \"%s\"\n", data, result_value, expected);
 }
 
 private Protobuf.DecodeBuffer string_to_buffer (string data)
