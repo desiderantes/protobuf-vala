@@ -9,13 +9,27 @@ namespace Protobuf
 
     public class DecodeBuffer
     {
-        public uint8[] buffer;
+        public unowned uint8[] buffer;
+        private uint8[]? internal_buffer;
         public size_t read_index;
         public bool error;
         
-        public DecodeBuffer (size_t size)
+        public DecodeBuffer (uint8[] buffer, size_t offset = 0, ssize_t length = -1)
         {
-            buffer = new uint8[size];
+            if (offset > buffer.length)
+                offset = buffer.length;
+            if (length < 0)
+                length = (ssize_t) (buffer.length - offset);
+            else if (offset + length > buffer.length)
+                length = (ssize_t) (buffer.length - offset);
+            this.buffer = (uint8[]) ((uint8*) buffer + offset);
+            this.buffer.length = (int) length;
+        }
+
+        public DecodeBuffer.sized (size_t size)
+        {
+            internal_buffer = new uint8[size];
+            buffer = internal_buffer;
             reset ();
         }
         

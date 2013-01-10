@@ -124,7 +124,7 @@ public static int main (string[] args)
     check_decode_enum_message ("08011801", TestEnum.ONE, TestEnum.ONE, TestEnum.ONE);
     check_decode_enum_message ("08021002", TestEnum.TWO, TestEnum.TWO, TestEnum.TWO);
     check_decode_enum_message ("080310031803", TestEnum.THREE, TestEnum.THREE, TestEnum.THREE);
-
+    
     check_decode_message ("08FFFFFFFFFFFFFFFFFF011001180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
 
     check_decode_required_message ("", 0, "", true);
@@ -166,6 +166,15 @@ public static int main (string[] args)
     check_decode_repeated_nested_message ("0A00", "", true);
     check_decode_repeated_nested_message ("0A020801", "1");
     check_decode_repeated_nested_message ("0A0208010A0208020A020803", "1 2 3");
+
+    check_decode_existing_buffer ("", 0, -1, 0, true);
+    check_decode_existing_buffer ("01", 0, 0, 0, true);
+    check_decode_existing_buffer ("01", 0, -1, 1);
+    check_decode_existing_buffer ("01", 0, 1, 1);
+    check_decode_existing_buffer ("01FFFFFF", 0, 1, 1);
+    check_decode_existing_buffer ("FF01FFFF", 1, 1, 1);
+    check_decode_existing_buffer ("FFFFFF01", 3, -1, 1);
+    check_decode_existing_buffer ("FFFFFF01", 4, -1, 0, true);
 
     if (n_passed != n_tests)
     {
@@ -622,9 +631,28 @@ private void check_decode_repeated_nested_message (string data, string expected,
         stderr.printf ("decode_repeated_nested_message (\"%s\") -> \"%s\", expected \"%s\"\n", data, result_value, expected);
 }
 
+private void check_decode_existing_buffer (string data, size_t offset, ssize_t length, uint64 expected, bool error = false)
+{
+    var b = new uint8[data.length / 2];
+    for (var i = 0; i < b.length; i++)
+        b[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
+    var buffer = new Protobuf.DecodeBuffer (b, offset, length);
+    var result = buffer.decode_varint ();
+
+    n_tests++;
+    if (!error && !buffer.error && result == expected)
+        n_passed++;
+    else if (error && buffer.error)
+        n_passed++;
+    else if (buffer.error != error)
+        stderr.printf ("decode_existing_buffer (\"%s\", %u, %i) -> error %s, expected error %s\n", data, (uint) offset, (int) length, buffer.error.to_string (), error.to_string ());
+    else
+        stderr.printf ("decode_existing_buffer (\"%s\", %u, %i) -> %u, expected %u\n", data, (uint) offset, (int) length, (uint) result, (uint) expected);
+}
+
 private Protobuf.DecodeBuffer string_to_buffer (string data)
 {
-    var value = new Protobuf.DecodeBuffer (data.length / 2);
+    var value = new Protobuf.DecodeBuffer.sized (data.length / 2);
 
     for (var i = 0; i < value.buffer.length; i++)
         value.buffer[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);

@@ -4,7 +4,7 @@ private HashTable<string, EnumDescriptorProto> enums;
 
 public static int main (string[] args)
 {
-    var buf = new Protobuf.DecodeBuffer (65535);
+    var buf = new Protobuf.DecodeBuffer.sized (65535);
     var n_read = stdin.read (buf.buffer); // FIXME: Read all
     if (n_read < 0)
         return 1;
