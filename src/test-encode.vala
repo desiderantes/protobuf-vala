@@ -1,3 +1,5 @@
+using Google.Protobuf;
+
 private int n_tests = 0;
 private int n_passed = 0;
 
@@ -102,9 +104,9 @@ public static int main (string[] args)
     check_encode_sint64 (int64.MAX, "FEFFFFFFFFFFFFFFFF01");
     check_encode_sint64 (int64.MIN, "FFFFFFFFFFFFFFFFFF01");
 
-    check_encode_enum_message (TestEnum.ONE, TestEnum.ONE, TestEnum.ONE, "08011801");
-    check_encode_enum_message (TestEnum.TWO, TestEnum.TWO, TestEnum.TWO, "08021002");
-    check_encode_enum_message (TestEnum.THREE, TestEnum.THREE, TestEnum.THREE, "080310031803");
+    check_encode_enum_message (Test.Vala.Enum.ONE, Test.Vala.Enum.ONE, Test.Vala.Enum.ONE, "08011801");
+    check_encode_enum_message (Test.Vala.Enum.TWO, Test.Vala.Enum.TWO, Test.Vala.Enum.TWO, "08021002");
+    check_encode_enum_message (Test.Vala.Enum.THREE, Test.Vala.Enum.THREE, Test.Vala.Enum.THREE, "080310031803");
 
     /* Check buffer resizing works */
     check_buffer_resize (0, 0);
@@ -160,7 +162,7 @@ public static int main (string[] args)
 
 private void check_encode_varint (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_varint (value);
     var result = buffer_to_string (buffer);
 
@@ -173,7 +175,7 @@ private void check_encode_varint (uint64 value, string expected)
 
 private void check_encode_double (double value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_double (value);
     var result = buffer_to_string (buffer);
 
@@ -186,7 +188,7 @@ private void check_encode_double (double value, string expected)
 
 private void check_encode_float (float value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_float (value);
     var result = buffer_to_string (buffer);
 
@@ -199,7 +201,7 @@ private void check_encode_float (float value, string expected)
 
 private void check_encode_int64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_int64 (value);
     var result = buffer_to_string (buffer);
 
@@ -212,7 +214,7 @@ private void check_encode_int64 (int64 value, string expected)
 
 private void check_encode_uint64 (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_uint64 (value);
     var result = buffer_to_string (buffer);
 
@@ -225,7 +227,7 @@ private void check_encode_uint64 (uint64 value, string expected)
 
 private void check_encode_int32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_int32 (value);
     var result = buffer_to_string (buffer);
 
@@ -238,7 +240,7 @@ private void check_encode_int32 (int32 value, string expected)
 
 private void check_encode_fixed64 (uint64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_fixed64 (value);
     var result = buffer_to_string (buffer);
 
@@ -251,7 +253,7 @@ private void check_encode_fixed64 (uint64 value, string expected)
 
 private void check_encode_fixed32 (uint32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_fixed32 (value);
     var result = buffer_to_string (buffer);
 
@@ -264,7 +266,7 @@ private void check_encode_fixed32 (uint32 value, string expected)
 
 private void check_encode_bool (bool value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_bool (value);
     var result = buffer_to_string (buffer);
 
@@ -277,7 +279,7 @@ private void check_encode_bool (bool value, string expected)
 
 private void check_encode_string (string value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_string (value);
     var result = buffer_to_string (buffer);
 
@@ -292,7 +294,7 @@ private void check_encode_bytes (string value, string expected)
 {
     var v = new ByteArray.take (string_to_array (value));
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_bytes (v);
     var result = buffer_to_string (buffer);
 
@@ -305,7 +307,7 @@ private void check_encode_bytes (string value, string expected)
 
 private void check_encode_uint32 (uint32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_uint32 (value);
     var result = buffer_to_string (buffer);
 
@@ -318,7 +320,7 @@ private void check_encode_uint32 (uint32 value, string expected)
 
 private void check_encode_sfixed32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_sfixed32 (value);
     var result = buffer_to_string (buffer);
 
@@ -331,7 +333,7 @@ private void check_encode_sfixed32 (int32 value, string expected)
 
 private void check_encode_sfixed64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_sfixed64 (value);
     var result = buffer_to_string (buffer);
 
@@ -344,7 +346,7 @@ private void check_encode_sfixed64 (int64 value, string expected)
 
 private void check_encode_sint32 (int32 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_sint32 (value);
     var result = buffer_to_string (buffer);
 
@@ -357,7 +359,7 @@ private void check_encode_sint32 (int32 value, string expected)
 
 private void check_encode_sint64 (int64 value, string expected)
 {
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     buffer.encode_sint64 (value);
     var result = buffer_to_string (buffer);
 
@@ -368,14 +370,14 @@ private void check_encode_sint64 (int64 value, string expected)
         stderr.printf ("encode_sint64 (%" + int64.FORMAT + ") -> \"%s\", expected \"%s\"\n", value, result, expected);
 }
 
-private void check_encode_enum_message (TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, string expected)
+private void check_encode_enum_message (Test.Vala.Enum enum_value, Test.Vala.Enum enum_value_o, Test.Vala.Enum enum_value_od, string expected)
 {
-    var value = new TestEnumMessage ();
+    var value = new Test.Vala.EnumMessage ();
     value.enum_value = enum_value;
     value.enum_value_o = enum_value_o;
     value.enum_value_od = enum_value_od;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -384,12 +386,12 @@ private void check_encode_enum_message (TestEnum enum_value, TestEnum enum_value
         n_passed++;
     else
         stderr.printf ("encode_enum_message (enum_value=%s enum_value_o=%s enum_value_od=%s) -> \"%s\", expected \"%s\"\n",
-                       TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od), result, expected);
+                       Test.Vala.Enum_to_string (enum_value), Test.Vala.Enum_to_string (enum_value_o), Test.Vala.Enum_to_string (enum_value_od), result, expected);
 }
 
 private void check_buffer_resize (size_t value_length, size_t buffer_length)
 {
-    var buffer = new Protobuf.EncodeBuffer (buffer_length);
+    var buffer = new EncodeBuffer (buffer_length);
     var value = "";
     for (var i = 0; i < value_length; i++)
         value += "FF";
@@ -406,7 +408,7 @@ private void check_buffer_resize (size_t value_length, size_t buffer_length)
 
 private void check_encode_message (string expected)
 {
-    var value = new TestMessage ();
+    var value = new Test.Vala.Message ();
     value.value_int32 = -1;
     value.value_uint32 = 1;
     value.value_sint32 = -1;
@@ -418,13 +420,13 @@ private void check_encode_message (string expected)
     value.value_fixed64 = 1;
     value.value_sfixed64 = -1;
     value.value_bool = true;
-    value.value_enum = TestEnum.ONE;
+    value.value_enum = Test.Vala.Enum.ONE;
     value.value_string = "TEST";
     value.value_bytes = new ByteArray.take (string_to_array ("BEEF"));
     value.value_double = 1.0d;
     value.value_float = 1.0f;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -437,11 +439,11 @@ private void check_encode_message (string expected)
 
 private void check_encode_required_message (int32 int_value, string string_value, string expected)
 {
-    var value = new TestRequiredMessage ();
+    var value = new Test.Vala.RequiredMessage ();
     value.int_value = int_value;
     value.string_value = string_value;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -454,11 +456,11 @@ private void check_encode_required_message (int32 int_value, string string_value
 
 private void check_encode_optional_message (int32 int_value, string string_value, string expected)
 {
-    var value = new TestOptionalMessage ();
+    var value = new Test.Vala.OptionalMessage ();
     value.int_value = int_value;
     value.string_value = string_value;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -471,11 +473,11 @@ private void check_encode_optional_message (int32 int_value, string string_value
 
 private void check_encode_optional_defaults_message (int32 int_value, string string_value, string expected)
 {
-    var value = new TestOptionalDefaultsMessage ();
+    var value = new Test.Vala.OptionalDefaultsMessage ();
     value.int_value = int_value;
     value.string_value = string_value;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -488,12 +490,12 @@ private void check_encode_optional_defaults_message (int32 int_value, string str
 
 private void check_encode_repeated_message (string repeated_value, string expected)
 {
-    var value = new TestRepeatedMessage ();
+    var value = new Test.Vala.RepeatedMessage ();
     var values = repeated_value.split (" ");
     for (var i = 0; i < values.length; i++)
         value.value.append (int.parse (values[i]));
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -506,12 +508,12 @@ private void check_encode_repeated_message (string repeated_value, string expect
 
 private void check_encode_repeated_packed_message (string repeated_value, string expected)
 {
-    var value = new TestRepeatedPackedMessage ();
+    var value = new Test.Vala.RepeatedPackedMessage ();
     var values = repeated_value.split (" ");
     for (var i = 0; i < values.length; i++)
         value.value.append (int.parse (values[i]));
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -524,10 +526,10 @@ private void check_encode_repeated_packed_message (string repeated_value, string
 
 private void check_encode_required_nested_message (uint32 v, string expected)
 {
-    var value = new TestRequiredNestedMessage ();
+    var value = new Test.Vala.RequiredNestedMessage ();
     value.child.value = v;
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -540,14 +542,14 @@ private void check_encode_required_nested_message (uint32 v, string expected)
 
 private void check_encode_optional_nested_message (uint32? v, string expected)
 {
-    var value = new TestOptionalNestedMessage ();
+    var value = new Test.Vala.OptionalNestedMessage ();
     if (v != null)
     {
-        value.child = new TestChildMessage ();
+        value.child = new Test.Vala.ChildMessage ();
         value.child.value = v;
     }
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -562,16 +564,16 @@ private void check_encode_optional_nested_message (uint32? v, string expected)
 
 private void check_encode_repeated_nested_message (string repeated_value, string expected)
 {
-    var value = new TestRepeatedNestedMessage ();
+    var value = new Test.Vala.RepeatedNestedMessage ();
     var values = repeated_value.split (" ");
     for (var i = 0; i < values.length; i++)
     {
-        var m = new TestChildMessage ();
+        var m = new Test.Vala.ChildMessage ();
         m.value = int.parse (values[i]);
         value.children.append (m);
     }
 
-    var buffer = new Protobuf.EncodeBuffer ();
+    var buffer = new EncodeBuffer ();
     value.encode (buffer);
     var result = buffer_to_string (buffer);
 
@@ -582,7 +584,7 @@ private void check_encode_repeated_nested_message (string repeated_value, string
         stderr.printf ("encode_repeated_nested_message (%s) -> \"%s\", expected \"%s\"\n", repeated_value, result, expected);
 }
 
-private string buffer_to_string (Protobuf.EncodeBuffer buffer)
+private string buffer_to_string (EncodeBuffer buffer)
 {
     var value = "";
 

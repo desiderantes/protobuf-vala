@@ -1,11 +1,13 @@
-enum TestEnum
+package test.vala;
+
+enum Enum
 {
     ONE = 1;
     TWO = 2;
     THREE = 3;
 }
 
-message TestMessage
+message Message
 {
     required int32 value_int32 = 1;
     required uint32 value_uint32 = 2;
@@ -18,50 +20,50 @@ message TestMessage
     required fixed64 value_fixed64 = 9;
     required sfixed64 value_sfixed64 = 10;
     required bool value_bool = 11;
-    required TestEnum value_enum = 12;
+    required Enum value_enum = 12;
     required string value_string = 13;
     required bytes value_bytes = 14;
     required double value_double = 15;
     required float value_float = 16;
 }
 
-message TestRequiredMessage
+message RequiredMessage
 {
     required sint32 int_value = 1;
     required string string_value = 2;
 }
 
-message TestOptionalMessage
+message OptionalMessage
 {
     optional sint32 int_value = 1;
     optional string string_value = 2;
 }
 
-message TestOptionalDefaultsMessage
+message OptionalDefaultsMessage
 {
     optional sint32 int_value = 1 [default = 1];
     optional string string_value = 2 [default = "TEST"];
 }
 
-message TestRepeatedMessage
+message RepeatedMessage
 {
     repeated uint32 value = 1;
 }
 
-message TestRepeatedPackedMessage
+message RepeatedPackedMessage
 {
     repeated uint32 value = 1 [packed = true];
 }
 
-message TestEnumMessage
+message EnumMessage
 {
-    required TestEnum enum_value = 1;
-    optional TestEnum enum_value_o = 2;
-    optional TestEnum enum_value_od = 3 [default = TWO];
-    repeated TestEnum enum_value_r = 4;
+    required Enum enum_value = 1;
+    optional Enum enum_value_o = 2;
+    optional Enum enum_value_od = 3 [default = TWO];
+    repeated Enum enum_value_r = 4;
 }
 
-message TestReservedMessage
+message ReservedMessage
 {
     required uint32 abstract = 1;
     required uint32 as = 2;
@@ -132,22 +134,22 @@ message TestReservedMessage
     required uint32 yield = 67;
 }
 
-message TestRequiredNestedMessage
+message RequiredNestedMessage
 {
-    required TestChildMessage child = 1;
+    required ChildMessage child = 1;
 }
 
-message TestOptionalNestedMessage
+message OptionalNestedMessage
 {
-    optional TestChildMessage child = 1;
+    optional ChildMessage child = 1;
 }
 
-message TestRepeatedNestedMessage
+message RepeatedNestedMessage
 {
-    repeated TestChildMessage children = 1;
+    repeated ChildMessage children = 1;
 }
 
-message TestChildMessage
+message ChildMessage
 {
     required uint32 value = 1;
 }

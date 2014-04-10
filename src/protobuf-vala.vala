@@ -1,4 +1,4 @@
-namespace Protobuf
+namespace Google.Protobuf
 {
     public abstract class Message
     {

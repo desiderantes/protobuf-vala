@@ -1,3 +1,5 @@
+using Google.Protobuf;
+
 private int n_tests = 0;
 private int n_passed = 0;
 
@@ -121,9 +123,9 @@ public static int main (string[] args)
     check_decode_sint64 ("FEFFFFFFFFFFFFFFFF01", int64.MAX);
     check_decode_sint64 ("FFFFFFFFFFFFFFFFFF01", int64.MIN);
 
-    check_decode_enum_message ("08011801", TestEnum.ONE, TestEnum.ONE, TestEnum.ONE);
-    check_decode_enum_message ("08021002", TestEnum.TWO, TestEnum.TWO, TestEnum.TWO);
-    check_decode_enum_message ("080310031803", TestEnum.THREE, TestEnum.THREE, TestEnum.THREE);
+    check_decode_enum_message ("08011801", Test.Vala.Enum.ONE, Test.Vala.Enum.ONE, Test.Vala.Enum.ONE);
+    check_decode_enum_message ("08021002", Test.Vala.Enum.TWO, Test.Vala.Enum.TWO, Test.Vala.Enum.TWO);
+    check_decode_enum_message ("080310031803", Test.Vala.Enum.THREE, Test.Vala.Enum.THREE, Test.Vala.Enum.THREE);
     
     check_decode_message ("08FFFFFFFFFFFFFFFFFF011001180125010000002DFFFFFFFF30FFFFFFFFFFFFFFFFFF013801400149010000000000000051FFFFFFFFFFFFFFFF580160016A04544553547202BEEF79000000000000F03F85010000803F");
 
@@ -408,9 +410,9 @@ private void check_decode_sint64 (string data, int64 expected)
         stderr.printf ("decode_sint64 (\"%s\") -> %" + int64.FORMAT + ", expected %" + int64.FORMAT + "\n", data, result, expected);
 }
 
-private void check_decode_enum_message (string data, TestEnum enum_value, TestEnum enum_value_o, TestEnum enum_value_od, bool error = false)
+private void check_decode_enum_message (string data, Test.Vala.Enum enum_value, Test.Vala.Enum enum_value_o, Test.Vala.Enum enum_value_od, bool error = false)
 {
-    var result = new TestEnumMessage ();
+    var result = new Test.Vala.EnumMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -423,12 +425,12 @@ private void check_decode_enum_message (string data, TestEnum enum_value, TestEn
         stderr.printf ("decode_enum_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
     else
         stderr.printf ("decode_enum_message (\"%s\") -> enum_value=%s enum_value_o=%s enum_value_od=%s, expected enum_value=%s enum_value_o=%s enum_value_od=%s\n",
-                       data, TestEnum_to_string (result.enum_value), TestEnum_to_string (result.enum_value_o), TestEnum_to_string (result.enum_value_od), TestEnum_to_string (enum_value), TestEnum_to_string (enum_value_o), TestEnum_to_string (enum_value_od));
+                       data, Test.Vala.Enum_to_string (result.enum_value), Test.Vala.Enum_to_string (result.enum_value_o), Test.Vala.Enum_to_string (result.enum_value_od), Test.Vala.Enum_to_string (enum_value), Test.Vala.Enum_to_string (enum_value_o), Test.Vala.Enum_to_string (enum_value_od));
 }
 
 private void check_decode_message (string data, bool error = false)
 {
-    var result = new TestMessage ();
+    var result = new Test.Vala.Message ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
     var result_value_bytes = array_to_string (result.value_bytes.data);
@@ -444,7 +446,7 @@ private void check_decode_message (string data, bool error = false)
                   result.value_fixed64 == 1 &&
                   result.value_sfixed64 == -1 &&
                   result.value_bool == true &&
-                  result.value_enum == TestEnum.ONE &&
+                  result.value_enum == Test.Vala.Enum.ONE &&
                   result.value_string == "TEST" &&
                   result_value_bytes == "BEEF" &&
                   result.value_double == 1.0d &&
@@ -463,7 +465,7 @@ private void check_decode_message (string data, bool error = false)
 
 private void check_decode_required_message (string data, int32 int_value, string string_value, bool error = false)
 {
-    var result = new TestRequiredMessage ();
+    var result = new Test.Vala.RequiredMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -481,11 +483,11 @@ private void check_decode_required_message (string data, int32 int_value, string
 
 private void check_decode_required_message_reencode (string data)
 {
-    var result = new TestRequiredMessage ();
+    var result = new Test.Vala.RequiredMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
-    var encode_buffer = new Protobuf.EncodeBuffer ();
+    var encode_buffer = new EncodeBuffer ();
     result.encode (encode_buffer);
 
     var encode_data = array_to_string (encode_buffer.data);
@@ -499,7 +501,7 @@ private void check_decode_required_message_reencode (string data)
 
 private void check_decode_optional_message (string data, int32 int_value, string string_value)
 {
-    var result = new TestOptionalMessage ();
+    var result = new Test.Vala.OptionalMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -513,7 +515,7 @@ private void check_decode_optional_message (string data, int32 int_value, string
 
 private void check_decode_optional_message_twice (string data1, string data2, int32 int_value, string string_value)
 {
-    var result = new TestOptionalMessage ();
+    var result = new Test.Vala.OptionalMessage ();
     var buffer1 = string_to_buffer (data1);
     result.decode (buffer1);
     var buffer2 = string_to_buffer (data2);
@@ -529,7 +531,7 @@ private void check_decode_optional_message_twice (string data1, string data2, in
 
 private void check_decode_optional_defaults_message (string data, int32 int_value, string string_value)
 {
-    var result = new TestOptionalDefaultsMessage ();
+    var result = new Test.Vala.OptionalDefaultsMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -543,7 +545,7 @@ private void check_decode_optional_defaults_message (string data, int32 int_valu
 
 private void check_decode_repeated_message (string data, string expected)
 {
-    var result = new TestRepeatedMessage ();
+    var result = new Test.Vala.RepeatedMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -564,7 +566,7 @@ private void check_decode_repeated_message (string data, string expected)
 
 private void check_decode_repeated_packed_message (string data, string expected)
 {
-    var result = new TestRepeatedPackedMessage ();
+    var result = new Test.Vala.RepeatedPackedMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -585,7 +587,7 @@ private void check_decode_repeated_packed_message (string data, string expected)
 
 private void check_decode_required_nested_message (string data, uint32 value, bool error = false)
 {
-    var result = new TestRequiredNestedMessage ();
+    var result = new Test.Vala.RequiredNestedMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -604,7 +606,7 @@ private void check_decode_required_nested_message (string data, uint32 value, bo
 
 private void check_decode_optional_nested_message (string data, uint32? value, bool error = false)
 {
-    var result = new TestOptionalNestedMessage ();
+    var result = new Test.Vala.OptionalNestedMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -629,7 +631,7 @@ private void check_decode_optional_nested_message (string data, uint32? value, b
 
 private void check_decode_repeated_nested_message (string data, string expected, bool error = false)
 {
-    var result = new TestRepeatedNestedMessage ();
+    var result = new Test.Vala.RepeatedNestedMessage ();
     var buffer = string_to_buffer (data);
     result.decode (buffer);
 
@@ -657,7 +659,7 @@ private void check_decode_existing_buffer (string data, size_t offset, ssize_t l
     var b = new uint8[data.length / 2];
     for (var i = 0; i < b.length; i++)
         b[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
-    var buffer = new Protobuf.DecodeBuffer (b, offset, length);
+    var buffer = new DecodeBuffer (b, offset, length);
     var result = buffer.decode_varint ();
 
     n_tests++;
@@ -671,9 +673,9 @@ private void check_decode_existing_buffer (string data, size_t offset, ssize_t l
         stderr.printf ("decode_existing_buffer (\"%s\", %u, %i) -> %u, expected %u\n", data, (uint) offset, (int) length, (uint) result, (uint) expected);
 }
 
-private Protobuf.DecodeBuffer string_to_buffer (string data)
+private DecodeBuffer string_to_buffer (string data)
 {
-    var value = new Protobuf.DecodeBuffer.sized (data.length / 2);
+    var value = new DecodeBuffer.sized (data.length / 2);
 
     for (var i = 0; i < value.buffer.length; i++)
         value.buffer[i] = str_to_int (data[i*2]) << 4 | str_to_int (data[i*2+1]);
