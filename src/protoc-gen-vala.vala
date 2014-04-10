@@ -6,11 +6,23 @@ private HashTable<string, EnumDescriptorProto> enums;
 
 public static int main (string[] args)
 {
-    var buf = new DecodeBuffer.sized (65535);
-    var n_read = stdin.read (buf.buffer); // FIXME: Read all
-    if (n_read < 0)
-        return 1;
-    buf.buffer.length = (int) n_read;
+    var data = new uint8[0];
+    while (true)
+    {
+        uint8 buffer[65535];
+        var n_read = stdin.read (buffer);
+        if (n_read < 0)
+            return Posix.EXIT_FAILURE;
+        if (n_read == 0)
+            break;
+
+        var n_used = data.length;
+        data.resize (n_used + (int) n_read);
+        for (var i = 0; i < n_read; i++)
+            data[n_used + i] = buffer[i];
+    }
+
+    var buf = new DecodeBuffer (data);
     var req = new Compiler.CodeGeneratorRequest ();
     req.decode (buf);
 
@@ -66,7 +78,7 @@ public static int main (string[] args)
     stdout.write (resp_buf.data);
     stdout.flush ();
 
-    return 0;
+    return Posix.EXIT_SUCCESS;
 }
 
 private static string write_enum (EnumDescriptorProto type, string indent = "")
