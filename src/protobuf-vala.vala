@@ -3,8 +3,8 @@ namespace Google.Protobuf
     public abstract class Message
     {
         protected List<UnknownField> unknown_fields;
-        public abstract size_t encode (Protobuf.EncodeBuffer buffer);
-        public abstract bool decode (Protobuf.DecodeBuffer buffer, ssize_t data_length = -1);
+        public abstract size_t encode (Google.Protobuf.EncodeBuffer buffer);
+        public abstract bool decode (Google.Protobuf.DecodeBuffer buffer, ssize_t data_length = -1);
         public abstract string to_string (string indent = "");
     }
 
