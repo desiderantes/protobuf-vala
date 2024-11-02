@@ -1,0 +1,6 @@
+namespace BuildConstants {
+	static const string VERSION = "@VERSION@";
+	static const string MICRO_VERSION = "@MICRO_VERSION@";
+	static const string MINOR_VERSION = "@MINOR_VERSION@";
+	static const string MAJOR_VERSION = "@MAJOR_VERSION@";
+}
