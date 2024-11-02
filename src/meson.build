@@ -49,6 +49,7 @@ pkgconfig.generate(
 protoc_gen_vala = executable('protoc-gen-vala', protoc_gen_vala_sources,
 	dependencies: protobuf_vala_deps + posix_dep,
 	link_with: protobuf_vala_lib,
+	install: true
 )
 
 protoc_exe = find_program('protoc', required: true)
