@@ -1,0 +1,8 @@
+[wrap-git]
+directory = valapoet
+url = https://github.com/desiderantes/valapoet.git
+revision = master
+depth = 1
+
+[provide]
+valapoet-0.1 = valapoet_dep

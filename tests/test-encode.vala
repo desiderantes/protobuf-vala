@@ -367,7 +367,7 @@ private void check_encode_enum_message (Test.Vala.Enum enum_value, Test.Vala.Enu
 		n_passed++;
 	else
 		stderr.printf ("encode_enum_message (enum_value=%s enum_value_o=%s enum_value_od=%s) -> \"%s\", expected \"%s\"\n",
-		               Test.Vala.Enum_to_string (enum_value), Test.Vala.Enum_to_string (enum_value_o), Test.Vala.Enum_to_string (enum_value_od), result, expected);
+		               enum_value.to_string (), enum_value_o.to_string (), enum_value_od.to_string (), result, expected);
 }
 
 private void check_buffer_resize (size_t value_length, size_t buffer_length) {

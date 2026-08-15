@@ -406,7 +406,7 @@ private void check_decode_enum_message (string data, Test.Vala.Enum enum_value, 
 		stderr.printf ("decode_enum_message (\"%s\") -> error %s, expected error %s\n", data, buffer.error.to_string (), error.to_string ());
 	else
 		stderr.printf ("decode_enum_message (\"%s\") -> enum_value=%s enum_value_o=%s enum_value_od=%s, expected enum_value=%s enum_value_o=%s enum_value_od=%s\n",
-		               data, Test.Vala.Enum_to_string (result.enum_value), Test.Vala.Enum_to_string (result.enum_value_o), Test.Vala.Enum_to_string (result.enum_value_od), Test.Vala.Enum_to_string (enum_value), Test.Vala.Enum_to_string (enum_value_o), Test.Vala.Enum_to_string (enum_value_od));
+		               data, result.enum_value.to_string (), result.enum_value_o.to_string (), result.enum_value_od.to_string (), enum_value.to_string (), enum_value_o.to_string (), enum_value_od.to_string ());
 }
 
 private void check_decode_message (string data, bool error = false) {
