@@ -20,15 +20,21 @@ config_file = configure_file(
 
 protoc_gen_vala_sources = [config_file] + files(
     'protoc-gen-vala.vala',
+    'wkt-handlers/wkt-handler.vala',
+    'wkt-handlers/timestamp-handler.vala',
+    'wkt-handlers/duration-handler.vala',
+    'wkt-handlers/wrapper-handler.vala',
+    'wkt-handlers/field-mask-handler.vala',
 )
 
 protobuf_vala_deps = [
-    dependency('glib-2.0'),
+    dependency('glib-2.0', version: '>= 2.80'),
     dependency('gobject-2.0'),
+    dependency('gee-0.8'),
 ]
 
 valapoet_dep = dependency(
-    'valapoet-0.1',
+    'valapoet-0.2',
     fallback: ['valapoet', 'valapoet_dep'],
     default_options: {'enable_valadoc': false, 'enable_tests': false},
 )
@@ -52,6 +58,8 @@ protobuf_vala_dep = declare_dependency(
     dependencies: protobuf_vala_deps,
 )
 
+meson.override_dependency('protobuf-vala-' + api_version, protobuf_vala_dep)
+
 pkgconfig.generate(
     description: 'Vala support for Protocol Buffers',
     libraries: protobuf_vala_lib,
@@ -59,7 +67,7 @@ pkgconfig.generate(
     filebase: 'protobuf-vala-' + api_version,
     version: meson.project_version(),
     subdirs: 'protobuf-vala',
-    requires: 'glib-2.0',
+    requires: ['glib-2.0', 'gee-0.8'],
     install_dir: get_option('libdir') / 'pkgconfig',
 )
 

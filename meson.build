@@ -3,7 +3,7 @@ project(
     'vala',
     'c',
     version: '0.1.0',
-    meson_version: '>= 1.2.0',
+    meson_version: '>= 1.10.0',
     default_options: [
         'warning_level=2',
         'werror=false',
@@ -66,10 +66,12 @@ test_c_args = [
     '-Wswitch-default',
     '-Wswitch-enum',
     '-Wundef',
+    '-Wno-unused-variable',
     '-Wuninitialized',
     '-Wunused',
     '-fno-strict-aliasing',
-    ['-Werror=format-security', '-Werror=format=2'],
+    '-Werror=format-security',
+    '-Werror=format=2',
 ]
 if get_option('buildtype') != 'plain'
     test_c_args += '-fstack-protector-strong'

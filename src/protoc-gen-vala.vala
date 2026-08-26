@@ -12,8 +12,7 @@ public static int main (string[] args) {
 		if (n_read == 0) break;
 		var n_used = data.length;
 		data.resize (n_used + (int) n_read);
-		for (var i = 0; i < n_read; i++)
-			data[n_used + i] = buffer[i];
+		Memory.copy ((uint8*) data + n_used, buffer, n_read);
 	}
 
 	var buf = new DecodeBuffer (data);
@@ -21,18 +20,25 @@ public static int main (string[] args) {
 	req.decode (buf);
 
 	var resp = new Compiler.CodeGeneratorResponse ();
+	resp.supported_features = Compiler.CodeGeneratorResponse.Feature.FEATURE_PROTO3_OPTIONAL;
 
 	enums = new HashTable<string, EnumDescriptorProto> (str_hash, str_equal);
 	foreach (var f in req.proto_file) {
+		if (req.file_to_generate != null && req.file_to_generate.find_custom (f.name, (a, b) => strcmp (a, b)) == null)
+			continue;
+
 		var out_file = new Compiler.CodeGeneratorResponse.File ();
 
 		if (f.name.has_suffix (".proto")) out_file.name = f.name.substring (0, f.name.length - 6) + ".pb.vala";
 		else out_file.name = f.name + ".vala";
 
 		var vala_file_builder = ValaFile.builder ();
+		vala_file_builder.add_using ("Google.Protobuf");
 
 		var vala_namespace = "";
 		if (f.package != "") vala_namespace = get_namespace (f.package);
+
+		bool is_proto3 = (f.syntax == "proto3");
 
 		if (vala_namespace != "") {
 			var ns_builder = TypeSpec.namespace_builder (vala_namespace);
@@ -42,7 +48,7 @@ public static int main (string[] args) {
 				ns_builder.add_type (write_enum (enum_type));
 			}
 			foreach (var message_type in f.message_type) {
-				ns_builder.add_type (write_class (message_type));
+				ns_builder.add_type (write_class (message_type, is_proto3));
 			}
 			vala_file_builder.add_type (ns_builder.build ());
 		} else {
@@ -52,7 +58,7 @@ public static int main (string[] args) {
 				vala_file_builder.add_type (write_enum (enum_type));
 			}
 			foreach (var message_type in f.message_type) {
-				vala_file_builder.add_type (write_class (message_type));
+				vala_file_builder.add_type (write_class (message_type, is_proto3));
 			}
 		}
 
@@ -74,16 +80,10 @@ public static int main (string[] args) {
 
 private static TypeSpec write_enum (EnumDescriptorProto type) {
 	var builder = TypeSpec.enum_builder (type.name)
-		.add_modifiers (ValaModifier.PUBLIC);
+		.visibility (Visibility.PUBLIC);
 
-	var n_values = type.value.length ();
-	for (int i = 0; i < n_values; i++) {
-		var value = type.value.nth_data (i);
-		if (i == n_values - 1) {
-			builder.add_error_code ("%s = %d;".printf (value.name, value.number));
-		} else {
-			builder.add_error_code ("%s = %d".printf (value.name, value.number));
-		}
+	foreach (var value in type.value) {
+		builder.add_constant (value.name, value.number);
 	}
 
 	var to_string_body = CodeBlock.builder ();
@@ -91,17 +91,17 @@ private static TypeSpec write_enum (EnumDescriptorProto type) {
 	foreach (var value in type.value) {
 		to_string_body.add ("case %s.%s:\n".printf (type.name, value.name));
 		to_string_body.indent ();
-		to_string_body.add_statement ("return \"%s\"".printf (value.name));
+		to_string_body.add_statement_raw ("return \"%s\"".printf (value.name));
 		to_string_body.unindent ();
 	}
 	to_string_body.add ("default:\n");
 	to_string_body.indent ();
-	to_string_body.add_statement ("assert_not_reached ()");
+	to_string_body.add_statement_raw ("assert_not_reached ()");
 	to_string_body.unindent ();
 	to_string_body.end_control_flow ();
 
 	var to_string_method = MethodSpec.method_builder ("to_string")
-		.add_modifiers (ValaModifier.PUBLIC)
+		.visibility (Visibility.PUBLIC)
 		.returns (TypeName.STRING)
 		.add_code (to_string_body.build ())
 		.build ();
@@ -110,47 +110,230 @@ private static TypeSpec write_enum (EnumDescriptorProto type) {
 	return builder.build ();
 }
 
-private static TypeSpec write_class (DescriptorProto type) {
+private static bool is_packable_type (FieldDescriptorProto.Type type) {
+	switch (type) {
+		case FieldDescriptorProto.Type.TYPE_DOUBLE:
+		case FieldDescriptorProto.Type.TYPE_FLOAT:
+		case FieldDescriptorProto.Type.TYPE_INT64:
+		case FieldDescriptorProto.Type.TYPE_UINT64:
+		case FieldDescriptorProto.Type.TYPE_INT32:
+		case FieldDescriptorProto.Type.TYPE_FIXED64:
+		case FieldDescriptorProto.Type.TYPE_FIXED32:
+		case FieldDescriptorProto.Type.TYPE_BOOL:
+		case FieldDescriptorProto.Type.TYPE_UINT32:
+		case FieldDescriptorProto.Type.TYPE_SFIXED32:
+		case FieldDescriptorProto.Type.TYPE_SFIXED64:
+		case FieldDescriptorProto.Type.TYPE_SINT32:
+		case FieldDescriptorProto.Type.TYPE_SINT64:
+		case FieldDescriptorProto.Type.TYPE_ENUM:
+			return true;
+		default:
+			return false;
+	}
+}
+
+private static bool is_packed_field (FieldDescriptorProto field, bool is_proto3) {
+	if (field.label != FieldDescriptorProto.Label.LABEL_REPEATED || !is_packable_type (field.type)) {
+		return false;
+	}
+	if (field.options != null) {
+		return field.options.packed;
+	}
+	return is_proto3;
+}
+
+private static bool is_timestamp_field (FieldDescriptorProto field) {
+	return WktRegistry.is_timestamp_field (field);
+}
+
+private static bool is_duration_field (FieldDescriptorProto field) {
+	return WktRegistry.is_duration_field (field);
+}
+
+private static DescriptorProto? get_map_entry (DescriptorProto? parent_type, FieldDescriptorProto field) {
+	if (parent_type == null) return null;
+	if (field.type != FieldDescriptorProto.Type.TYPE_MESSAGE) return null;
+	if (field.label != FieldDescriptorProto.Label.LABEL_REPEATED) return null;
+	var type_name = field.type_name;
+	var last_dot = type_name.last_index_of (".");
+	var short_name = (last_dot >= 0) ? type_name.substring (last_dot + 1) : type_name;
+
+	foreach (var nested in parent_type.nested_type) {
+		if (nested.name == short_name && nested.options != null && nested.options.map_entry) {
+			return nested;
+		}
+	}
+	return null;
+}
+
+private static bool is_map_field (DescriptorProto? parent_type, FieldDescriptorProto field) {
+	return get_map_entry (parent_type, field) != null;
+}
+
+private static FieldDescriptorProto get_map_key_field (DescriptorProto map_entry) {
+	foreach (var f in map_entry.field) {
+		if (f.number == 1 || f.name == "key") return f;
+	}
+	return map_entry.field.first ().data;
+}
+
+private static FieldDescriptorProto get_map_value_field (DescriptorProto map_entry) {
+	foreach (var f in map_entry.field) {
+		if (f.number == 2 || f.name == "value") return f;
+	}
+	return map_entry.field.last ().data;
+}
+
+private static string get_map_type_name (DescriptorProto parent_type, FieldDescriptorProto field) {
+	var map_entry = get_map_entry (parent_type, field);
+	var key_field = get_map_key_field (map_entry);
+	var val_field = get_map_value_field (map_entry);
+	return "Gee.HashMap<%s, %s>".printf (get_type_name (key_field, false), get_type_name (val_field, false));
+}
+
+private static string get_map_init (DescriptorProto parent_type, FieldDescriptorProto field) {
+	var map_entry = get_map_entry (parent_type, field);
+	var key_field = get_map_key_field (map_entry);
+	var val_field = get_map_value_field (map_entry);
+	return "new Gee.HashMap<%s, %s> ()".printf (get_type_name (key_field, false), get_type_name (val_field, false));
+}
+
+private static string get_single_decode_expression (FieldDescriptorProto field) {
+	switch (field.type) {
+		case FieldDescriptorProto.Type.TYPE_DOUBLE: return "buffer.decode_double ()";
+		case FieldDescriptorProto.Type.TYPE_FLOAT: return "buffer.decode_float ()";
+		case FieldDescriptorProto.Type.TYPE_INT64: return "buffer.decode_int64 ()";
+		case FieldDescriptorProto.Type.TYPE_UINT64: return "buffer.decode_uint64 ()";
+		case FieldDescriptorProto.Type.TYPE_INT32: return "buffer.decode_int32 ()";
+		case FieldDescriptorProto.Type.TYPE_FIXED64: return "buffer.decode_fixed64 ()";
+		case FieldDescriptorProto.Type.TYPE_FIXED32: return "buffer.decode_fixed32 ()";
+		case FieldDescriptorProto.Type.TYPE_BOOL: return "buffer.decode_bool ()";
+		case FieldDescriptorProto.Type.TYPE_STRING: return "buffer.decode_string ((size_t) buffer.decode_varint ())";
+		case FieldDescriptorProto.Type.TYPE_BYTES: return "buffer.decode_bytes ((size_t) buffer.decode_varint ())";
+		case FieldDescriptorProto.Type.TYPE_MESSAGE: return "new %s.from_data (buffer, (ssize_t) buffer.decode_varint ())".printf (get_type_name (field, false));
+		case FieldDescriptorProto.Type.TYPE_ENUM: return "(%s) buffer.decode_varint ()".printf (get_type_name (field, false));
+		case FieldDescriptorProto.Type.TYPE_UINT32: return "buffer.decode_uint32 ()";
+		case FieldDescriptorProto.Type.TYPE_SFIXED32: return "buffer.decode_sfixed32 ()";
+		case FieldDescriptorProto.Type.TYPE_SFIXED64: return "buffer.decode_sfixed64 ()";
+		case FieldDescriptorProto.Type.TYPE_SINT32: return "buffer.decode_sint32 ()";
+		case FieldDescriptorProto.Type.TYPE_SINT64: return "buffer.decode_sint64 ()";
+		default: return "buffer.DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
+	}
+}
+
+private static string get_encode_expression (FieldDescriptorProto field, string val_var, out int wire_type, out bool is_length_delimited) {
+	wire_type = 0;
+	is_length_delimited = false;
+	switch (field.type) {
+		case FieldDescriptorProto.Type.TYPE_DOUBLE:
+			wire_type = 1;
+			return "buffer.encode_double (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_FLOAT:
+			wire_type = 5;
+			return "buffer.encode_float (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_INT64:
+			return "buffer.encode_int64 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_UINT64:
+			return "buffer.encode_uint64 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_INT32:
+			return "buffer.encode_int32 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_FIXED64:
+			wire_type = 1;
+			return "buffer.encode_fixed64 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_FIXED32:
+			wire_type = 5;
+			return "buffer.encode_fixed32 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_BOOL:
+			return "buffer.encode_bool (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_STRING:
+			wire_type = 2;
+			is_length_delimited = true;
+			return "buffer.encode_string (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_BYTES:
+			wire_type = 2;
+			is_length_delimited = true;
+			return "buffer.encode_bytes (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_UINT32:
+			return "buffer.encode_uint32 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_SFIXED64:
+			wire_type = 1;
+			return "buffer.encode_sfixed64 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_SFIXED32:
+			wire_type = 5;
+			return "buffer.encode_sfixed32 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_SINT64:
+			return "buffer.encode_sint64 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_SINT32:
+			return "buffer.encode_sint32 (%s)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_MESSAGE:
+			wire_type = 2;
+			is_length_delimited = true;
+			return "%s.encode (buffer)".printf (val_var);
+		case FieldDescriptorProto.Type.TYPE_ENUM:
+			return "buffer.encode_varint (%s)".printf (val_var);
+		default:
+			return "ENCODE_UNKNOWN_TYPE%d (%s)".printf (field.type, val_var);
+	}
+}
+
+private static TypeSpec write_class (DescriptorProto type, bool is_proto3 = false) {
 	var builder = TypeSpec.class_builder (type.name)
-		.add_modifiers (ValaModifier.PUBLIC)
-		.superclass (ClassName.get ("", "Google.Protobuf.Message"));
+		.visibility (Visibility.PUBLIC)
+		.superclass (ClassName.get ("Google.Protobuf", "Message"));
 
 	foreach (var enum_type in type.enum_type)
 		builder.add_type (write_enum (enum_type));
 
-	foreach (var nested_type in type.nested_type)
-		builder.add_type (write_class (nested_type));
+	foreach (var nested_type in type.nested_type) {
+		if (nested_type.options != null && nested_type.options.map_entry) continue;
+		builder.add_type (write_class (nested_type, is_proto3));
+	}
 
 	foreach (var field in type.field) {
-		var field_type = ClassName.get ("", get_type_name (field));
+		TypeName field_type;
+		var wkt = WktRegistry.get_handler (field);
+		if (is_map_field (type, field)) {
+			field_type = ClassName.get ("", get_map_type_name (type, field));
+		} else if (wkt != null) {
+			field_type = ClassName.get ("", wkt.get_vala_type (field));
+		} else {
+			field_type = ClassName.get ("", get_type_name (field));
+		}
 		builder.add_field (FieldSpec.builder (field_type, get_field_name (field))
-			.add_modifiers (ValaModifier.PUBLIC)
+			.visibility (Visibility.PUBLIC)
 			.build ());
 	}
 
 	// Default Constructor
 	var ctor = MethodSpec.constructor_builder ()
-		.add_modifiers (ValaModifier.PUBLIC);
+		.visibility (Visibility.PUBLIC);
 	foreach (var field in type.field) {
-		ctor.add_statement ("this.%s = %s".printf (get_field_name (field), get_default_value (field)));
+		var wkt = WktRegistry.get_handler (field);
+		if (is_map_field (type, field)) {
+			ctor.add_statement ("this.%s = %s".printf (get_field_name (field), get_map_init (type, field)));
+		} else if (wkt != null) {
+			ctor.add_statement ("this.%s = %s".printf (get_field_name (field), wkt.get_default_value (field)));
+		} else {
+			ctor.add_statement ("this.%s = %s".printf (get_field_name (field), get_field_default_value (field)));
+		}
 	}
 	builder.add_method (ctor.build ());
 
 	// from_data Constructor
 	var from_data_ctor = MethodSpec.named_constructor_builder ("from_data")
-		.add_modifiers (ValaModifier.PUBLIC)
-		.add_parameter (ParameterSpec.builder (ClassName.get ("", "Google.Protobuf.DecodeBuffer"), "buffer").build ())
-		.add_parameter (ParameterSpec.builder (ClassName.get ("", "ssize_t"), "data_length").default_value ("-1").build ())
+		.visibility (Visibility.PUBLIC)
+		.add_parameter (ParameterSpec.builder (ClassName.get ("Google.Protobuf", "DecodeBuffer"), "buffer").build ())
+		.add_parameter (ParameterSpec.builder (TypeName.SSIZE_T, "data_length").default_value ("-1").build ())
 		.add_statement ("decode (buffer, data_length)")
 		.build ();
 	builder.add_method (from_data_ctor);
 
 	// decode Method
 	var decode_method = MethodSpec.method_builder ("decode")
-		.add_modifiers (ValaModifier.PUBLIC, ValaModifier.OVERRIDE)
+		.visibility (Visibility.PUBLIC).add_modifiers (SymbolModifier.OVERRIDE)
 		.returns (TypeName.BOOL)
-		.add_parameter (ParameterSpec.builder (ClassName.get ("", "Google.Protobuf.DecodeBuffer"), "buffer").build ())
-		.add_parameter (ParameterSpec.builder (ClassName.get ("", "ssize_t"), "data_length").default_value ("-1").build ());
+		.add_parameter (ParameterSpec.builder (ClassName.get ("Google.Protobuf", "DecodeBuffer"), "buffer").build ())
+		.add_parameter (ParameterSpec.builder (TypeName.SSIZE_T, "data_length").default_value ("-1").build ());
 
 	decode_method.add_statement ("size_t end");
 	decode_method.begin_control_flow ("if (data_length < 0)");
@@ -168,7 +351,14 @@ private static TypeSpec write_class (DescriptorProto type) {
 	}
 
 	foreach (var field in type.field) {
-		decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), get_default_value (field)));
+		var wkt = WktRegistry.get_handler (field);
+		if (is_map_field (type, field)) {
+			decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), get_map_init (type, field)));
+		} else if (wkt != null) {
+			decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), wkt.get_default_value (field)));
+		} else {
+			decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), get_field_default_value (field)));
+		}
 	}
 
 	decode_method.begin_control_flow ("while (buffer.read_index < end)");
@@ -178,93 +368,86 @@ private static TypeSpec write_class (DescriptorProto type) {
 
 	var first = true;
 	foreach (var field in type.field) {
-		var decode_expression = "";
+		if (is_map_field (type, field)) {
+			if (first) {
+				decode_method.begin_control_flow ("if (field_number == %d && wire_type == 2)".printf (field.number));
+			} else {
+				decode_method.next_control_flow ("else if (field_number == %d && wire_type == 2)".printf (field.number));
+			}
+			var map_entry = get_map_entry (type, field);
+			var key_field = get_map_key_field (map_entry);
+			var val_field = get_map_value_field (map_entry);
+			decode_method.add_statement ("var entry_len = (ssize_t) buffer.decode_varint ()");
+			decode_method.add_statement ("var entry_end = buffer.read_index + entry_len");
+			decode_method.add_statement ("%s entry_key = %s".printf (get_type_name (key_field, false), get_field_default_value (key_field)));
+			decode_method.add_statement ("%s entry_val = %s".printf (get_type_name (val_field, false), get_field_default_value (val_field)));
+			decode_method.begin_control_flow ("while (buffer.read_index < entry_end)");
+			decode_method.add_statement ("var entry_tag = buffer.decode_varint ()");
+			decode_method.add_statement ("var entry_num = entry_tag >> 3");
+			decode_method.begin_control_flow ("if (entry_num == 1)");
+			decode_method.add_statement ("entry_key = %s".printf (get_single_decode_expression (key_field)));
+			decode_method.next_control_flow ("else if (entry_num == 2)");
+			decode_method.add_statement ("entry_val = %s".printf (get_single_decode_expression (val_field)));
+			decode_method.next_control_flow ("else");
+			decode_method.add_statement ("this.unknown_fields.prepend (buffer.decode_unknown_field (entry_tag))");
+			decode_method.end_control_flow ();
+			decode_method.end_control_flow ();
+			decode_method.begin_control_flow ("if (buffer.read_index != entry_end)");
+			decode_method.add_statement ("buffer.error = true");
+			decode_method.end_control_flow ();
+			decode_method.add_statement ("this.%s.set (entry_key, entry_val)".printf (get_field_name (field)));
+			first = false;
+			continue;
+		}
+
+		var wkt = WktRegistry.get_handler (field);
+		if (wkt != null) {
+			wkt.emit_decode (decode_method, field, ref first);
+			continue;
+		}
+
+		var decode_expression = get_single_decode_expression (field);
 		var wire_type = 0;
 		switch (field.type) {
 			case FieldDescriptorProto.Type.TYPE_DOUBLE:
 				wire_type = 1;
-				decode_expression = "buffer.decode_double ()";
 				break;
 			case FieldDescriptorProto.Type.TYPE_FLOAT:
 				wire_type = 5;
-				decode_expression = "buffer.decode_float ()";
 				break;
 			case FieldDescriptorProto.Type.TYPE_INT64:
-				wire_type = 0;
-				decode_expression = "buffer.decode_int64 ()";
-				break;
 			case FieldDescriptorProto.Type.TYPE_UINT64:
-				wire_type = 0;
-				decode_expression = "buffer.decode_uint64 ()";
-				break;
 			case FieldDescriptorProto.Type.TYPE_INT32:
-				wire_type = 0;
-				decode_expression = "buffer.decode_int32 ()";
-				break;
-			case FieldDescriptorProto.Type.TYPE_FIXED64:
-				wire_type = 1;
-				decode_expression = "buffer.decode_fixed64 ()";
-				break;
-			case FieldDescriptorProto.Type.TYPE_FIXED32:
-				wire_type = 5;
-				decode_expression = "buffer.decode_fixed32 ()";
-				break;
 			case FieldDescriptorProto.Type.TYPE_BOOL:
-				wire_type = 0;
-				decode_expression = "buffer.decode_bool ()";
-				break;
-			case FieldDescriptorProto.Type.TYPE_STRING:
-				wire_type = 2;
-				decode_expression = "buffer.decode_string ((size_t) buffer.decode_varint ())";
-				break;
-			case FieldDescriptorProto.Type.TYPE_BYTES:
-				wire_type = 2;
-				decode_expression = "buffer.decode_bytes ((size_t) buffer.decode_varint ())";
-				break;
-			case FieldDescriptorProto.Type.TYPE_MESSAGE:
-				wire_type = 2;
-				decode_expression = "new %s.from_data (buffer, (ssize_t) buffer.decode_varint ())".printf (get_type_name (field, false));
-				break;
 			case FieldDescriptorProto.Type.TYPE_ENUM:
-				wire_type = 0;
-				decode_expression = "(%s) buffer.decode_varint ()".printf (get_type_name (field, false));
-				break;
 			case FieldDescriptorProto.Type.TYPE_UINT32:
-				wire_type = 0;
-				decode_expression = "buffer.decode_uint32 ()";
-				break;
-			case FieldDescriptorProto.Type.TYPE_SFIXED32:
-				wire_type = 5;
-				decode_expression = "buffer.decode_sfixed32 ()";
-				break;
-			case FieldDescriptorProto.Type.TYPE_SFIXED64:
-				wire_type = 1;
-				decode_expression = "buffer.decode_sfixed64 ()";
-				break;
 			case FieldDescriptorProto.Type.TYPE_SINT32:
-				wire_type = 0;
-				decode_expression = "buffer.decode_sint32 ()";
-				break;
 			case FieldDescriptorProto.Type.TYPE_SINT64:
 				wire_type = 0;
-				decode_expression = "buffer.decode_sint64 ()";
 				break;
-			default:
-				decode_expression = "buffer.DECODE_UNKNOWN_TYPE%d ()".printf (field.type);
+			case FieldDescriptorProto.Type.TYPE_FIXED64:
+			case FieldDescriptorProto.Type.TYPE_SFIXED64:
+				wire_type = 1;
 				break;
-		}
-
-		var packed = field.options != null && field.options.packed;
-		if (packed) wire_type = 2;
-
-		if (first) {
-			decode_method.begin_control_flow ("if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
-		} else {
-			decode_method.next_control_flow ("else if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+			case FieldDescriptorProto.Type.TYPE_FIXED32:
+			case FieldDescriptorProto.Type.TYPE_SFIXED32:
+				wire_type = 5;
+				break;
+			case FieldDescriptorProto.Type.TYPE_STRING:
+			case FieldDescriptorProto.Type.TYPE_BYTES:
+			case FieldDescriptorProto.Type.TYPE_MESSAGE:
+				wire_type = 2;
+				break;
 		}
 
 		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
-			if (packed) {
+			if (is_packable_type (field.type)) {
+				// Packed format (wire_type = 2)
+				if (first) {
+					decode_method.begin_control_flow ("if (field_number == %d && wire_type == 2)".printf (field.number));
+				} else {
+					decode_method.next_control_flow ("else if (field_number == %d && wire_type == 2)".printf (field.number));
+				}
 				decode_method.add_statement ("var %s_length = buffer.decode_varint ()".printf (field.name));
 				decode_method.add_statement ("var %s_end = buffer.read_index + %s_length".printf (field.name, field.name));
 				decode_method.begin_control_flow ("while (buffer.read_index < %s_end)".printf (field.name));
@@ -273,14 +456,30 @@ private static TypeSpec write_class (DescriptorProto type) {
 				decode_method.begin_control_flow ("if (buffer.read_index != %s_end)".printf (field.name));
 				decode_method.add_statement ("buffer.error = true");
 				decode_method.end_control_flow ();
+
+				// Unpacked format (wire_type = scalar_wire_type)
+				decode_method.next_control_flow ("else if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+				decode_method.add_statement ("this.%s.append (%s)".printf (get_field_name (field), decode_expression));
 			} else {
+				if (first) {
+					decode_method.begin_control_flow ("if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+				} else {
+					decode_method.next_control_flow ("else if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+				}
 				decode_method.add_statement ("this.%s.append (%s)".printf (get_field_name (field), decode_expression));
 			}
-		} else if (field.label == FieldDescriptorProto.Label.LABEL_REQUIRED) {
-			decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), decode_expression));
-			decode_method.add_statement ("have_%s = true".printf (field.name));
 		} else {
-			decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), decode_expression));
+			if (first) {
+				decode_method.begin_control_flow ("if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+			} else {
+				decode_method.next_control_flow ("else if (field_number == %d && wire_type == %d)".printf (field.number, wire_type));
+			}
+			if (field.label == FieldDescriptorProto.Label.LABEL_REQUIRED) {
+				decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), decode_expression));
+				decode_method.add_statement ("have_%s = true".printf (field.name));
+			} else {
+				decode_method.add_statement ("this.%s = %s".printf (get_field_name (field), decode_expression));
+			}
 		}
 
 		first = false;
@@ -309,9 +508,9 @@ private static TypeSpec write_class (DescriptorProto type) {
 
 	// encode Method
 	var encode_method = MethodSpec.method_builder ("encode")
-		.add_modifiers (ValaModifier.PUBLIC, ValaModifier.OVERRIDE)
-		.returns (ClassName.get ("", "size_t"))
-		.add_parameter (ParameterSpec.builder (ClassName.get ("", "Google.Protobuf.EncodeBuffer"), "buffer").build ());
+		.visibility (Visibility.PUBLIC).add_modifiers (SymbolModifier.OVERRIDE)
+		.returns (TypeName.SIZE_T)
+		.add_parameter (ParameterSpec.builder (ClassName.get ("Google.Protobuf", "EncodeBuffer"), "buffer").build ());
 
 	encode_method.add_statement ("size_t n_written = 0");
 	encode_method.begin_control_flow ("foreach (var f in this.unknown_fields)");
@@ -320,11 +519,64 @@ private static TypeSpec write_class (DescriptorProto type) {
 
 	for (unowned List<FieldDescriptorProto> i = type.field.last (); i != null; i = i.prev) {
 		var field = i.data;
-		var packed = field.options != null && field.options.packed;
+		if (is_map_field (type, field)) {
+			var map_entry = get_map_entry (type, field);
+			var key_field = get_map_key_field (map_entry);
+			var val_field = get_map_value_field (map_entry);
+
+			encode_method.begin_control_flow ("if (this.%s != null && this.%s.size > 0)".printf (get_field_name (field), get_field_name (field)));
+			encode_method.begin_control_flow ("foreach (var entry in this.%s.entries)".printf (get_field_name (field)));
+			encode_method.add_statement ("var k = entry.key");
+			encode_method.add_statement ("var v = entry.value");
+			encode_method.add_statement ("var entry_buf = new Google.Protobuf.EncodeBuffer ()");
+			encode_method.add_statement ("size_t entry_len = 0");
+
+			int v_wire_type;
+			bool v_is_len;
+			var v_expr = get_encode_expression (val_field, "v", out v_wire_type, out v_is_len);
+			if (v_is_len) {
+				encode_method.add_statement ("var v_len = %s".printf (v_expr.replace ("buffer.", "entry_buf.")));
+				encode_method.add_statement ("entry_len += v_len");
+				encode_method.add_statement ("entry_len += entry_buf.encode_varint (v_len)");
+			} else {
+				encode_method.add_statement ("entry_len += %s".printf (v_expr.replace ("buffer.", "entry_buf.")));
+			}
+			encode_method.add_statement ("entry_len += entry_buf.encode_varint (%d)".printf ((2 << 3) | v_wire_type));
+
+			int k_wire_type;
+			bool k_is_len;
+			var k_expr = get_encode_expression (key_field, "k", out k_wire_type, out k_is_len);
+			if (k_is_len) {
+				encode_method.add_statement ("var k_len = %s".printf (k_expr.replace ("buffer.", "entry_buf.")));
+				encode_method.add_statement ("entry_len += k_len");
+				encode_method.add_statement ("entry_len += entry_buf.encode_varint (k_len)");
+			} else {
+				encode_method.add_statement ("entry_len += %s".printf (k_expr.replace ("buffer.", "entry_buf.")));
+			}
+			encode_method.add_statement ("entry_len += entry_buf.encode_varint (%d)".printf ((1 << 3) | k_wire_type));
+
+			encode_method.add_statement ("n_written += buffer.encode_raw_bytes (entry_buf.data)");
+			encode_method.add_statement ("n_written += buffer.encode_varint (entry_len)");
+			encode_method.add_statement ("n_written += buffer.encode_varint (%d)".printf ((field.number << 3) | 2));
+			encode_method.add_statement ("n_written += entry_len");
+			encode_method.end_control_flow (); // end foreach
+			encode_method.end_control_flow (); // end if
+			continue;
+		}
+
+		var wkt = WktRegistry.get_handler (field);
+		if (wkt != null) {
+			wkt.emit_encode (encode_method, field);
+			continue;
+		}
+
+		var packed = is_packed_field (field, is_proto3);
 		var field_name = "this.%s".printf (get_field_name (field));
 
-		if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL) {
-			encode_method.begin_control_flow ("if (%s != %s)".printf (field_name, get_default_value (field)));
+		bool is_optional = (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL) || (is_proto3 && field.label != FieldDescriptorProto.Label.LABEL_REPEATED);
+
+		if (is_optional) {
+			encode_method.begin_control_flow ("if (%s != %s)".printf (field_name, get_field_default_value (field)));
 		} else if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
 			if (packed) encode_method.add_statement ("size_t %s_length = 0".printf (field.name));
 			encode_method.begin_control_flow ("for (unowned %s i = %s.last (); i != null; i = i.prev)".printf (get_type_name (field), field_name));
@@ -346,71 +598,11 @@ private static TypeSpec write_class (DescriptorProto type) {
 		else stmt_prefix = "n_written += ";
 
 		var wire_type = 0;
-		switch (field.type) {
-			case FieldDescriptorProto.Type.TYPE_DOUBLE:
-				encode_method.add_statement ("%sbuffer.encode_double (%s)".printf (stmt_prefix, field_name));
-				wire_type = 1;
-				break;
-			case FieldDescriptorProto.Type.TYPE_FLOAT:
-				encode_method.add_statement ("%sbuffer.encode_float (%s)".printf (stmt_prefix, field_name));
-				wire_type = 5;
-				break;
-			case FieldDescriptorProto.Type.TYPE_INT64:
-				encode_method.add_statement ("%sbuffer.encode_int64 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_UINT64:
-				encode_method.add_statement ("%sbuffer.encode_uint64 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_INT32:
-				encode_method.add_statement ("%sbuffer.encode_int32 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_FIXED64:
-				encode_method.add_statement ("%sbuffer.encode_fixed64 (%s)".printf (stmt_prefix, field_name));
-				wire_type = 1;
-				break;
-			case FieldDescriptorProto.Type.TYPE_FIXED32:
-				encode_method.add_statement ("%sbuffer.encode_fixed32 (%s)".printf (stmt_prefix, field_name));
-				wire_type = 5;
-				break;
-			case FieldDescriptorProto.Type.TYPE_BOOL:
-				encode_method.add_statement ("%sbuffer.encode_bool (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_STRING:
-				encode_method.add_statement ("%sbuffer.encode_string (%s)".printf (stmt_prefix, field_name));
-				wire_type = 2;
-				break;
-			case FieldDescriptorProto.Type.TYPE_BYTES:
-				encode_method.add_statement ("%sbuffer.encode_bytes (%s)".printf (stmt_prefix, field_name));
-				wire_type = 2;
-				break;
-			case FieldDescriptorProto.Type.TYPE_UINT32:
-				encode_method.add_statement ("%sbuffer.encode_uint32 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_SFIXED64:
-				encode_method.add_statement ("%sbuffer.encode_sfixed64 (%s)".printf (stmt_prefix, field_name));
-				wire_type = 1;
-				break;
-			case FieldDescriptorProto.Type.TYPE_SFIXED32:
-				encode_method.add_statement ("%sbuffer.encode_sfixed32 (%s)".printf (stmt_prefix, field_name));
-				wire_type = 5;
-				break;
-			case FieldDescriptorProto.Type.TYPE_SINT64:
-				encode_method.add_statement ("%sbuffer.encode_sint64 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_SINT32:
-				encode_method.add_statement ("%sbuffer.encode_sint32 (%s)".printf (stmt_prefix, field_name));
-				break;
-			case FieldDescriptorProto.Type.TYPE_MESSAGE:
-				encode_method.add_statement ("%s%s.encode (buffer)".printf (stmt_prefix, field_name));
-				wire_type = 2;
-				break;
-			case FieldDescriptorProto.Type.TYPE_ENUM:
-				encode_method.add_statement ("%sbuffer.encode_varint (%s)".printf (stmt_prefix, field_name));
-				break;
-			default:
-				encode_method.add_statement ("%sENCODE_UNKNOWN_TYPE%d (%s)".printf (stmt_prefix, field.type, field_name));
-				break;
-		}
+		int wt;
+		bool is_len;
+		var enc_stmt = get_encode_expression (field, field_name, out wt, out is_len);
+		encode_method.add_statement ("%s%s".printf (stmt_prefix, enc_stmt));
+		wire_type = wt;
 
 		if (encode_length) {
 			encode_method.add_statement ("n_written += %s_length".printf (field.name));
@@ -422,7 +614,7 @@ private static TypeSpec write_class (DescriptorProto type) {
 			encode_method.add_statement ("n_written += buffer.encode_varint (%d)".printf (n));
 		}
 
-		if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL || field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
+		if (is_optional || field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
 			encode_method.end_control_flow ();
 		}
 
@@ -441,30 +633,56 @@ private static TypeSpec write_class (DescriptorProto type) {
 
 	// to_string Method
 	var to_string_method = MethodSpec.method_builder ("to_string")
-		.add_modifiers (ValaModifier.PUBLIC, ValaModifier.OVERRIDE)
+		.visibility (Visibility.PUBLIC).add_modifiers (SymbolModifier.OVERRIDE)
 		.returns (TypeName.STRING)
 		.add_parameter (ParameterSpec.builder (TypeName.STRING, "indent").default_value ("\"\"").build ());
 
 	to_string_method.add_statement ("var text = \"\"");
 
 	foreach (var field in type.field) {
+		if (is_map_field (type, field)) {
+			var map_entry = get_map_entry (type, field);
+			var key_field = get_map_key_field (map_entry);
+			var val_field = get_map_value_field (map_entry);
+			to_string_method.begin_control_flow ("if (this.%s != null)".printf (get_field_name (field)));
+			to_string_method.begin_control_flow ("foreach (var entry in this.%s.entries)".printf (get_field_name (field)));
+			to_string_method.add_statement ("var k = entry.key");
+			to_string_method.add_statement ("var v = entry.value");
+			to_string_method.add_statement ("text += indent + \"%s {\\n\"".printf (field.name));
+			to_string_method.add_statement_raw ("text += indent + \"  key: %%s\\n\".printf (%s)".printf (get_to_string_method (key_field, "k")));
+			to_string_method.add_statement_raw ("text += indent + \"  value: %%s\\n\".printf (%s)".printf (get_to_string_method (val_field, "v")));
+			to_string_method.add_statement ("text += indent + \"}\\n\"");
+			to_string_method.end_control_flow (); // end foreach
+			to_string_method.end_control_flow (); // end if
+			continue;
+		}
+
+		var wkt = WktRegistry.get_handler (field);
+		if (wkt != null) {
+			wkt.emit_to_string (to_string_method, field);
+			continue;
+		}
+
 		var field_name = "this.%s".printf (get_field_name (field));
+		bool is_custom_msg = field.type == FieldDescriptorProto.Type.TYPE_MESSAGE && WktRegistry.get_handler (field) == null;
+		bool is_nullable_opt = field.proto3_optional || (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL && (field.type == FieldDescriptorProto.Type.TYPE_STRING || field.type == FieldDescriptorProto.Type.TYPE_BYTES));
+
 		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
 			to_string_method.begin_control_flow ("foreach (unowned %s v in %s)".printf (get_type_name (field, false), field_name));
 			field_name = "v";
-		} else if (field.type == FieldDescriptorProto.Type.TYPE_MESSAGE) {
-			to_string_method.begin_control_flow ("if (%s != null)".printf (field.name));
+		} else if (is_custom_msg || is_nullable_opt) {
+			to_string_method.begin_control_flow ("if (%s != null)".printf (field_name));
 		}
 
-		if (field.type == FieldDescriptorProto.Type.TYPE_MESSAGE) {
+		if (is_custom_msg) {
 			to_string_method.add_statement ("text += indent + \"%s {\\n\"".printf (field.name));
-			to_string_method.add_statement ("text += \"%%%%s\".printf (%s)".printf (get_to_string_method (field, field_name, "  ")));
+			to_string_method.add_statement_raw ("text += \"%s\".printf (%s)".printf ("%s", get_to_string_method (field, field_name, "  ")));
 			to_string_method.add_statement ("text += indent + \"}\\n\"");
 		} else {
-			to_string_method.add_statement ("text += indent + \"%s: %%%%s\\n\".printf (%s)".printf (field.name, get_to_string_method (field, field_name)));
+			to_string_method.add_statement_raw ("text += indent + \"%s: %%s\\n\".printf (%s)".printf (field.name, get_to_string_method (field, field_name)));
 		}
 
-		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED || field.type == FieldDescriptorProto.Type.TYPE_MESSAGE) {
+		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED || is_custom_msg || is_nullable_opt) {
 			to_string_method.end_control_flow ();
 		}
 	}
@@ -551,8 +769,16 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
 			needs_box = true;
 			break;
 		case FieldDescriptorProto.Type.TYPE_MESSAGE:
-			type_name = get_namespace (field.type_name);
-			nullable = true;
+			if (is_timestamp_field (field)) {
+				type_name = "GLib.DateTime";
+				nullable = true;
+			} else if (is_duration_field (field)) {
+				type_name = "GLib.TimeSpan";
+				needs_box = true;
+			} else {
+				type_name = get_namespace (field.type_name);
+				nullable = true;
+			}
 			break;
 		case FieldDescriptorProto.Type.TYPE_ENUM:
 			type_name = get_namespace (field.type_name);
@@ -568,7 +794,7 @@ private static string get_type_name (FieldDescriptorProto field, bool full = tru
 			if (needs_box) return "List<%s?>".printf (type_name);
 			else return "List<%s>".printf (type_name);
 		case FieldDescriptorProto.Label.LABEL_OPTIONAL:
-			if (nullable) return "%s?".printf (type_name);
+			if (nullable || field.proto3_optional) return "%s?".printf (type_name);
 			else return type_name;
 		default:
 		case FieldDescriptorProto.Label.LABEL_REQUIRED:
@@ -609,7 +835,8 @@ private static string get_field_name (FieldDescriptorProto field) {
 	return field.name;
 }
 
-private static string get_default_value (FieldDescriptorProto field) {
+private static string get_field_default_value (FieldDescriptorProto field) {
+	if (field.proto3_optional) return "null";
 	if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) return "new %s ()".printf (get_type_name (field));
 	switch (field.type) {
 		case FieldDescriptorProto.Type.TYPE_DOUBLE:
@@ -641,6 +868,8 @@ private static string get_default_value (FieldDescriptorProto field) {
 		case FieldDescriptorProto.Type.TYPE_BYTES:
 			return "null";
 		case FieldDescriptorProto.Type.TYPE_MESSAGE:
+			if (is_timestamp_field (field)) return "null";
+			if (is_duration_field (field)) return "0";
 			if (field.label == FieldDescriptorProto.Label.LABEL_OPTIONAL) return "null";
 			else return "new %s ()".printf (get_type_name (field));
 		case FieldDescriptorProto.Type.TYPE_ENUM:
@@ -661,6 +890,7 @@ private static string get_to_string_method (FieldDescriptorProto field, string f
 		case FieldDescriptorProto.Type.TYPE_BYTES:
 			return "Google.Protobuf.bytes_to_string (%s)".printf (field_name);
 		case FieldDescriptorProto.Type.TYPE_MESSAGE:
+			if (is_timestamp_field (field) || is_duration_field (field)) return "%s.to_string ()".printf (field_name);
 			return "%s.to_string (indent + \"%s\")".printf (field_name, indent);
 		case FieldDescriptorProto.Type.TYPE_ENUM:
 			return "%s.to_string ()".printf (field_name);

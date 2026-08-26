@@ -45,6 +45,10 @@ namespace Google.Protobuf {
 			var shift = 0;
 
 			while (read_index < buffer.length) {
+				if (shift >= 64) {
+					error = true;
+					return 0;
+				}
 				var b = (uint64) buffer[read_index];
 				read_index++;
 				value |= (b & 0x7F) << shift;
@@ -115,12 +119,12 @@ namespace Google.Protobuf {
 				return "";
 			}
 
-			var value = new GLib.StringBuilder.sized (length);
-			for (var i = 0; i < length; i++)
-				value.append_c ((char) buffer[read_index + i]);
+			var data = new uint8[length + 1];
+			Memory.copy (data, (uint8*) buffer + read_index, length);
+			data[length] = 0;
 			read_index += length;
 
-			return value.str;
+			return (string) (owned) data;
 		}
 
 		public GLib.ByteArray decode_bytes (size_t length) {
@@ -131,11 +135,10 @@ namespace Google.Protobuf {
 			}
 
 			var data = new uint8[length];
-			for (var i = 0; i < length; i++)
-				data[i] = buffer[read_index + i];
+			Memory.copy (data, (uint8*) buffer + read_index, length);
 			read_index += length;
 
-			return new ByteArray.take (data);
+			return new ByteArray.take ((owned) data);
 		}
 
 		public uint32 decode_uint32 () {
@@ -188,7 +191,8 @@ namespace Google.Protobuf {
 			case 5:                                     // 32-bit
 				value.data = decode_bytes (4);
 				break;
-			default:                                     // FIXME: throw error
+			default:
+				error = true;
 				GLib.stderr.printf ("Unknown wire type %" + uint64.FORMAT + "\n", wire_type);
 				break;
 			}
@@ -293,19 +297,26 @@ namespace Google.Protobuf {
 			var length = value.length;
 			allocate (length);
 			write_index -= length;
-			for (var i = 0; i < length; i++)
-				buffer[write_index + i] = value[i];
+			Memory.copy ((uint8*) buffer + write_index, (uint8*) value, length);
 
 			return length;
 		}
 
-		public size_t encode_bytes (GLib.ByteArray value) {
+		public size_t encode_bytes (GLib.ByteArray? value) {
+			if (value == null) return 0;
 			allocate (value.len);
 			write_index -= value.len;
-			for (var i = 0; i < value.len; i++)
-				buffer[write_index + i] = value.data[i];
+			Memory.copy ((uint8*) buffer + write_index, value.data, value.len);
 
 			return value.len;
+		}
+
+		public size_t encode_raw_bytes (uint8[] value) {
+			allocate (value.length);
+			write_index -= value.length;
+			Memory.copy ((uint8*) buffer + write_index, value, value.length);
+
+			return value.length;
 		}
 
 		public size_t encode_uint32 (uint32 value) {
@@ -365,33 +376,31 @@ namespace Google.Protobuf {
 			if (required <= buffer.length)
 				return;
 
-			/* Double buffer until enough space */
 			var new_length = buffer.length;
 			while (required > new_length)
 				new_length *= 2;
 
-			/* Create new buffer and copy over data */
 			var new_buffer = new uint8[new_length];
 			var write_offset = new_buffer.length - buffer.length;
-			for (var i = write_index; i < buffer.length; i++)
-				new_buffer[i + write_offset] = buffer[i];
+			Memory.copy ((uint8*) new_buffer + write_index + write_offset, (uint8*) buffer + write_index, buffer.length - write_index);
 
-			/* Switch buffers */
 			buffer = (owned) new_buffer;
 			write_index += write_offset;
 		}
 	}
 
-	public static string bytes_to_string (ByteArray value) {
-		var text = "";
+	public static string bytes_to_string (ByteArray? value) {
+		if (value == null) return "\"\"";
+		var text = new StringBuilder.sized (value.len * 2);
 		for (var i = 0; i < value.len; i++)
-			text += "%02X".printf (value.data[i]);
-		return text;
+			text.append_printf ("%02X", value.data[i]);
+		return text.str;
 	}
 
 	public static string string_to_string (string value) {
+		if (value == null) return "\"\"";
 		var v = value.replace ("\\", "\\\\");
-		v = value.replace ("\"", "\\\"");
+		v = v.replace ("\"", "\\\"");
 		return "\"%s\"".printf (v);
 	}
 }
