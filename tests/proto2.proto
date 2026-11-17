@@ -1,5 +1,9 @@
+// Proto2-only test schemas: required fields, explicit defaults, non-zero-based enums,
+// unpacked-by-default repeated fields, and Vala keyword escaping.
 syntax = "proto2";
 package test.vala;
+
+import "imported.proto";
 
 enum Enum {
 	ONE = 1;
@@ -142,3 +146,12 @@ message ChildMessage {
 	required uint32 value = 1;
 }
 
+message NestedAndImportedEnumMessage {
+	enum LocalNestedEnum {
+		LOCAL_FIRST = 4;
+		LOCAL_SECOND = 5;
+	}
+	optional LocalNestedEnum local_nested = 1;
+	optional NoPkgEnum no_pkg = 2;
+	optional NoPkgOuter.NestedEnum imp_nested = 3;
+}

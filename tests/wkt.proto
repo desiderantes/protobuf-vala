@@ -1,0 +1,45 @@
+// Syntax-agnostic Well-Known Types test schemas: Timestamp, Duration, Wrappers, and FieldMask.
+syntax = "proto3";
+package test.wkt;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/field_mask.proto";
+
+message WktMessage {
+	google.protobuf.Timestamp timestamp = 1;
+	google.protobuf.Duration duration = 2;
+}
+
+message WrapperMessage {
+	google.protobuf.Int32Value wrp_int32 = 1;
+	google.protobuf.Int64Value wrp_int64 = 2;
+	google.protobuf.UInt32Value wrp_uint32 = 3;
+	google.protobuf.UInt64Value wrp_uint64 = 4;
+	google.protobuf.FloatValue wrp_float = 5;
+	google.protobuf.DoubleValue wrp_double = 6;
+	google.protobuf.BoolValue wrp_bool = 7;
+	google.protobuf.StringValue wrp_string = 8;
+	google.protobuf.BytesValue wrp_bytes = 9;
+}
+
+message FieldMaskMessage {
+	google.protobuf.FieldMask update_mask = 1;
+}
+
+message NestedWktContainer {
+	WktMessage wkt_msg = 1;
+	WrapperMessage wrp_msg = 2;
+	FieldMaskMessage fm_msg = 3;
+}
+
+message RepeatedWktMessage {
+	repeated google.protobuf.Timestamp timestamps = 1;
+	repeated google.protobuf.Duration durations = 2;
+	repeated google.protobuf.Int32Value int32_wrappers = 3;
+	repeated google.protobuf.Int64Value int64_wrappers = 4;
+	repeated google.protobuf.DoubleValue double_wrappers = 5;
+	repeated google.protobuf.StringValue string_wrappers = 6;
+	repeated google.protobuf.FieldMask masks = 7;
+}

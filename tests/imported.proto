@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+enum NoPkgEnum {
+	NOPKG_FIRST = 5;
+	NOPKG_SECOND = 6;
+}
+
+message NoPkgOuter {
+	enum NestedEnum {
+		NESTED_FIRST = 9;
+		NESTED_SECOND = 10;
+	}
+}

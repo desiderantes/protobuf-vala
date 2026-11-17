@@ -22,20 +22,39 @@ namespace Google.Protobuf.Compiler {
 		}
 
 		public override bool decode (DecodeBuffer buffer, ssize_t data_length = -1) {
+			var expected_end_group = buffer.end_group_field_number;
+			buffer.end_group_field_number = -1;
 			size_t end;
 			if (data_length < 0) {
 				end = buffer.buffer.length;
+			} else if (buffer.read_index > buffer.buffer.length || (size_t) data_length > buffer.buffer.length - buffer.read_index) {
+				buffer.read_index = buffer.buffer.length;
+				buffer.error = true;
+				return false;
 			} else {
-				end = buffer.read_index + data_length;
+				end = buffer.read_index + (size_t) data_length;
 			}
 			this.major = 0;
 			this.minor = 0;
 			this.patch = 0;
 			this.suffix = "";
-			while (buffer.read_index < end) {
+			while (buffer.read_index < end && !buffer.error) {
 				var key = buffer.decode_varint ();
+				if (buffer.error) {
+					break;
+				}
 				var wire_type = key & 0x7;
 				var field_number = key >> 3;
+				if (wire_type == 4) {
+					if (expected_end_group >= 0 && (int64) field_number == expected_end_group) {
+						expected_end_group = -1;
+						end = buffer.read_index;
+						break;
+					} else {
+						buffer.error = true;
+						break;
+					}
+				}
 				if (field_number == 1 && wire_type == 0) {
 					this.major = buffer.decode_int32 ();
 				} else if (field_number == 2 && wire_type == 0) {
@@ -43,12 +62,12 @@ namespace Google.Protobuf.Compiler {
 				} else if (field_number == 3 && wire_type == 0) {
 					this.patch = buffer.decode_int32 ();
 				} else if (field_number == 4 && wire_type == 2) {
-					this.suffix = buffer.decode_string ((size_t) buffer.decode_varint ());
+					this.suffix = buffer.decode_string ((size_t) buffer.decode_length ());
 				} else {
 					this.unknown_fields.prepend (buffer.decode_unknown_field (key));
 				}
 			}
-			if (buffer.read_index != end) {
+			if (buffer.read_index != end || expected_end_group >= 0) {
 				buffer.error = true;
 			}
 			return !buffer.error;
@@ -96,12 +115,14 @@ namespace Google.Protobuf.Compiler {
 		public List<string> file_to_generate;
 		public string parameter;
 		public List<Google.Protobuf.FileDescriptorProto> proto_file;
+		public List<Google.Protobuf.FileDescriptorProto> source_file_descriptors;
 		public Google.Protobuf.Compiler.Version? compiler_version;
 
 		public CodeGeneratorRequest () {
 			this.file_to_generate = new List<string> ();
 			this.parameter = "";
 			this.proto_file = new List<Google.Protobuf.FileDescriptorProto> ();
+			this.source_file_descriptors = new List<Google.Protobuf.FileDescriptorProto> ();
 			this.compiler_version = null;
 		}
 
@@ -110,33 +131,55 @@ namespace Google.Protobuf.Compiler {
 		}
 
 		public override bool decode (DecodeBuffer buffer, ssize_t data_length = -1) {
+			var expected_end_group = buffer.end_group_field_number;
+			buffer.end_group_field_number = -1;
 			size_t end;
 			if (data_length < 0) {
 				end = buffer.buffer.length;
+			} else if (buffer.read_index > buffer.buffer.length || (size_t) data_length > buffer.buffer.length - buffer.read_index) {
+				buffer.read_index = buffer.buffer.length;
+				buffer.error = true;
+				return false;
 			} else {
-				end = buffer.read_index + data_length;
+				end = buffer.read_index + (size_t) data_length;
 			}
 			this.file_to_generate = new List<string> ();
 			this.parameter = "";
 			this.proto_file = new List<Google.Protobuf.FileDescriptorProto> ();
+			this.source_file_descriptors = new List<Google.Protobuf.FileDescriptorProto> ();
 			this.compiler_version = null;
-			while (buffer.read_index < end) {
+			while (buffer.read_index < end && !buffer.error) {
 				var key = buffer.decode_varint ();
+				if (buffer.error) {
+					break;
+				}
 				var wire_type = key & 0x7;
 				var field_number = key >> 3;
+				if (wire_type == 4) {
+					if (expected_end_group >= 0 && (int64) field_number == expected_end_group) {
+						expected_end_group = -1;
+						end = buffer.read_index;
+						break;
+					} else {
+						buffer.error = true;
+						break;
+					}
+				}
 				if (field_number == 1 && wire_type == 2) {
-					this.file_to_generate.append (buffer.decode_string ((size_t) buffer.decode_varint ()));
+					this.file_to_generate.append (buffer.decode_string ((size_t) buffer.decode_length ()));
 				} else if (field_number == 2 && wire_type == 2) {
-					this.parameter = buffer.decode_string ((size_t) buffer.decode_varint ());
+					this.parameter = buffer.decode_string ((size_t) buffer.decode_length ());
 				} else if (field_number == 15 && wire_type == 2) {
-					this.proto_file.append (new Google.Protobuf.FileDescriptorProto.from_data (buffer, (ssize_t) buffer.decode_varint ()));
+					this.proto_file.append (new Google.Protobuf.FileDescriptorProto.from_data (buffer, buffer.decode_length ()));
+				} else if (field_number == 17 && wire_type == 2) {
+					this.source_file_descriptors.append (new Google.Protobuf.FileDescriptorProto.from_data (buffer, buffer.decode_length ()));
 				} else if (field_number == 3 && wire_type == 2) {
-					this.compiler_version = new Google.Protobuf.Compiler.Version.from_data (buffer, (ssize_t) buffer.decode_varint ());
+					this.compiler_version = new Google.Protobuf.Compiler.Version.from_data (buffer, buffer.decode_length ());
 				} else {
 					this.unknown_fields.prepend (buffer.decode_unknown_field (key));
 				}
 			}
-			if (buffer.read_index != end) {
+			if (buffer.read_index != end || expected_end_group >= 0) {
 				buffer.error = true;
 			}
 			return !buffer.error;
@@ -153,11 +196,21 @@ namespace Google.Protobuf.Compiler {
 				n_written += buffer.encode_varint (compiler_version_length);
 				n_written += buffer.encode_varint (26);
 			}
+			for (unowned List<Google.Protobuf.FileDescriptorProto> i = this.source_file_descriptors.last (); i != null; i = i.prev) {
+				if (i.data != null) {
+					var source_file_descriptors_length = i.data.encode (buffer);
+					n_written += source_file_descriptors_length;
+					n_written += buffer.encode_varint (source_file_descriptors_length);
+					n_written += buffer.encode_varint (138);
+				}
+			}
 			for (unowned List<Google.Protobuf.FileDescriptorProto> i = this.proto_file.last (); i != null; i = i.prev) {
-				var proto_file_length = i.data.encode (buffer);
-				n_written += proto_file_length;
-				n_written += buffer.encode_varint (proto_file_length);
-				n_written += buffer.encode_varint (122);
+				if (i.data != null) {
+					var proto_file_length = i.data.encode (buffer);
+					n_written += proto_file_length;
+					n_written += buffer.encode_varint (proto_file_length);
+					n_written += buffer.encode_varint (122);
+				}
 			}
 			if (this.parameter != "") {
 				var parameter_length = buffer.encode_string (this.parameter);
@@ -183,9 +236,18 @@ namespace Google.Protobuf.Compiler {
 				text += indent + "parameter: %s\n".printf (Google.Protobuf.string_to_string (this.parameter));
 			}
 			foreach (unowned Google.Protobuf.FileDescriptorProto v in this.proto_file) {
-				text += indent + "proto_file {\n";
-				text += "%s".printf (v.to_string (indent + "  "));
-				text += indent + "}\n";
+				if (v != null) {
+					text += indent + "proto_file {\n";
+					text += "%s".printf (v.to_string (indent + "  "));
+					text += indent + "}\n";
+				}
+			}
+			foreach (unowned Google.Protobuf.FileDescriptorProto v in this.source_file_descriptors) {
+				if (v != null) {
+					text += indent + "source_file_descriptors {\n";
+					text += "%s".printf (v.to_string (indent + "  "));
+					text += indent + "}\n";
+				}
 			}
 			if (this.compiler_version != null) {
 				text += indent + "compiler_version {\n";
@@ -199,11 +261,15 @@ namespace Google.Protobuf.Compiler {
 	public class CodeGeneratorResponse : Message {
 		public string error;
 		public uint64 supported_features;
+		public int32 minimum_edition;
+		public int32 maximum_edition;
 		public List<Google.Protobuf.Compiler.CodeGeneratorResponse.File> file;
 
 		public CodeGeneratorResponse () {
 			this.error = "";
 			this.supported_features = 0;
+			this.minimum_edition = 0;
+			this.maximum_edition = 0;
 			this.file = new List<Google.Protobuf.Compiler.CodeGeneratorResponse.File> ();
 		}
 
@@ -212,30 +278,55 @@ namespace Google.Protobuf.Compiler {
 		}
 
 		public override bool decode (DecodeBuffer buffer, ssize_t data_length = -1) {
+			var expected_end_group = buffer.end_group_field_number;
+			buffer.end_group_field_number = -1;
 			size_t end;
 			if (data_length < 0) {
 				end = buffer.buffer.length;
+			} else if (buffer.read_index > buffer.buffer.length || (size_t) data_length > buffer.buffer.length - buffer.read_index) {
+				buffer.read_index = buffer.buffer.length;
+				buffer.error = true;
+				return false;
 			} else {
-				end = buffer.read_index + data_length;
+				end = buffer.read_index + (size_t) data_length;
 			}
 			this.error = "";
 			this.supported_features = 0;
+			this.minimum_edition = 0;
+			this.maximum_edition = 0;
 			this.file = new List<Google.Protobuf.Compiler.CodeGeneratorResponse.File> ();
-			while (buffer.read_index < end) {
+			while (buffer.read_index < end && !buffer.error) {
 				var key = buffer.decode_varint ();
+				if (buffer.error) {
+					break;
+				}
 				var wire_type = key & 0x7;
 				var field_number = key >> 3;
+				if (wire_type == 4) {
+					if (expected_end_group >= 0 && (int64) field_number == expected_end_group) {
+						expected_end_group = -1;
+						end = buffer.read_index;
+						break;
+					} else {
+						buffer.error = true;
+						break;
+					}
+				}
 				if (field_number == 1 && wire_type == 2) {
-					this.error = buffer.decode_string ((size_t) buffer.decode_varint ());
+					this.error = buffer.decode_string ((size_t) buffer.decode_length ());
 				} else if (field_number == 2 && wire_type == 0) {
 					this.supported_features = buffer.decode_uint64 ();
+				} else if (field_number == 3 && wire_type == 0) {
+					this.minimum_edition = buffer.decode_int32 ();
+				} else if (field_number == 4 && wire_type == 0) {
+					this.maximum_edition = buffer.decode_int32 ();
 				} else if (field_number == 15 && wire_type == 2) {
-					this.file.append (new Google.Protobuf.Compiler.CodeGeneratorResponse.File.from_data (buffer, (ssize_t) buffer.decode_varint ()));
+					this.file.append (new Google.Protobuf.Compiler.CodeGeneratorResponse.File.from_data (buffer, buffer.decode_length ()));
 				} else {
 					this.unknown_fields.prepend (buffer.decode_unknown_field (key));
 				}
 			}
-			if (buffer.read_index != end) {
+			if (buffer.read_index != end || expected_end_group >= 0) {
 				buffer.error = true;
 			}
 			return !buffer.error;
@@ -247,10 +338,20 @@ namespace Google.Protobuf.Compiler {
 				n_written += buffer.encode_unknown_field (f);
 			}
 			for (unowned List<Google.Protobuf.Compiler.CodeGeneratorResponse.File> i = this.file.last (); i != null; i = i.prev) {
-				var file_length = i.data.encode (buffer);
-				n_written += file_length;
-				n_written += buffer.encode_varint (file_length);
-				n_written += buffer.encode_varint (122);
+				if (i.data != null) {
+					var file_length = i.data.encode (buffer);
+					n_written += file_length;
+					n_written += buffer.encode_varint (file_length);
+					n_written += buffer.encode_varint (122);
+				}
+			}
+			if (this.maximum_edition != 0) {
+				n_written += buffer.encode_int32 (this.maximum_edition);
+				n_written += buffer.encode_varint (32);
+			}
+			if (this.minimum_edition != 0) {
+				n_written += buffer.encode_int32 (this.minimum_edition);
+				n_written += buffer.encode_varint (24);
 			}
 			if (this.supported_features != 0) {
 				n_written += buffer.encode_uint64 (this.supported_features);
@@ -271,28 +372,35 @@ namespace Google.Protobuf.Compiler {
 				text += indent + "error: %s\n".printf (Google.Protobuf.string_to_string (this.error));
 			}
 			text += indent + "supported_features: %s\n".printf (this.supported_features.to_string ());
+			text += indent + "minimum_edition: %s\n".printf (this.minimum_edition.to_string ());
+			text += indent + "maximum_edition: %s\n".printf (this.maximum_edition.to_string ());
 			foreach (unowned Google.Protobuf.Compiler.CodeGeneratorResponse.File v in this.file) {
-				text += indent + "file {\n";
-				text += "%s".printf (v.to_string (indent + "  "));
-				text += indent + "}\n";
+				if (v != null) {
+					text += indent + "file {\n";
+					text += "%s".printf (v.to_string (indent + "  "));
+					text += indent + "}\n";
+				}
 			}
 			return text;
 		}
 
 		public enum Feature {
 			FEATURE_NONE = 0,
-			FEATURE_PROTO3_OPTIONAL = 1;
+			FEATURE_PROTO3_OPTIONAL = 1,
+			FEATURE_SUPPORTS_EDITIONS = 2;
 
-		public string to_string () {
-			switch (this) {
-				case Feature.FEATURE_NONE:
-					return "FEATURE_NONE";
-				case Feature.FEATURE_PROTO3_OPTIONAL:
-					return "FEATURE_PROTO3_OPTIONAL";
-				default:
-					assert_not_reached ();
+			public string to_string () {
+				switch (this) {
+					case Feature.FEATURE_NONE:
+						return "FEATURE_NONE";
+					case Feature.FEATURE_PROTO3_OPTIONAL:
+						return "FEATURE_PROTO3_OPTIONAL";
+					case Feature.FEATURE_SUPPORTS_EDITIONS:
+						return "FEATURE_SUPPORTS_EDITIONS";
+					default:
+						return ((int) this).to_string ();
+				}
 			}
-		}
 		}
 
 		public class File : Message {
@@ -313,33 +421,52 @@ namespace Google.Protobuf.Compiler {
 			}
 
 			public override bool decode (DecodeBuffer buffer, ssize_t data_length = -1) {
+				var expected_end_group = buffer.end_group_field_number;
+				buffer.end_group_field_number = -1;
 				size_t end;
 				if (data_length < 0) {
 					end = buffer.buffer.length;
+				} else if (buffer.read_index > buffer.buffer.length || (size_t) data_length > buffer.buffer.length - buffer.read_index) {
+					buffer.read_index = buffer.buffer.length;
+					buffer.error = true;
+					return false;
 				} else {
-					end = buffer.read_index + data_length;
+					end = buffer.read_index + (size_t) data_length;
 				}
 				this.name = "";
 				this.insertion_point = "";
 				this.content = "";
 				this.generated_code_info = null;
-				while (buffer.read_index < end) {
+				while (buffer.read_index < end && !buffer.error) {
 					var key = buffer.decode_varint ();
+					if (buffer.error) {
+						break;
+					}
 					var wire_type = key & 0x7;
 					var field_number = key >> 3;
+					if (wire_type == 4) {
+						if (expected_end_group >= 0 && (int64) field_number == expected_end_group) {
+							expected_end_group = -1;
+							end = buffer.read_index;
+							break;
+						} else {
+							buffer.error = true;
+							break;
+						}
+					}
 					if (field_number == 1 && wire_type == 2) {
-						this.name = buffer.decode_string ((size_t) buffer.decode_varint ());
+						this.name = buffer.decode_string ((size_t) buffer.decode_length ());
 					} else if (field_number == 2 && wire_type == 2) {
-						this.insertion_point = buffer.decode_string ((size_t) buffer.decode_varint ());
+						this.insertion_point = buffer.decode_string ((size_t) buffer.decode_length ());
 					} else if (field_number == 15 && wire_type == 2) {
-						this.content = buffer.decode_string ((size_t) buffer.decode_varint ());
+						this.content = buffer.decode_string ((size_t) buffer.decode_length ());
 					} else if (field_number == 16 && wire_type == 2) {
-						this.generated_code_info = new Google.Protobuf.GeneratedCodeInfo.from_data (buffer, (ssize_t) buffer.decode_varint ());
+						this.generated_code_info = new Google.Protobuf.GeneratedCodeInfo.from_data (buffer, buffer.decode_length ());
 					} else {
 						this.unknown_fields.prepend (buffer.decode_unknown_field (key));
 					}
 				}
-				if (buffer.read_index != end) {
+				if (buffer.read_index != end || expected_end_group >= 0) {
 					buffer.error = true;
 				}
 				return !buffer.error;

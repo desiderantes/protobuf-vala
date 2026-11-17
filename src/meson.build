@@ -79,6 +79,9 @@ protoc_gen_vala = executable(
     install: true,
 )
 
+meson.override_find_program('protoc-gen-vala', protoc_gen_vala)
+meson.add_devenv({'PROTOBUF_VALA_PROTO_PATH': meson.current_source_dir() / 'proto'})
+
 protoc_exe = find_program('protoc', required: true)
 
 protoc_vala_generator = generator(
@@ -89,6 +92,20 @@ protoc_vala_generator = generator(
         '--proto_path=@CURRENT_SOURCE_DIR@',
         '--vala_out=@BUILD_DIR@',
         '@INPUT@',
+    ],
+    depends: [protoc_gen_vala],
+)
+
+run_target(
+    'regen-proto',
+    command: [
+        protoc_exe,
+        '--plugin=protoc-gen-vala=' + protoc_gen_vala.full_path(),
+        '--vala_opt=paths=flat',
+        '--proto_path=' + meson.current_source_dir() / 'proto',
+        '--vala_out=' + meson.current_source_dir(),
+        meson.current_source_dir() / 'proto/google/protobuf/descriptor.proto',
+        meson.current_source_dir() / 'proto/google/protobuf/compiler/plugin.proto',
     ],
     depends: [protoc_gen_vala],
 )

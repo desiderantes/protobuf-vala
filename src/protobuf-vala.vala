@@ -17,13 +17,14 @@ namespace Google.Protobuf {
 		private uint8[] ? internal_buffer;
 		public size_t read_index;
 		public bool error;
+		public int64 end_group_field_number = -1;
 
 		public DecodeBuffer (uint8[] buffer, size_t offset = 0, ssize_t length = -1) {
 			if (offset > buffer.length)
 				offset = buffer.length;
 			if (length < 0)
 				length = (ssize_t) (buffer.length - offset);
-			else if (offset + length > buffer.length)
+			else if ((size_t) length > buffer.length - offset)
 				length = (ssize_t) (buffer.length - offset);
 			this.buffer = (uint8[]) ((uint8*) buffer + offset);
 			this.buffer.length = (int) length;
@@ -38,6 +39,7 @@ namespace Google.Protobuf {
 		public void reset () {
 			read_index = 0;
 			error = false;
+			end_group_field_number = -1;
 		}
 
 		public uint64 decode_varint () {
@@ -59,6 +61,20 @@ namespace Google.Protobuf {
 
 			error = true;
 			return 0;
+		}
+
+		public ssize_t decode_length () {
+			var len = decode_varint ();
+			if (error) {
+				read_index = buffer.length;
+				return 0;
+			}
+			if (read_index > buffer.length || len > (uint64) (buffer.length - read_index)) {
+				read_index = buffer.length;
+				error = true;
+				return 0;
+			}
+			return (ssize_t) len;
 		}
 
 		public double decode_double () {
@@ -85,7 +101,7 @@ namespace Google.Protobuf {
 		}
 
 		public uint64 decode_fixed64 () {
-			if (read_index + 8 > buffer.length) {
+			if (read_index > buffer.length || buffer.length - read_index < 8) {
 				read_index = buffer.length;
 				error = true;
 				return 0;
@@ -97,7 +113,7 @@ namespace Google.Protobuf {
 		}
 
 		public uint32 decode_fixed32 () {
-			if (read_index + 4 > buffer.length) {
+			if (read_index > buffer.length || buffer.length - read_index < 4) {
 				read_index = buffer.length;
 				error = true;
 				return 0;
@@ -113,7 +129,7 @@ namespace Google.Protobuf {
 		}
 
 		public string decode_string (size_t length) {
-			if (read_index + length > buffer.length) {
+			if (read_index > buffer.length || length > buffer.length - read_index) {
 				read_index = buffer.length;
 				error = true;
 				return "";
@@ -127,8 +143,33 @@ namespace Google.Protobuf {
 			return (string) (owned) data;
 		}
 
+		public string decode_utf8_string (size_t length) {
+			if (read_index > buffer.length || length > buffer.length - read_index) {
+				read_index = buffer.length;
+				error = true;
+				return "";
+			}
+
+			var data = new uint8[length + 1];
+			Memory.copy (data, (uint8*) buffer + read_index, length);
+			data[length] = 0;
+			read_index += length;
+
+			size_t pos = 0;
+			while (pos < length) {
+				unowned string chunk = (string) ((uint8*) data + pos);
+				if (!chunk.validate ()) {
+					error = true;
+					return "";
+				}
+				pos += chunk.length + 1;
+			}
+
+			return (string) (owned) data;
+		}
+
 		public GLib.ByteArray decode_bytes (size_t length) {
-			if (read_index + length > buffer.length) {
+			if (read_index > buffer.length || length > buffer.length - read_index) {
 				read_index = buffer.length;
 				error = true;
 				return new ByteArray ();
@@ -173,6 +214,75 @@ namespace Google.Protobuf {
 				return v;
 		}
 
+		private bool skip_unknown_group (uint64 group_field_number, int depth, out size_t end_before_tag) {
+			end_before_tag = read_index;
+			if (depth >= 100) {
+				read_index = buffer.length;
+				error = true;
+				return false;
+			}
+			while (read_index < buffer.length && !error) {
+				var before_tag = read_index;
+				var tag = decode_varint ();
+				if (error) {
+					return false;
+				}
+				var wt = tag & 0x7;
+				var fnum = tag >> 3;
+				if (wt == 4) {
+					if (fnum == group_field_number) {
+						end_before_tag = before_tag;
+						return true;
+					}
+					read_index = buffer.length;
+					error = true;
+					return false;
+				}
+				switch (wt) {
+				case 0:
+					decode_varint ();
+					break;
+				case 1:
+					if (read_index > buffer.length || buffer.length - read_index < 8) {
+						read_index = buffer.length;
+						error = true;
+						return false;
+					}
+					read_index += 8;
+					break;
+				case 2:
+					var len = decode_varint ();
+					if (error || read_index > buffer.length || len > (uint64) (buffer.length - read_index)) {
+						read_index = buffer.length;
+						error = true;
+						return false;
+					}
+					read_index += (size_t) len;
+					break;
+				case 3:
+					size_t nested_end;
+					if (!skip_unknown_group (fnum, depth + 1, out nested_end)) {
+						return false;
+					}
+					break;
+				case 5:
+					if (read_index > buffer.length || buffer.length - read_index < 4) {
+						read_index = buffer.length;
+						error = true;
+						return false;
+					}
+					read_index += 4;
+					break;
+				default:
+					read_index = buffer.length;
+					error = true;
+					return false;
+				}
+			}
+			error = true;
+			return false;
+		}
+
 		public UnknownField decode_unknown_field (uint64 key) {
 			var value = new UnknownField ();
 			value.key = key;
@@ -186,7 +296,27 @@ namespace Google.Protobuf {
 				break;
 			case 2:                                     // length-delimited
 				var length = decode_varint ();
-				value.data = decode_bytes ((size_t) length);
+				if (error || read_index > buffer.length || length > (uint64) (buffer.length - read_index)) {
+					read_index = buffer.length;
+					error = true;
+					value.data = new ByteArray ();
+				} else {
+					value.data = decode_bytes ((size_t) length);
+				}
+				break;
+			case 3:                                     // start group
+				var start_index = read_index;
+				size_t end_before_tag;
+				if (skip_unknown_group (key >> 3, 0, out end_before_tag)) {
+					var group_len = end_before_tag - start_index;
+					var data = new uint8[group_len];
+					if (group_len > 0) {
+						Memory.copy (data, (uint8*) buffer + start_index, group_len);
+					}
+					value.data = new ByteArray.take ((owned) data);
+				} else {
+					value.data = new ByteArray ();
+				}
 				break;
 			case 5:                                     // 32-bit
 				value.data = decode_bytes (4);
@@ -293,7 +423,8 @@ namespace Google.Protobuf {
 			return encode_varint (value ? 1 : 0);
 		}
 
-		public size_t encode_string (string value) {
+		public size_t encode_string (string? value) {
+			if (value == null) return 0;
 			var length = value.length;
 			allocate (length);
 			write_index -= length;
@@ -361,6 +492,10 @@ namespace Google.Protobuf {
 				n_written += encode_bytes (value.data);
 				n_written += encode_varint (value.data.len);
 				break;
+			case 3:                                     // start group
+				n_written += encode_varint ((value.key & ~((uint64) 0x7)) | 4);
+				n_written += encode_bytes (value.data);
+				break;
 			default:                                     // FIXME: throw error
 				GLib.stderr.printf ("Unknown wire type %" + uint64.FORMAT + "\n", wire_type);
 				break;
@@ -397,7 +532,7 @@ namespace Google.Protobuf {
 		return text.str;
 	}
 
-	public static string string_to_string (string value) {
+	public static string string_to_string (string? value) {
 		if (value == null) return "\"\"";
 		var v = value.replace ("\\", "\\\\");
 		v = v.replace ("\"", "\\\"");

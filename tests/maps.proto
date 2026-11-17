@@ -1,0 +1,33 @@
+// Syntax-agnostic map<> field test schemas across scalar, message, and WKT values.
+syntax = "proto3";
+package test.maps;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/field_mask.proto";
+
+message MapChildMessage {
+	sint32 int_value = 1;
+	string string_value = 2;
+}
+
+message MapMessage {
+	map<string, int32> string_to_int = 1;
+	map<int32, string> int_to_string = 2;
+}
+
+message NestedMapContainer {
+	MapMessage map_msg = 1;
+}
+
+message ExtendedMapMessage {
+	map<int64, string> int64_to_string = 1;
+	map<uint64, double> uint64_to_double = 2;
+	map<bool, MapChildMessage> bool_to_msg = 3;
+	map<string, google.protobuf.Timestamp> str_to_ts = 4;
+	map<string, google.protobuf.Duration> str_to_dur = 5;
+	map<string, google.protobuf.Int32Value> str_to_int32_wrp = 6;
+	map<string, google.protobuf.Int64Value> str_to_int64_wrp = 7;
+	map<string, google.protobuf.FieldMask> str_to_mask = 8;
+}

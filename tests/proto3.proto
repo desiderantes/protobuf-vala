@@ -1,0 +1,59 @@
+// Proto3-only test schemas: implicit zero-value suppression, default-packed repeated fields,
+// proto3 optional keyword, and open zero-based enums.
+syntax = "proto3";
+package test.vala3;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+
+enum Enum3 {
+	ZERO = 0;
+	ONE = 1;
+	TWO = 2;
+	THREE = 3;
+}
+
+message Message3 {
+	int32 value_int32 = 1;
+	uint32 value_uint32 = 2;
+	sint32 value_sint32 = 3;
+	fixed32 value_fixed32 = 4;
+	sfixed32 value_sfixed32 = 5;
+	int64 value_int64 = 6;
+	uint64 value_uint64 = 7;
+	sint64 value_sint64 = 8;
+	fixed64 value_fixed64 = 9;
+	sfixed64 value_sfixed64 = 10;
+	bool value_bool = 11;
+	Enum3 value_enum = 12;
+	string value_string = 13;
+	bytes value_bytes = 14;
+	double value_double = 15;
+	float value_float = 16;
+}
+
+message ScalarMessage3 {
+	sint32 int_value = 1;
+	string string_value = 2;
+}
+
+message RepeatedMessage3 {
+	repeated uint32 value = 1;
+	repeated uint32 deprecated_packed = 2 [deprecated = true];
+	repeated uint32 explicitly_unpacked = 3 [packed = false];
+}
+
+message EnumMessage3 {
+	Enum3 enum_value = 1;
+	repeated Enum3 enum_value_r = 2;
+}
+
+message OptionalMessage3 {
+	optional int32 opt_int = 1;
+	optional string opt_str = 2;
+	optional Enum3 opt_enum = 3;
+	optional bool opt_bool = 4;
+	optional bytes opt_bytes = 5;
+	optional google.protobuf.Duration opt_duration = 6;
+	optional google.protobuf.FieldMask opt_field_mask = 7;
+}

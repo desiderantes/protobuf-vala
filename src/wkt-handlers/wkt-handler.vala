@@ -2,11 +2,45 @@ using Google.Protobuf;
 using ValaPoet;
 
 private abstract class WktHandler : Object {
-	public abstract string get_vala_type (FieldDescriptorProto field, bool full = true);
-	public abstract string get_default_value (FieldDescriptorProto field);
-	public abstract void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first);
-	public abstract void emit_encode (MethodSpec.Builder encode_method, FieldDescriptorProto field);
-	public abstract void emit_to_string (MethodSpec.Builder to_string_method, FieldDescriptorProto field);
+	public abstract string get_vala_type (FieldDescriptorProto field, bool full = true, bool is_explicit = false, bool is_required = false);
+	public virtual string get_generic_type (FieldDescriptorProto field) {
+		return get_vala_type (field, false);
+	}
+	public abstract string get_default_value (FieldDescriptorProto field, bool is_explicit = false, bool is_required = false);
+	public virtual string get_map_default_value (FieldDescriptorProto field) {
+		return get_default_value (field);
+	}
+	public abstract void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template);
+	public abstract void emit_encode_submessage (MethodSpec.Builder encode_method, FieldDescriptorProto field, string val_expr, string buf_var, string len_var);
+	public virtual void emit_encode_map_value (MethodSpec.Builder encode_method, FieldDescriptorProto field, string val_expr, string entry_buf_var, string entry_len_var) {
+		encode_method.add_statement ("var wkt_buf = new Google.Protobuf.EncodeBuffer ()");
+		encode_method.add_statement ("size_t wkt_len = 0");
+		emit_encode_submessage (encode_method, field, val_expr, "wkt_buf", "wkt_len");
+		encode_method.add_statement ("%s += %s.encode_raw_bytes (wkt_buf.data)".printf (entry_len_var, entry_buf_var));
+		encode_method.add_statement ("%s += %s.encode_varint (wkt_len)".printf (entry_len_var, entry_buf_var));
+		encode_method.add_statement ("%s += %s.encode_varint (%d)".printf (entry_len_var, entry_buf_var, (2 << 3) | 2));
+	}
+	public abstract void emit_map_value_to_string (MethodSpec.Builder to_string_method, FieldDescriptorProto field, string val_expr);
+
+	public virtual void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first, bool is_explicit = false, bool is_required = false) {
+		if (first) {
+			decode_method.begin_control_flow ("if (field_number == %d && wire_type == 2)".printf (field.number));
+		} else {
+			decode_method.next_control_flow ("else if (field_number == %d && wire_type == 2)".printf (field.number));
+		}
+		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
+			emit_decode_value (decode_method, field, "this.%s.append ({val})".printf (get_field_name (field)));
+		} else {
+			emit_decode_value (decode_method, field, "this.%s = {val}".printf (get_field_name (field)));
+			if (is_required) {
+				decode_method.add_statement ("have_%s = true".printf (field.name));
+			}
+		}
+		first = false;
+	}
+
+	public abstract void emit_encode (MethodSpec.Builder encode_method, FieldDescriptorProto field, bool is_explicit = false, bool is_required = false);
+	public abstract void emit_to_string (MethodSpec.Builder to_string_method, FieldDescriptorProto field, bool is_explicit = false, bool is_required = false);
 }
 
 private class WktRegistry {

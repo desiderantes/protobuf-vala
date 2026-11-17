@@ -32,10 +32,62 @@ meson test -C build
 
 ## Usage
 
-Compile `.proto` files using the `protoc-gen-vala` plugin:
+Compile `.proto` files using `protoc` and `protoc-gen-vala`:
 
 ```bash
 protoc --plugin=build/src/protoc-gen-vala --vala_out=src my_file.proto
+```
+
+### Development Environment (`meson devenv`)
+
+`meson devenv` puts `protoc-gen-vala` in your `PATH` (along with uninstalled `pkg-config`, `LD_LIBRARY_PATH`, and `PROTOBUF_VALA_PROTO_PATH`), so `protoc` finds `--vala_out` without `--plugin=`.
+
+Enter an interactive shell at the repository root once with `-w .`:
+
+```bash
+meson devenv -C build -w .
+protoc --vala_out=src my_file.proto
+```
+
+Or run a one-shot command directly:
+
+```bash
+meson devenv -C build -w . protoc --vala_out=src my_file.proto
+```
+
+### Using as a Meson Subproject
+
+When `protobuf-vala` is included as a Meson subproject, both `dependency('protobuf-vala-1.0')` and `find_program('protoc-gen-vala')` are overridden once the subproject is loaded (or you can reuse `protoc_vala_generator`):
+
+```meson
+protobuf_vala_dep = dependency('protobuf-vala-1.0', fallback: ['protobuf-vala', 'protobuf_vala_dep'])
+protoc_gen_vala = find_program('protoc-gen-vala')
+# Or reuse the built-in generator directly:
+protoc_vala_gen = subproject('protobuf-vala').get_variable('protoc_vala_generator')
+generated_vala = protoc_vala_gen.process('my_file.proto')
+```
+
+### Plugin Options (`--vala_opt=...`)
+
+You can pass configuration parameters to `protoc-gen-vala` via `--vala_opt`:
+
+| Option | Description | Example |
+| :--- | :--- | :--- |
+| `paths=flat` \| `flat=true` | Strips directory paths; outputs generated files directly into target folder. | `--vala_opt=paths=flat` |
+| `paths=source_relative` | *(Default)* Preserves input directory structure under target output folder. | `--vala_opt=paths=source_relative` |
+| `file_extension=.ext` \| `ext=.ext` | Overrides default `.pb.vala` extension (e.g. `.vala`, `.g.vala`). | `--vala_opt=file_extension=.g.vala` |
+
+**Example using options**:
+```bash
+protoc --vala_opt=paths=flat,file_extension=.g.vala --vala_out=src my_file.proto
+```
+
+### Regenerating Built-in Descriptor Schemas
+
+To regenerate `src/descriptor.pb.vala` and `src/plugin.pb.vala` using the newly built `protoc-gen-vala` plugin:
+
+```bash
+ninja -C build regen-proto
 ```
 
 ## License
