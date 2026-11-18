@@ -76,6 +76,12 @@ public class TestProto2 : Object {
 			check_decode_optional_message ("120454455354", 0, "TEST");
 			check_decode_optional_message ("0802120454455354", 1, "TEST");
 			check_decode_optional_message_twice ("120454455354", "0802", 1, "");
+
+			// Proto2 defaults to utf8_validation = NONE: non-UTF-8 string bytes are accepted
+			var raw_str_bytes = string_to_buffer ("1202FFFE");
+			var raw_str_msg = new Test.Vala.OptionalMessage.from_data (raw_str_bytes);
+			assert_true (!raw_str_bytes.error);
+			assert_cmpint (raw_str_msg.string_value.length, CompareOperator.EQ, 2);
 		});
 
 		GLib.Test.add_func ("/protobuf-vala/proto2/optional_defaults", () => {

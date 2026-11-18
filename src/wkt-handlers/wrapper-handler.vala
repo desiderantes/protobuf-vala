@@ -84,7 +84,7 @@ private class WrapperHandler : WktHandler {
 		}
 	}
 
-	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template) {
+	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template, bool verify_utf8 = false) {
 		var name = get_wrapper_name (field);
 		var base_type = get_vala_type (field, false);
 
@@ -119,7 +119,11 @@ private class WrapperHandler : WktHandler {
 				decode_method.add_statement ("wrp_val = buffer.decode_bool ()");
 				break;
 			case "google.protobuf.StringValue":
-				decode_method.add_statement ("wrp_val = buffer.decode_string ((size_t) buffer.decode_length ())");
+				if (verify_utf8) {
+					decode_method.add_statement ("wrp_val = buffer.decode_utf8_string ((size_t) buffer.decode_length ())");
+				} else {
+					decode_method.add_statement ("wrp_val = buffer.decode_string ((size_t) buffer.decode_length ())");
+				}
 				break;
 			case "google.protobuf.BytesValue":
 				decode_method.add_statement ("wrp_val = buffer.decode_bytes ((size_t) buffer.decode_length ())");

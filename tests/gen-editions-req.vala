@@ -181,6 +181,8 @@ private static FileDescriptorProto build_editions2023_file () {
 	utf8_none_msg.options.features.utf8_validation = FeatureSet.Utf8Validation.NONE;
 	utf8_none_msg.field.append (make_field ("raw_str", 1, FieldDescriptorProto.Type.TYPE_STRING));
 	add_map_field (utf8_none_msg, ".test.editions2023", "raw_map", 2, "RawMapEntry");
+	utf8_none_msg.field.append (make_field ("raw_str_wrp", 3, FieldDescriptorProto.Type.TYPE_MESSAGE, FieldDescriptorProto.Label.LABEL_OPTIONAL, ".google.protobuf.StringValue"));
+	utf8_none_msg.field.append (make_field ("raw_mask", 4, FieldDescriptorProto.Type.TYPE_MESSAGE, FieldDescriptorProto.Label.LABEL_OPTIONAL, ".google.protobuf.FieldMask"));
 	file.message_type.append (utf8_none_msg);
 
 	var delimited_msg = new DescriptorProto ();

@@ -481,7 +481,7 @@ private static string get_single_decode_expression (FieldDescriptorProto field, 
 		case FieldDescriptorProto.Type.TYPE_FIXED32: return "buffer.decode_fixed32 ()";
 		case FieldDescriptorProto.Type.TYPE_BOOL: return "buffer.decode_bool ()";
 		case FieldDescriptorProto.Type.TYPE_STRING:
-			if (is_editions && field_features.utf8_validation == FeatureSet.Utf8Validation.VERIFY) {
+			if (field_features.utf8_validation == FeatureSet.Utf8Validation.VERIFY) {
 				return "buffer.decode_utf8_string ((size_t) buffer.decode_length ())";
 			}
 			return "buffer.decode_string ((size_t) buffer.decode_length ())";
@@ -725,7 +725,7 @@ private static TypeSpec write_class (DescriptorProto type, bool is_proto3 = fals
 			decode_method.add_statement ("entry_key = %s".printf (get_single_decode_expression (key_field, key_features, is_editions)));
 			decode_method.next_control_flow ("else if (entry_num == 2)");
 			if (val_wkt != null) {
-				val_wkt.emit_decode_value (decode_method, val_field, "entry_val = {val}");
+				val_wkt.emit_decode_value (decode_method, val_field, "entry_val = {val}", val_features.utf8_validation == FeatureSet.Utf8Validation.VERIFY);
 			} else {
 				var val_closed_enum = is_closed_enum (val_field, is_editions) ? find_enum_descriptor (val_field) : null;
 				if (val_closed_enum != null) {
@@ -748,7 +748,7 @@ private static TypeSpec write_class (DescriptorProto type, bool is_proto3 = fals
 
 		var wkt = WktRegistry.get_handler (field);
 		if (wkt != null) {
-			wkt.emit_decode (decode_method, field, ref first, is_explicit, is_required);
+			wkt.emit_decode (decode_method, field, ref first, is_explicit, is_required, field_features.utf8_validation == FeatureSet.Utf8Validation.VERIFY);
 			continue;
 		}
 

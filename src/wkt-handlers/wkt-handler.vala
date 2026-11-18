@@ -10,7 +10,7 @@ private abstract class WktHandler : Object {
 	public virtual string get_map_default_value (FieldDescriptorProto field) {
 		return get_default_value (field);
 	}
-	public abstract void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template);
+	public abstract void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template, bool verify_utf8 = false);
 	public abstract void emit_encode_submessage (MethodSpec.Builder encode_method, FieldDescriptorProto field, string val_expr, string buf_var, string len_var);
 	public virtual void emit_encode_map_value (MethodSpec.Builder encode_method, FieldDescriptorProto field, string val_expr, string entry_buf_var, string entry_len_var) {
 		encode_method.add_statement ("var wkt_buf = new Google.Protobuf.EncodeBuffer ()");
@@ -22,16 +22,16 @@ private abstract class WktHandler : Object {
 	}
 	public abstract void emit_map_value_to_string (MethodSpec.Builder to_string_method, FieldDescriptorProto field, string val_expr);
 
-	public virtual void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first, bool is_explicit = false, bool is_required = false) {
+	public virtual void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first, bool is_explicit = false, bool is_required = false, bool verify_utf8 = false) {
 		if (first) {
 			decode_method.begin_control_flow ("if (field_number == %d && wire_type == 2)".printf (field.number));
 		} else {
 			decode_method.next_control_flow ("else if (field_number == %d && wire_type == 2)".printf (field.number));
 		}
 		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
-			emit_decode_value (decode_method, field, "this.%s.append ({val})".printf (get_field_name (field)));
+			emit_decode_value (decode_method, field, "this.%s.append ({val})".printf (get_field_name (field)), verify_utf8);
 		} else {
-			emit_decode_value (decode_method, field, "this.%s = {val}".printf (get_field_name (field)));
+			emit_decode_value (decode_method, field, "this.%s = {val}".printf (get_field_name (field)), verify_utf8);
 			if (is_required) {
 				decode_method.add_statement ("have_%s = true".printf (field.name));
 			}

@@ -30,7 +30,7 @@ private class FieldMaskHandler : WktHandler {
 		return "new Gee.ArrayList<string> ()";
 	}
 
-	public override void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first, bool is_explicit = false, bool is_required = false) {
+	public override void emit_decode (MethodSpec.Builder decode_method, FieldDescriptorProto field, ref bool first, bool is_explicit = false, bool is_required = false, bool verify_utf8 = false) {
 		if (first) {
 			decode_method.begin_control_flow ("if (field_number == %d && wire_type == 2)".printf (field.number));
 		} else {
@@ -38,11 +38,11 @@ private class FieldMaskHandler : WktHandler {
 		}
 		var fname = get_field_name (field);
 		if (field.label == FieldDescriptorProto.Label.LABEL_REPEATED) {
-			emit_decode_value (decode_method, field, "this.%s.append ({val})".printf (fname));
+			emit_decode_value (decode_method, field, "this.%s.append ({val})".printf (fname), verify_utf8);
 		} else if (is_explicit || field.proto3_optional) {
-			emit_decode_value (decode_method, field, "if (this.%s == null) this.%s = {val}; else this.%s.add_all ({val})".printf (fname, fname, fname));
+			emit_decode_value (decode_method, field, "if (this.%s == null) this.%s = {val}; else this.%s.add_all ({val})".printf (fname, fname, fname), verify_utf8);
 		} else {
-			emit_decode_value (decode_method, field, "this.%s.add_all ({val})".printf (fname));
+			emit_decode_value (decode_method, field, "this.%s.add_all ({val})".printf (fname), verify_utf8);
 			if (is_required) {
 				decode_method.add_statement ("have_%s = true".printf (field.name));
 			}
@@ -50,7 +50,7 @@ private class FieldMaskHandler : WktHandler {
 		first = false;
 	}
 
-	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template) {
+	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template, bool verify_utf8 = false) {
 		decode_method.add_statement ("var fm_len = buffer.decode_length ()");
 		decode_method.add_statement ("var fm_end = buffer.read_index + fm_len");
 		decode_method.add_statement ("var fm_val = new Gee.ArrayList<string> ()");
@@ -58,7 +58,11 @@ private class FieldMaskHandler : WktHandler {
 		decode_method.add_statement ("var fm_tag = buffer.decode_varint ()");
 		decode_method.add_statement ("var fm_num = fm_tag >> 3");
 		decode_method.begin_control_flow ("if (fm_num == 1)");
-		decode_method.add_statement ("fm_val.add (buffer.decode_string ((size_t) buffer.decode_length ()))");
+		if (verify_utf8) {
+			decode_method.add_statement ("fm_val.add (buffer.decode_utf8_string ((size_t) buffer.decode_length ()))");
+		} else {
+			decode_method.add_statement ("fm_val.add (buffer.decode_string ((size_t) buffer.decode_length ()))");
+		}
 		decode_method.next_control_flow ("else");
 		decode_method.add_statement ("this.unknown_fields.prepend (buffer.decode_unknown_field (fm_tag))");
 		decode_method.end_control_flow (); // end if

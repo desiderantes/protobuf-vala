@@ -114,6 +114,29 @@ public class TestMaps : Object {
 			assert_cmpstr (decoded.str_to_mask.get ("mask").get (0), CompareOperator.EQ, "foo.bar");
 		});
 
+		GLib.Test.add_func ("/protobuf-vala/maps/utf8_validation", () => {
+			// Invalid UTF-8 in map string key (field 1: 0A 06 0A 02 FF FE 10 01) fails decode
+			var bad_key = string_to_array ("0A060A02FFFE1001");
+			var bad_key_buf = new DecodeBuffer (bad_key);
+			var bad_key_msg = new Test.Maps.MapMessage ();
+			assert_false (bad_key_msg.decode (bad_key_buf));
+			assert_true (bad_key_buf.error);
+
+			// Invalid UTF-8 in map string value (field 2: 12 06 08 01 12 02 C3 28) fails decode
+			var bad_val = string_to_array ("120608011202C328");
+			var bad_val_buf = new DecodeBuffer (bad_val);
+			var bad_val_msg = new Test.Maps.MapMessage ();
+			assert_false (bad_val_msg.decode (bad_val_buf));
+			assert_true (bad_val_buf.error);
+
+			// Invalid UTF-8 in map FieldMask value (field 8: 42 09 0A 01 6B 12 04 0A 02 FF FE) fails decode
+			var bad_fm_val = string_to_array ("42090A016B12040A02FFFE");
+			var bad_fm_val_buf = new DecodeBuffer (bad_fm_val);
+			var bad_fm_val_msg = new Test.Maps.ExtendedMapMessage ();
+			assert_false (bad_fm_val_msg.decode (bad_fm_val_buf));
+			assert_true (bad_fm_val_buf.error);
+		});
+
 		return GLib.Test.run ();
 	}
 

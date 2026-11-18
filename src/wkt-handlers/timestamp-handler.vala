@@ -21,7 +21,7 @@ private class TimestampHandler : WktHandler {
 		return "new GLib.DateTime.from_unix_utc (0)";
 	}
 
-	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template) {
+	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template, bool verify_utf8 = false) {
 		decode_method.add_statement ("var ts_len = buffer.decode_length ()");
 		decode_method.add_statement ("var ts_end = buffer.read_index + ts_len");
 		decode_method.add_statement ("int64 ts_sec = 0");

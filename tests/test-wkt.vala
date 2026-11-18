@@ -186,6 +186,46 @@ public class TestWkt : Object {
 			assert_true (s.contains ("masks { paths: [\"a.b\"] }"));
 		});
 
+		GLib.Test.add_func ("/protobuf-vala/wkt/utf8_validation", () => {
+			// Valid multi-byte UTF-8 roundtrips on StringValue and FieldMask
+			var wrp_msg = new Test.Wkt.WrapperMessage ();
+			wrp_msg.wrp_string = "héllo";
+			var wrp_enc = new EncodeBuffer ();
+			wrp_msg.encode (wrp_enc);
+			var wrp_dbuf = new DecodeBuffer (wrp_enc.data);
+			var wrp_dec = new Test.Wkt.WrapperMessage.from_data (wrp_dbuf);
+			assert_true (!wrp_dbuf.error);
+			assert_cmpstr (wrp_dec.wrp_string, CompareOperator.EQ, "héllo");
+
+			// Invalid UTF-8 in singular StringValue (field 8: 42 04 0A 02 FF FE) fails decode
+			var bad_str_wrp = string_to_array ("42040A02FFFE");
+			var bad_str_wrp_buf = new DecodeBuffer (bad_str_wrp);
+			var bad_str_wrp_msg = new Test.Wkt.WrapperMessage ();
+			assert_false (bad_str_wrp_msg.decode (bad_str_wrp_buf));
+			assert_true (bad_str_wrp_buf.error);
+
+			// Invalid UTF-8 in repeated StringValue (field 6: 32 04 0A 02 C3 28) fails decode
+			var bad_rep_wrp = string_to_array ("32040A02C328");
+			var bad_rep_wrp_buf = new DecodeBuffer (bad_rep_wrp);
+			var bad_rep_wrp_msg = new Test.Wkt.RepeatedWktMessage ();
+			assert_false (bad_rep_wrp_msg.decode (bad_rep_wrp_buf));
+			assert_true (bad_rep_wrp_buf.error);
+
+			// Invalid UTF-8 in singular FieldMask (field 1: 0A 04 0A 02 FF FE) fails decode
+			var bad_fm = string_to_array ("0A040A02FFFE");
+			var bad_fm_buf = new DecodeBuffer (bad_fm);
+			var bad_fm_msg = new Test.Wkt.FieldMaskMessage ();
+			assert_false (bad_fm_msg.decode (bad_fm_buf));
+			assert_true (bad_fm_buf.error);
+
+			// Invalid UTF-8 in repeated FieldMask (field 7: 3A 04 0A 02 C3 28) fails decode
+			var bad_rep_fm = string_to_array ("3A040A02C328");
+			var bad_rep_fm_buf = new DecodeBuffer (bad_rep_fm);
+			var bad_rep_fm_msg = new Test.Wkt.RepeatedWktMessage ();
+			assert_false (bad_rep_fm_msg.decode (bad_rep_fm_buf));
+			assert_true (bad_rep_fm_buf.error);
+		});
+
 		return GLib.Test.run ();
 	}
 

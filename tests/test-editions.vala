@@ -158,6 +158,13 @@ public class TestEditions : Object {
 			var bad_mv_msg = new Test.Editions2023.DefaultsMsg ();
 			assert_false (bad_mv_msg.decode (bad_mv_buf));
 			assert_true (bad_mv_buf.error);
+
+			// Invalid UTF-8 in FieldMask (field 7: 3A 04 0A 02 FF FE)
+			var bad_fm_bytes = string_to_array ("3A040A02FFFE");
+			var bad_fm_buf = new DecodeBuffer (bad_fm_bytes);
+			var bad_fm_msg = new Test.Editions2023.DefaultsMsg ();
+			assert_false (bad_fm_msg.decode (bad_fm_buf));
+			assert_true (bad_fm_buf.error);
 		});
 
 		GLib.Test.add_func ("/protobuf-vala/editions/presence_and_inheritance", () => {
@@ -252,14 +259,19 @@ public class TestEditions : Object {
 		});
 
 		GLib.Test.add_func ("/protobuf-vala/editions/utf8_validation_none", () => {
-			// field 1: FF FE, field 2 map: key=FF, val=C3 28
-			var raw_bytes = string_to_array ("0A02FFFE12070A01FF1202C328");
+			// field 1: FF FE, field 2 map: key=FF, val=C3 28, field 3 StringValue: FF FE, field 4 FieldMask: C3 28
+			var raw_bytes = string_to_array ("0A02FFFE12070A01FF1202C3281A040A02FFFE22040A02C328");
 			var dbuf = new DecodeBuffer (raw_bytes);
 			var msg = new Test.Editions2023.Utf8NoneMsg.from_data (dbuf);
 			assert_true (!dbuf.error);
 			assert_true (msg.raw_str != null);
 			assert_cmpint (msg.raw_str.length, CompareOperator.EQ, 2);
 			assert_cmpint (msg.raw_map.size, CompareOperator.EQ, 1);
+			assert_true (msg.raw_str_wrp != null);
+			assert_cmpint (msg.raw_str_wrp.length, CompareOperator.EQ, 2);
+			assert_true (msg.raw_mask != null);
+			assert_cmpint (msg.raw_mask.size, CompareOperator.EQ, 1);
+			assert_cmpint (msg.raw_mask.get (0).length, CompareOperator.EQ, 2);
 
 			var ebuf = new EncodeBuffer ();
 			msg.encode (ebuf);
@@ -268,6 +280,8 @@ public class TestEditions : Object {
 			assert_true (!dbuf2.error);
 			assert_cmpint (msg2.raw_str.length, CompareOperator.EQ, 2);
 			assert_cmpint (msg2.raw_map.size, CompareOperator.EQ, 1);
+			assert_cmpint (msg2.raw_str_wrp.length, CompareOperator.EQ, 2);
+			assert_cmpint (msg2.raw_mask.size, CompareOperator.EQ, 1);
 		});
 
 		GLib.Test.add_func ("/protobuf-vala/editions/2024_file_inheritance", () => {

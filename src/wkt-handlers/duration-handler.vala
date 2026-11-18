@@ -23,7 +23,7 @@ private class DurationHandler : WktHandler {
 		return "(GLib.TimeSpan) 0";
 	}
 
-	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template) {
+	public override void emit_decode_value (MethodSpec.Builder decode_method, FieldDescriptorProto field, string target_template, bool verify_utf8 = false) {
 		decode_method.add_statement ("var dur_len = buffer.decode_length ()");
 		decode_method.add_statement ("var dur_end = buffer.read_index + dur_len");
 		decode_method.add_statement ("int64 dur_sec = 0");

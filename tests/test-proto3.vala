@@ -159,6 +159,37 @@ public class TestProto3 : Object {
 			assert_true (b_bad_dur.error);
 		});
 
+		GLib.Test.add_func ("/protobuf-vala/proto3/utf8_validation", () => {
+			// Valid multi-byte UTF-8 roundtrips on scalar and optional proto3 strings
+			var msg = new Test.Vala3.ScalarMessage3 ();
+			msg.int_value = 3;
+			msg.string_value = "héllo";
+			var enc = new EncodeBuffer ();
+			msg.encode (enc);
+			var dbuf = new DecodeBuffer (enc.data);
+			var dec = new Test.Vala3.ScalarMessage3.from_data (dbuf);
+			assert_true (!dbuf.error);
+			assert_cmpint (dec.int_value, CompareOperator.EQ, 3);
+			assert_cmpstr (dec.string_value, CompareOperator.EQ, "héllo");
+
+			// Invalid UTF-8 on proto3 scalar string (field 2: 12 02 FF FE) fails decode
+			check_decode_scalar_message ("1202FFFE", 0, "", true);
+
+			// Invalid UTF-8 on proto3 optional string (field 2: 12 02 C3 28) fails decode
+			var bad_opt_str_bytes = string_to_array ("1202C328");
+			var bad_opt_str_buf = new DecodeBuffer (bad_opt_str_bytes);
+			var bad_opt_str_msg = new Test.Vala3.OptionalMessage3 ();
+			assert_false (bad_opt_str_msg.decode (bad_opt_str_buf));
+			assert_true (bad_opt_str_buf.error);
+
+			// Invalid UTF-8 on proto3 optional FieldMask (field 7: 3A 04 0A 02 FF FE) fails decode
+			var bad_opt_fm_bytes = string_to_array ("3A040A02FFFE");
+			var bad_opt_fm_buf = new DecodeBuffer (bad_opt_fm_bytes);
+			var bad_opt_fm_msg = new Test.Vala3.OptionalMessage3 ();
+			assert_false (bad_opt_fm_msg.decode (bad_opt_fm_buf));
+			assert_true (bad_opt_fm_buf.error);
+		});
+
 		return GLib.Test.run ();
 	}
 
