@@ -5,4 +5,4 @@ revision = master
 depth = 1
 
 [provide]
-valapoet-0.1 = valapoet_dep
+valapoet-0.2 = valapoet_dep

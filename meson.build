@@ -2,7 +2,7 @@ project(
     'protobuf-vala',
     'vala',
     'c',
-    version: '1.0.0',
+    version: '1.2.0',
     meson_version: '>= 1.10.0',
     default_options: [
         'warning_level=2',
@@ -14,7 +14,6 @@ project(
 cc = meson.get_compiler('c')
 valac = meson.get_compiler('vala')
 pkgconfig = import('pkgconfig')
-g_ir_compiler = find_program('g-ir-compiler', required: false)
 
 project_c_args = []
 test_c_args = [

@@ -1,0 +1,6 @@
+option(
+    'protobuf_proto_dir',
+    type: 'string',
+    value: '',
+    description: 'Directory containing google/protobuf/descriptor.proto and compiler/plugin.proto for regen-proto',
+)

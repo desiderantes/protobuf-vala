@@ -8,7 +8,7 @@ Vala support for Protocol Buffers (proto2 and proto3).
 - Meson (`>= 1.10.0`) and Ninja
 - GLib 2.0 (`>= 2.80`)
 - `gee-0.8` (required for proto3 `map<K, V>` fields)
-- `libprotobuf-c` and `protoc`
+- `protoc` (Protocol Buffers compiler)
 - (Optional) valapoet (https://github.com/desiderantes/valapoet). This is already included as a meson subproject.
 
 > [!NOTE]
@@ -40,7 +40,7 @@ protoc --plugin=build/src/protoc-gen-vala --vala_out=src my_file.proto
 
 ### Development Environment (`meson devenv`)
 
-`meson devenv` puts `protoc-gen-vala` in your `PATH` (along with uninstalled `pkg-config`, `LD_LIBRARY_PATH`, and `PROTOBUF_VALA_PROTO_PATH`), so `protoc` finds `--vala_out` without `--plugin=`.
+`meson devenv` puts `protoc-gen-vala` in your `PATH` (along with uninstalled `pkg-config` and `LD_LIBRARY_PATH`), so `protoc` finds `--vala_out` without `--plugin=`.
 
 Enter an interactive shell at the repository root once with `-w .`:
 
@@ -84,9 +84,16 @@ protoc --vala_opt=paths=flat,file_extension=.g.vala --vala_out=src my_file.proto
 
 ### Regenerating Built-in Descriptor Schemas
 
-To regenerate `src/descriptor.pb.vala` and `src/plugin.pb.vala` using the newly built `protoc-gen-vala` plugin:
+To regenerate `src/descriptor.pb.vala` and `src/plugin.pb.vala` using the newly built `protoc-gen-vala` plugin (requires protobuf >= 26 `descriptor.proto` / `plugin.proto` headers with Editions support):
 
 ```bash
+ninja -C build regen-proto
+```
+
+By default, Meson auto-detects the proto header directory (`src/proto` if present, otherwise the system `protobuf` include directory). If your system headers are older or located elsewhere, override it with `-Dprotobuf_proto_dir`:
+
+```bash
+meson configure build -Dprotobuf_proto_dir=/path/to/protobuf/src
 ninja -C build regen-proto
 ```
 

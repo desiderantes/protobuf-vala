@@ -41,8 +41,6 @@ valapoet_dep = dependency(
 
 posix_dep = valac.find_library('posix')
 
-proto_dep = dependency('libprotobuf-c')
-
 protobuf_vala_lib = library(
     'protobuf-vala',
     protobuf_vala_sources,
@@ -80,7 +78,6 @@ protoc_gen_vala = executable(
 )
 
 meson.override_find_program('protoc-gen-vala', protoc_gen_vala)
-meson.add_devenv({'PROTOBUF_VALA_PROTO_PATH': meson.current_source_dir() / 'proto'})
 
 protoc_exe = find_program('protoc', required: true)
 
@@ -96,16 +93,42 @@ protoc_vala_generator = generator(
     depends: [protoc_gen_vala],
 )
 
+fs = import('fs')
+regen_proto_dir = get_option('protobuf_proto_dir')
+if regen_proto_dir == ''
+    if fs.exists(meson.current_source_dir() / 'proto/google/protobuf/descriptor.proto')
+        regen_proto_dir = meson.current_source_dir() / 'proto'
+    else
+        protobuf_dep = dependency('protobuf', required: false)
+        if protobuf_dep.found()
+            regen_proto_dir = protobuf_dep.get_variable(pkgconfig: 'includedir', default_value: '')
+        endif
+        if regen_proto_dir == ''
+            regen_proto_dir = fs.parent(fs.parent(protoc_exe.full_path())) / 'include'
+        endif
+    endif
+endif
+summary({'regen-proto proto dir': regen_proto_dir}, section: 'Codegen')
+
+sh = find_program('sh')
 run_target(
     'regen-proto',
     command: [
-        protoc_exe,
-        '--plugin=protoc-gen-vala=' + protoc_gen_vala.full_path(),
-        '--vala_opt=paths=flat',
-        '--proto_path=' + meson.current_source_dir() / 'proto',
-        '--vala_out=' + meson.current_source_dir(),
-        meson.current_source_dir() / 'proto/google/protobuf/descriptor.proto',
-        meson.current_source_dir() / 'proto/google/protobuf/compiler/plugin.proto',
+        sh,
+        '-c',
+        'dir="$1"; protoc_bin="$2"; plugin="$3"; outdir="$4"; ' +
+        'if [ ! -f "$dir/google/protobuf/descriptor.proto" ] || [ ! -f "$dir/google/protobuf/compiler/plugin.proto" ]; then ' +
+        '  echo "error: descriptor.proto or plugin.proto not found under $dir (pass -Dprotobuf_proto_dir=/path/to/protobuf/src)" >&2; exit 1; ' +
+        'fi; ' +
+        'if ! grep -q "enum Edition" "$dir/google/protobuf/descriptor.proto"; then ' +
+        '  echo "error: $dir/google/protobuf/descriptor.proto predates Editions (requires protobuf >= 26 headers); pass -Dprotobuf_proto_dir=/path/to/protobuf/src" >&2; exit 1; ' +
+        'fi; ' +
+        'exec "$protoc_bin" --plugin="protoc-gen-vala=$plugin" --vala_opt=paths=flat --proto_path="$dir" --vala_out="$outdir" "$dir/google/protobuf/descriptor.proto" "$dir/google/protobuf/compiler/plugin.proto"',
+        'regen-proto',
+        regen_proto_dir,
+        protoc_exe.full_path(),
+        protoc_gen_vala.full_path(),
+        meson.current_source_dir(),
     ],
     depends: [protoc_gen_vala],
 )
